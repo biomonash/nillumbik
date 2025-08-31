@@ -1,10 +1,11 @@
 services:
   db:
     image: postgis/postgis:17-3.5
+    # env_file: ../.env.dev
     environment:
-      POSTGRES_USER: biom
-      POSTGRES_PASSWORD: supersecretpassword
-      POSTGRES_DB: nillumbik
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - ./db:/var/lib/postgresql/data
     ports:

@@ -1,6 +1,10 @@
 # Nillumbik Monorepo Makefile
 # Supports both Go backend and TypeScript frontend
 
+# Load environment and export to all commands
+include .env.dev
+export
+
 # Variables
 BINARY_NAME=nillumbik
 BACKEND_DIR=backend
@@ -8,7 +12,7 @@ FRONTEND_DIR=frontend
 DOCKER_DIR=docker
 GO_MAIN=cmd/api/main.go
 DOCKER_COMPOSE_FILE=docker/docker-compose.yml
-POSTGRESQL_URL=postgres://biom:supersecretpassword@localhost:5432/nillumbik?sslmode=disable
+# POSTGRESQL_URL=postgres://biom:supersecretpassword@localhost:5432/nillumbik?sslmode=disable
 
 # Colors for output
 GREEN=\033[0;32m
@@ -31,7 +35,7 @@ install: install-backend install-frontend ## Install all dependencies
 .PHONY: dev
 dev: ## Start development servers for both backend and frontend
 	@printf "$(GREEN)Starting development environment...$(NC)\n"
-	@$(MAKE) -j2 dev-backend dev-frontend
+	@$(MAKE) dev-backend dev-frontend
 
 .PHONY: build
 build: build-backend build-frontend ## Build both backend and frontend
@@ -132,7 +136,7 @@ sqlc-generate: ## Generate Go code from SQL using sqlc
 db-migrate-up: ## Run database migrations up (requires golang-migrate)
 	@printf "$(GREEN)Running database migrations up...$(NC)\n"
 	@if command -v migrate >/dev/null 2>&1; then \
-		cd $(BACKEND_DIR) && migrate -path db/migrations -database $(POSTGRESQL_URL) up; \
+		cd $(BACKEND_DIR) && migrate -path db/migrations -database $(DB_URL) up; \
 	else \
 		printf "$(RED)golang-migrate not installed. Install from: https://github.com/golang-migrate/migrate$(NC)\n"; \
 		exit 1; \
@@ -142,7 +146,7 @@ db-migrate-up: ## Run database migrations up (requires golang-migrate)
 db-migrate-down: ## Run database migrations down (requires golang-migrate)
 	@printf "$(YELLOW)Running database migrations down...$(NC)\n"
 	@if command -v migrate >/dev/null 2>&1; then \
-		cd $(BACKEND_DIR) && migrate -path db/migrations -database $(POSTGRESQL_URL) down; \
+		cd $(BACKEND_DIR) && migrate -path db/migrations -database $(DB_URL) down; \
 	else \
 		printf "$(RED)golang-migrate not installed. Install from: https://github.com/golang-migrate/migrate$(NC)\n"; \
 		exit 1; \
@@ -164,7 +168,7 @@ db-migrate-create: ## Create a new migration file (usage: make db-migrate-create
 
 .PHONY: db-seed
 db-seed:
-		docker compose -f $(DOCKER_COMPOSE_FILE) exec -T db psql $(POSTGRESQL_URL) < $(BACKEND_DIR)/db/seed.sql
+		docker compose -f $(DOCKER_COMPOSE_FILE) exec -T db psql $(DB_URL) < $(BACKEND_DIR)/db/seed.sql
 
 # =============================================================================
 # Frontend (TypeScript) Commands
