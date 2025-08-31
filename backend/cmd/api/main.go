@@ -34,14 +34,11 @@ func run() error {
 
 	querier := db.New(conn)
 	r := gin.Default()
-	siteCtl := site.NewController(querier)
-	site.Register(r, &siteCtl)
+	site.Register(r, site.NewController(querier))
 
-	speciesCtl := species.NewController(querier)
-	species.Register(r, &speciesCtl)
+	species.Register(r, species.NewController(querier))
 
-	observationCtl := observation.NewController(querier)
-	observation.Register(r, &observationCtl)
+	observation.Register(r, observation.NewController(querier))
 
 	r.Run(":8000")
 	return nil
