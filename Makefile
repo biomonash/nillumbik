@@ -11,6 +11,7 @@ BACKEND_DIR=backend
 FRONTEND_DIR=frontend
 DOCKER_DIR=docker
 GO_MAIN=cmd/api/main.go
+GO_IMPORTER=cmd/importer/main.go
 DOCKER_COMPOSE_FILE=docker/docker-compose.yml
 # POSTGRESQL_URL=postgres://biom:supersecretpassword@localhost:5432/nillumbik?sslmode=disable
 
@@ -82,6 +83,10 @@ dev-backend: ## Start backend in development mode with hot reload (requires air)
 		printf "$(YELLOW)Running without hot reload...$(NC)\n"; \
 		$(MAKE) run-backend; \
 	fi
+
+.PHONY: run-import
+run-import:
+	@cd $(BACKEND_DIR) && go run $(GO_IMPORTER)
 
 .PHONY: test-backend
 test-backend: ## Run Go tests

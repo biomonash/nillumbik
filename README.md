@@ -41,6 +41,7 @@ make dev
 - `make run-backend` - Run Go backend
 - `make sqlc-generate` - Generate code from SQL (only required when schema changed)
 - `make test-backend-coverage` - Run tests with coverage
+- `make run-import` - Run CSV importer `cmd/importer/main.go`
 
 ### Frontend (TypeScript)
 - `make init-frontend` - Initialize new React+TypeScript frontend
