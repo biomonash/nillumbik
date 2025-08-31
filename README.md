@@ -19,8 +19,11 @@ make install
 # Start database
 make docker-up
 
-# Generate SQL code
-make sqlc-generate
+# Migrate database
+make db-migrate-up
+
+# Seed database with sample values
+make db-seed
 
 # Start development servers
 make dev
@@ -36,8 +39,9 @@ make dev
 
 ### Backend (Go)
 - `make run-backend` - Run Go backend
-- `make sqlc-generate` - Generate code from SQL
+- `make sqlc-generate` - Generate code from SQL (only required when schema changed)
 - `make test-backend-coverage` - Run tests with coverage
+- `make run-import` - Run CSV importer `cmd/importer/main.go`
 
 ### Frontend (TypeScript)
 - `make init-frontend` - Initialize new React+TypeScript frontend
@@ -45,7 +49,10 @@ make dev
 
 ### Database
 - `make docker-up` - Start PostgreSQL database
+- `make docker-down` - Stop PostgreSQL database
 - `make db-migrate-up` - Run database migrations
+- `make db-migrate-down` - Revert database migrations
+- `make db-migrate-create name=[migration name]` - Create new migration files
 
 ### Utilities
 - `make help` - Show all available commands

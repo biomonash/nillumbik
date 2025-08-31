@@ -9,11 +9,32 @@ import (
 )
 
 type Querier interface {
-	CreateAuthor(ctx context.Context, arg CreateAuthorParams) (Author, error)
-	DeleteAuthor(ctx context.Context, id int64) error
-	GetAuthor(ctx context.Context, id int64) (Author, error)
-	ListAuthors(ctx context.Context) ([]Author, error)
-	UpdateAuthor(ctx context.Context, arg UpdateAuthorParams) error
+	CountObservations(ctx context.Context) (int64, error)
+	CountObservationsBySite(ctx context.Context, siteID int64) (int64, error)
+	CountObservationsBySpecies(ctx context.Context, speciesID int64) (int64, error)
+	CountSites(ctx context.Context) (int64, error)
+	CountSpecies(ctx context.Context) (int64, error)
+	CreateObservation(ctx context.Context, arg CreateObservationParams) (Observation, error)
+	CreateSite(ctx context.Context, arg CreateSiteParams) (Site, error)
+	CreateSpecies(ctx context.Context, arg CreateSpeciesParams) (Species, error)
+	DeleteObservation(ctx context.Context, id int64) error
+	DeleteSite(ctx context.Context, id int64) error
+	DeleteSiteByCode(ctx context.Context, code string) error
+	DeleteSpecies(ctx context.Context, id int64) error
+	GetObservation(ctx context.Context, id int64) (GetObservationRow, error)
+	GetSite(ctx context.Context, id int64) (Site, error)
+	GetSiteByCode(ctx context.Context, code string) (Site, error)
+	GetSpecies(ctx context.Context, id int64) (Species, error)
+	ListObservations(ctx context.Context) ([]ListObservationsRow, error)
+	ListSites(ctx context.Context) ([]Site, error)
+	ListSpecies(ctx context.Context) ([]Species, error)
+	SearchObservations(ctx context.Context, scientificName string) ([]SearchObservationsRow, error)
+	SearchSites(ctx context.Context, code string) ([]Site, error)
+	SearchSpecies(ctx context.Context, scientificName string) ([]Species, error)
+	UpdateObservation(ctx context.Context, arg UpdateObservationParams) (Observation, error)
+	UpdateSite(ctx context.Context, arg UpdateSiteParams) (Site, error)
+	UpdateSiteByCode(ctx context.Context, arg UpdateSiteByCodeParams) (Site, error)
+	UpdateSpecies(ctx context.Context, arg UpdateSpeciesParams) (Species, error)
 }
 
 var _ Querier = (*Queries)(nil)

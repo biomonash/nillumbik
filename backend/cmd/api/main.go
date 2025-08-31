@@ -3,18 +3,30 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
+	"github.com/joho/godotenv"
 
-	"github.com/lancatlin/nillumbik/internal/author"
 	"github.com/lancatlin/nillumbik/internal/db"
+	"github.com/lancatlin/nillumbik/internal/observation"
+	"github.com/lancatlin/nillumbik/internal/site"
+	"github.com/lancatlin/nillumbik/internal/species"
 )
+
+func init() {
+	err := godotenv.Load(".env.dev")
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
 
 func run() error {
 	ctx := context.Background()
 
-	conn, err := pgx.Connect(ctx, "postgres://postgres:supersecretpassword@localhost:5432/nillumbik")
+	dbUrl := os.Getenv("DB_URL")
+	conn, err := pgx.Connect(ctx, dbUrl)
 	if err != nil {
 		return err
 	}
@@ -22,8 +34,11 @@ func run() error {
 
 	querier := db.New(conn)
 	r := gin.Default()
-	authorCtl := author.NewController(querier)
-	author.Register(r, &authorCtl)
+	site.Register(r, site.NewController(querier))
+
+	species.Register(r, species.NewController(querier))
+
+	observation.Register(r, observation.NewController(querier))
 
 	r.Run(":8000")
 	return nil

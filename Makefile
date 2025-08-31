@@ -1,13 +1,19 @@
 # Nillumbik Monorepo Makefile
 # Supports both Go backend and TypeScript frontend
 
+# Load environment and export to all commands
+include .env.dev
+export
+
 # Variables
 BINARY_NAME=nillumbik
 BACKEND_DIR=backend
 FRONTEND_DIR=frontend
 DOCKER_DIR=docker
 GO_MAIN=cmd/api/main.go
+GO_IMPORTER=cmd/importer/main.go
 DOCKER_COMPOSE_FILE=docker/docker-compose.yml
+# POSTGRESQL_URL=postgres://biom:supersecretpassword@localhost:5432/nillumbik?sslmode=disable
 
 # Colors for output
 GREEN=\033[0;32m
@@ -30,7 +36,7 @@ install: install-backend install-frontend ## Install all dependencies
 .PHONY: dev
 dev: ## Start development servers for both backend and frontend
 	@printf "$(GREEN)Starting development environment...$(NC)\n"
-	@$(MAKE) -j2 dev-backend dev-frontend
+	@$(MAKE) dev-backend dev-frontend
 
 .PHONY: build
 build: build-backend build-frontend ## Build both backend and frontend
@@ -77,6 +83,10 @@ dev-backend: ## Start backend in development mode with hot reload (requires air)
 		printf "$(YELLOW)Running without hot reload...$(NC)\n"; \
 		$(MAKE) run-backend; \
 	fi
+
+.PHONY: run-import
+run-import:
+	@cd $(BACKEND_DIR) && go run $(GO_IMPORTER)
 
 .PHONY: test-backend
 test-backend: ## Run Go tests
@@ -131,7 +141,7 @@ sqlc-generate: ## Generate Go code from SQL using sqlc
 db-migrate-up: ## Run database migrations up (requires golang-migrate)
 	@printf "$(GREEN)Running database migrations up...$(NC)\n"
 	@if command -v migrate >/dev/null 2>&1; then \
-		cd $(BACKEND_DIR) && migrate -path db/migrations -database "postgres://postgres:supersecretpassword@localhost:5432/postgres?sslmode=disable" up; \
+		cd $(BACKEND_DIR) && migrate -path db/migrations -database $(DB_URL) up; \
 	else \
 		printf "$(RED)golang-migrate not installed. Install from: https://github.com/golang-migrate/migrate$(NC)\n"; \
 		exit 1; \
@@ -141,11 +151,29 @@ db-migrate-up: ## Run database migrations up (requires golang-migrate)
 db-migrate-down: ## Run database migrations down (requires golang-migrate)
 	@printf "$(YELLOW)Running database migrations down...$(NC)\n"
 	@if command -v migrate >/dev/null 2>&1; then \
-		cd $(BACKEND_DIR) && migrate -path db/migrations -database "postgres://postgres:supersecretpassword@localhost:5432/postgres?sslmode=disable" down; \
+		cd $(BACKEND_DIR) && migrate -path db/migrations -database $(DB_URL) down; \
 	else \
 		printf "$(RED)golang-migrate not installed. Install from: https://github.com/golang-migrate/migrate$(NC)\n"; \
 		exit 1; \
 	fi
+
+.PHONY: db-migrate-create
+db-migrate-create: ## Create a new migration file (usage: make db-migrate-create name=migration_name)
+	@if [ -z "$(name)" ]; then \
+		printf "$(RED)Error: Migration name not provided. Usage: make db-migrate-create name=migration_name$(NC)\n"; \
+		exit 1; \
+	fi
+	@printf "$(GREEN)Creating new migration file: $(name)...$(NC)\n"
+	@if command -v migrate >/dev/null 2>&1; then \
+		cd $(BACKEND_DIR) && migrate create -ext sql -dir db/migrations -seq $(name); \
+	else \
+		printf "$(RED)golang-migrate not installed. Install from: https://github.com/golang-migrate/migrate$(NC)\n"; \
+		exit 1; \
+	fi
+
+.PHONY: db-seed
+db-seed:
+		docker compose -f $(DOCKER_COMPOSE_FILE) exec -T db psql $(DB_URL) < $(BACKEND_DIR)/db/seed.sql
 
 # =============================================================================
 # Frontend (TypeScript) Commands
@@ -251,8 +279,9 @@ setup-dev: ## Setup development environment
 	@printf "$(GREEN)Setting up development environment...$(NC)\n"
 	@echo "Installing development tools..."
 	@printf "$(YELLOW)Recommended tools to install:$(NC)\n"
-	go install github.com/air-verse/air@latest
-	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+	go install github.com/air-verse/air@v1.62.0
+	go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.29.0
+	go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.0
 	@$(MAKE) install
 
 .PHONY: check

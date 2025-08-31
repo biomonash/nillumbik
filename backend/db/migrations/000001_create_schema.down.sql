@@ -1,0 +1,14 @@
+BEGIN;
+
+DROP TABLE IF EXISTS observations;
+DROP TABLE IF EXISTS species;
+DROP TABLE IF EXISTS sites;
+
+DROP TYPE IF EXISTS tenure_type;
+DROP TYPE IF EXISTS forest_type;
+DROP TYPE IF EXISTS taxa;
+DROP TYPE IF EXISTS observation_method;
+
+-- DROP EXTENSION postgis;
+
+COMMIT;

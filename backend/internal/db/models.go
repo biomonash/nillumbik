@@ -4,8 +4,211 @@
 
 package db
 
-type Author struct {
-	ID   int64   `json:"id"`
-	Name string  `json:"name"`
-	Bio  *string `json:"bio"`
+import (
+	"database/sql/driver"
+	"fmt"
+
+	"github.com/jackc/pgx/v5/pgtype"
+)
+
+type ForestType string
+
+const (
+	ForestTypeDry ForestType = "dry"
+	ForestTypeWet ForestType = "wet"
+)
+
+func (e *ForestType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = ForestType(s)
+	case string:
+		*e = ForestType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for ForestType: %T", src)
+	}
+	return nil
+}
+
+type NullForestType struct {
+	ForestType ForestType `json:"forest_type"`
+	Valid      bool       `json:"valid"` // Valid is true if ForestType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullForestType) Scan(value interface{}) error {
+	if value == nil {
+		ns.ForestType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.ForestType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullForestType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.ForestType), nil
+}
+
+type ObservationMethod string
+
+const (
+	ObservationMethodAudio    ObservationMethod = "audio"
+	ObservationMethodCamera   ObservationMethod = "camera"
+	ObservationMethodObserved ObservationMethod = "observed"
+)
+
+func (e *ObservationMethod) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = ObservationMethod(s)
+	case string:
+		*e = ObservationMethod(s)
+	default:
+		return fmt.Errorf("unsupported scan type for ObservationMethod: %T", src)
+	}
+	return nil
+}
+
+type NullObservationMethod struct {
+	ObservationMethod ObservationMethod `json:"observation_method"`
+	Valid             bool              `json:"valid"` // Valid is true if ObservationMethod is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullObservationMethod) Scan(value interface{}) error {
+	if value == nil {
+		ns.ObservationMethod, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.ObservationMethod.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullObservationMethod) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.ObservationMethod), nil
+}
+
+type Taxa string
+
+const (
+	TaxaBird    Taxa = "bird"
+	TaxaMammal  Taxa = "mammal"
+	TaxaReptile Taxa = "reptile"
+)
+
+func (e *Taxa) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Taxa(s)
+	case string:
+		*e = Taxa(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Taxa: %T", src)
+	}
+	return nil
+}
+
+type NullTaxa struct {
+	Taxa  Taxa `json:"taxa"`
+	Valid bool `json:"valid"` // Valid is true if Taxa is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullTaxa) Scan(value interface{}) error {
+	if value == nil {
+		ns.Taxa, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.Taxa.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullTaxa) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.Taxa), nil
+}
+
+type TenureType string
+
+const (
+	TenureTypePublic  TenureType = "public"
+	TenureTypePrivate TenureType = "private"
+)
+
+func (e *TenureType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = TenureType(s)
+	case string:
+		*e = TenureType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for TenureType: %T", src)
+	}
+	return nil
+}
+
+type NullTenureType struct {
+	TenureType TenureType `json:"tenure_type"`
+	Valid      bool       `json:"valid"` // Valid is true if TenureType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullTenureType) Scan(value interface{}) error {
+	if value == nil {
+		ns.TenureType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.TenureType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullTenureType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.TenureType), nil
+}
+
+type Observation struct {
+	ID             int64                     `json:"id"`
+	SiteID         int64                     `json:"site_id"`
+	SpeciesID      int64                     `json:"species_id"`
+	Timestamp      pgtype.Timestamptz        `json:"timestamp"`
+	Method         ObservationMethod         `json:"method"`
+	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
+	Temperature    *int32                    `json:"temperature"`
+	Narrative      *string                   `json:"narrative"`
+	Confidence     *float32                  `json:"confidence"`
+	Indicator      bool                      `json:"indicator"`
+	Reportable     bool                      `json:"reportable"`
+}
+
+type Site struct {
+	ID       int64       `json:"id"`
+	Code     string      `json:"code"`
+	Block    int32       `json:"block"`
+	Name     *string     `json:"name"`
+	Location interface{} `json:"location"`
+	Tenure   TenureType  `json:"tenure"`
+	Forest   ForestType  `json:"forest"`
+}
+
+type Species struct {
+	ID             int64  `json:"id"`
+	ScientificName string `json:"scientific_name"`
+	CommonName     string `json:"common_name"`
+	Native         bool   `json:"native"`
+	Taxa           Taxa   `json:"taxa"`
 }
