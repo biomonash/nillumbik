@@ -28,20 +28,43 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		return fmt.Errorf("failed to read CSV: %w", err)
 	}
 
+	const minCols = 23 // adjust if your CSV has more/less columns
 	for i, row := range records {
 		if i == 0 {
 			continue // skip header
 		}
 
-		// --- Parse site ---
-		siteCode := row[1]
-		block, _ := strconv.Atoi(row[21])
-		forest := strings.ToLower(row[16])
-		tenure := strings.ToLower(row[19])
-		lat, lon := parseCoords(row[2], row[3])
+		if len(row) < minCols {
+			return fmt.Errorf("row %d: unexpected column count %d, want >= %d", i+1, len(row), minCols)
+		}
 
-		// Convert to PostGIS point
-		location := fmt.Sprintf("SRID=4326;POINT(%f %f)", lon, lat)
+		// --- Parse site ---
+		siteCode := strings.TrimSpace(row[1])
+
+		blockInt, err := strconv.Atoi(strings.TrimSpace(row[21]))
+		if err != nil {
+			return fmt.Errorf("row %d: invalid block value %q: %w", i+1, row[21], err)
+		}
+		block := int32(blockInt)
+
+		forest := strings.ToLower(strings.TrimSpace(row[16]))
+		tenure := strings.ToLower(strings.TrimSpace(row[19]))
+
+		latStr, lonStr := strings.TrimSpace(row[2]), strings.TrimSpace(row[3])
+
+		// location for CreateSiteParams is interface{} in generated code.
+		// Provide WKT string when coords present, otherwise nil to insert NULL.
+		var location interface{}
+		if latStr != "" && lonStr != "" && latStr != "####" && lonStr != "####" {
+			lat, lon, err := parseCoords(latStr, lonStr)
+			if err != nil {
+				return fmt.Errorf("row %d: invalid coords %q,%q: %w", i+1, latStr, lonStr, err)
+			}
+			// WKT: POINT(lon lat)
+			location = fmt.Sprintf("POINT(%f %f)", lon, lat)
+		} else {
+			location = nil
+		}
 
 		var tenureEnum db.TenureType
 		switch tenure {
@@ -64,13 +87,13 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		}
 
 		// Check if site exists
-		site, err := q.GetSiteByCode(ctx, siteCode)
+		siteID, err := q.GetSiteIDByCode(ctx, siteCode)
 		if err != nil {
 			if err == pgx.ErrNoRows {
-				// Site does not exist, insert
-				site, err = q.CreateSite(ctx, db.CreateSiteParams{
+				// Site does not exist, insert and get full site
+				site, err := q.CreateSite(ctx, db.CreateSiteParams{
 					Code:     siteCode,
-					Block:    int32(block),
+					Block:    block,
 					Name:     &siteCode,
 					Tenure:   tenureEnum,
 					Forest:   forestEnum,
@@ -79,12 +102,11 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 				if err != nil {
 					return fmt.Errorf("insert site failed: %w", err)
 				}
+				siteID = site.ID
 			} else {
-				// Some other error occurred
-				return fmt.Errorf("failed to get site by code: %w", err)
+				return fmt.Errorf("failed to get site id by code: %w", err)
 			}
 		}
-		siteID := site.ID
 
 		// --- Parse species ---
 		scientific := row[14]
@@ -104,19 +126,38 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 			return fmt.Errorf("unknown taxa: %s", taxa)
 		}
 
-		species, err := q.CreateSpecies(ctx, db.CreateSpeciesParams{
-			ScientificName: scientific,
-			CommonName:     common,
-			Native:         native,
-			Taxa:           taxaEnum,
-		})
+		// Try to find species by scientific name
+		speciesList, err := q.SearchSpecies(ctx, scientific)
 		if err != nil {
-			return fmt.Errorf("insert species failed: %w", err)
+			return fmt.Errorf("failed to search species: %w", err)
+		}
+
+		var species db.Species
+		if len(speciesList) > 0 {
+			species = speciesList[0]
+		} else {
+			// Species does not exist, insert
+			species, err = q.CreateSpecies(ctx, db.CreateSpeciesParams{
+				ScientificName: scientific,
+				CommonName:     common,
+				Native:         native,
+				Taxa:           taxaEnum,
+			})
+			if err != nil {
+				return fmt.Errorf("insert species failed: %w", err)
+			}
 		}
 		speciesID := species.ID
 
 		// --- Parse observation ---
-		ts := parseTimestamp(row[4], row[5])
+		ts, err := parseTimestamp(row[4], row[5])
+		var tsPG pgtype.Timestamptz
+		if err != nil {
+			// fallback to now because DB requires NOT NULL
+			tsPG = pgtype.Timestamptz{Time: time.Now().UTC(), Valid: true}
+		} else {
+			tsPG = pgtype.Timestamptz{Time: ts, Valid: true}
+		}
 
 		var method db.ObservationMethod
 		switch strings.ToLower(row[6]) {
@@ -153,10 +194,6 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 			confidencePtr = &conf
 		}
 
-		tsPG := pgtype.Timestamptz{
-			Time: ts,
-		}
-
 		indicator := strings.ToLower(row[17]) == "y"
 		reportable := strings.ToLower(row[20]) == "y"
 
@@ -185,26 +222,39 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 }
 
 // --- Helpers ---
-func parseCoords(latStr, lonStr string) (float64, float64) {
-	lat, _ := strconv.ParseFloat(latStr, 64)
-	lon, _ := strconv.ParseFloat(lonStr, 64)
-	return lat, lon
+func parseCoords(latStr, lonStr string) (float64, float64, error) {
+	lat, err := strconv.ParseFloat(latStr, 64)
+	if err != nil {
+		return 0, 0, err
+	}
+	lon, err := strconv.ParseFloat(lonStr, 64)
+	if err != nil {
+		return 0, 0, err
+	}
+	return lat, lon, nil
 }
 
-func parseTimestamp(dateStr, timeStr string) time.Time {
+func parseTimestamp(dateStr, timeStr string) (time.Time, error) {
+	if strings.TrimSpace(dateStr) == "" || strings.TrimSpace(timeStr) == "" {
+		return time.Time{}, fmt.Errorf("missing date or time")
+	}
 	layout := "2-Jan-06 3:04 pm"
 	t, err := time.Parse(layout, dateStr+" "+timeStr)
 	if err != nil {
-		panic(err)
+		return time.Time{}, err
 	}
-	return t
+	return t, nil
 }
 
 func parseOptionalInt(s string) *int32 {
+	s = strings.TrimSpace(s)
 	if s == "" {
 		return nil
 	}
-	v, _ := strconv.Atoi(s)
+	v, err := strconv.Atoi(s)
+	if err != nil {
+		return nil
+	}
 	val := int32(v)
 	return &val
 }
