@@ -6,6 +6,7 @@ include .env.dev
 export
 
 # Variables
+MAKE=make
 BINARY_NAME=nillumbik
 BACKEND_DIR=backend
 FRONTEND_DIR=frontend
@@ -36,7 +37,7 @@ install: install-backend install-frontend ## Install all dependencies
 .PHONY: dev
 dev: ## Start development servers for both backend and frontend
 	@printf "$(GREEN)Starting development environment...$(NC)\n"
-	@$(MAKE) dev-backend dev-frontend
+	@$(MAKE) -j 2 dev-backend dev-frontend
 
 .PHONY: build
 build: build-backend build-frontend ## Build both backend and frontend
@@ -183,7 +184,7 @@ db-seed:
 install-frontend: ## Install Node.js dependencies
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Installing Node.js dependencies...$(NC)\n"; \
-		cd $(FRONTEND_DIR) && npm install; \
+		cd $(FRONTEND_DIR) && yarn install; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend installation.$(NC)\n"; \
 	fi
@@ -192,7 +193,7 @@ install-frontend: ## Install Node.js dependencies
 build-frontend: ## Build the TypeScript frontend
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Building TypeScript frontend...$(NC)\n"; \
-		cd $(FRONTEND_DIR) && npm run build; \
+		cd $(FRONTEND_DIR) && yarn build; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend build.$(NC)\n"; \
 	fi
@@ -201,7 +202,7 @@ build-frontend: ## Build the TypeScript frontend
 dev-frontend: ## Start frontend in development mode
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Starting frontend development server...$(NC)\n"; \
-		cd $(FRONTEND_DIR) && npm run dev; \
+		cd $(FRONTEND_DIR) && yarn dev; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend dev server.$(NC)\n"; \
 	fi
@@ -210,7 +211,7 @@ dev-frontend: ## Start frontend in development mode
 test-frontend: ## Run TypeScript/JavaScript tests
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Running frontend tests...$(NC)\n"; \
-		cd $(FRONTEND_DIR) && npm test; \
+		cd $(FRONTEND_DIR) && yarn test; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend tests.$(NC)\n"; \
 	fi
@@ -219,7 +220,7 @@ test-frontend: ## Run TypeScript/JavaScript tests
 lint-frontend: ## Run frontend linter
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Running frontend linter...$(NC)\n"; \
-		cd $(FRONTEND_DIR) && npm run lint; \
+		cd $(FRONTEND_DIR) && yarn lint; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend linting.$(NC)\n"; \
 	fi
@@ -228,7 +229,7 @@ lint-frontend: ## Run frontend linter
 format-frontend: ## Format frontend code
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Formatting frontend code...$(NC)\n"; \
-		cd $(FRONTEND_DIR) && npm run format; \
+		cd $(FRONTEND_DIR) && yarn format; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend formatting.$(NC)\n"; \
 	fi
@@ -291,15 +292,6 @@ check: ## Run all checks (lint, test, build)
 	@$(MAKE) test
 	@$(MAKE) build
 
-.PHONY: init-frontend
-init-frontend: ## Initialize a new TypeScript frontend (using Vite + React)
-	@printf "$(GREEN)Initializing TypeScript frontend...$(NC)\n"
-	@if [ ! -f "$(FRONTEND_DIR)/package.json" ]; then \
-		npm create vite@latest $(FRONTEND_DIR) -- --template react-ts; \
-		printf "$(GREEN)Frontend initialized! Run 'make install-frontend' to install dependencies.$(NC)\n"; \
-	else \
-		printf "$(YELLOW)Frontend already exists!$(NC)\n"; \
-	fi
 
 # Legacy compatibility (matches your original Makefile)
 .PHONY: run docker
