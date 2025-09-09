@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/lancatlin/nillumbik/internal/db"
@@ -15,36 +16,48 @@ import (
 func main() {
 	fmt.Println("Starting CSV import...")
 
-	// Flags for CSV path and DB connection string
-	csvPath := flag.String("csv", "", "Path to the CSV file to import")
-	dbURL := flag.String("db", "", "PostgreSQL connection string")
-	flag.Parse()
-
-	// Allow env vars as fallback
-	if *dbURL == "" {
-		*dbURL = os.Getenv("DATABASE_URL")
-	}
-	if *csvPath == "" {
-		*csvPath = os.Getenv("CSV_PATH")
+	// Load DB connection string from environment
+	connStr := os.Getenv("DB_URL")
+	if connStr == "" {
+		log.Fatal("DB_URL environment variable not set")
 	}
 
-	if *dbURL == "" || *csvPath == "" {
-		log.Fatal("Database connection string and CSV path must be provided via flags or environment variables")
-	}
+	// Setup context with cancellation for graceful shutdown
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Handle OS signals for graceful shutdown
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-sigCh
+		fmt.Println("\nInterrupt received, shutting down...")
+		cancel()
+	}()
 
 	// Connect to PostgreSQL
-	pool, err := pgxpool.New(context.Background(), *dbURL)
+	pool, err := pgxpool.New(ctx, connStr)
 	if err != nil {
-		log.Fatal("failed to connect to DB:", err)
+		log.Fatalf("Failed to connect to DB: %v", err)
 	}
 	defer pool.Close()
 
 	q := db.New(pool)
 
-	// Call the importer
-	err = importer.ImportCSV(context.Background(), q, *csvPath)
-	if err != nil {
-		log.Fatal("Import failed:", err)
+	// Determine CSV path (environment variable fallback or default relative path)
+	csvPath := os.Getenv("CSV_PATH")
+	if csvPath == "" {
+		csvPath = "./data/nillumbik.csv"
+	}
+
+	// Check that CSV file exists
+	if _, err := os.Stat(csvPath); err != nil {
+		log.Fatalf("CSV file not found at %s: %v", csvPath, err)
+	}
+
+	// Run importer
+	if err := importer.ImportCSV(ctx, q, csvPath); err != nil {
+		log.Fatalf("Import failed: %v", err)
 	}
 
 	fmt.Println("Import completed successfully!")
