@@ -12,6 +12,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/lancatlin/nillumbik/internal/db"
+	"github.com/lancatlin/nillumbik/internal/species"
 )
 
 func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
@@ -103,13 +104,17 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		default:
 			return fmt.Errorf("unknown taxa: %s", taxa)
 		}
-
-		species, err := q.CreateSpecies(ctx, db.CreateSpeciesParams{
+		species, err := q.GetSpecies(ctx, scientific)
+		if err != nil && err != pgx.ErrNoRows {
+			species, err := q.CreateSpecies(ctx, db.CreateSpeciesParams{
 			ScientificName: scientific,
 			CommonName:     common,
 			Native:         native,
 			Taxa:           taxaEnum,
 		})
+			return fmt.Errorf("failed to get species: %w", err)
+		}
+		
 		if err != nil {
 			return fmt.Errorf("insert species failed: %w", err)
 		}
