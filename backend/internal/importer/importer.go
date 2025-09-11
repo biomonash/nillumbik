@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/biomonash/nillumbik/internal/db"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/lancatlin/nillumbik/internal/db"
 )
 
 func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
