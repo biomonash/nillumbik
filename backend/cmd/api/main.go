@@ -11,11 +11,11 @@ import (
 	swaggerFiles "github.com/swaggo/files"     // swagger embed files
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 
-	_ "github.com/lancatlin/nillumbik/docs"
-	"github.com/lancatlin/nillumbik/internal/db"
-	"github.com/lancatlin/nillumbik/internal/observation"
-	"github.com/lancatlin/nillumbik/internal/site"
-	"github.com/lancatlin/nillumbik/internal/species"
+	_ "github.com/biomonash/nillumbik/docs"
+	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/observation"
+	"github.com/biomonash/nillumbik/internal/site"
+	"github.com/biomonash/nillumbik/internal/species"
 )
 
 func init() {

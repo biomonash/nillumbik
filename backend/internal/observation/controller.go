@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lancatlin/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/db"
 )
 
 type Controller struct {

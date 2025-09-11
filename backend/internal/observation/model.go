@@ -3,7 +3,7 @@ package observation
 import (
 	"time"
 
-	"github.com/lancatlin/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/db"
 )
 
 type Observation struct {

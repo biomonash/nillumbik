@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/lancatlin/nillumbik/internal/importer"
+	"github.com/biomonash/nillumbik/internal/importer"
 )
 
 func main() {
