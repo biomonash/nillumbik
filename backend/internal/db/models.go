@@ -191,8 +191,6 @@ type Observation struct {
 	Temperature    *int32                    `json:"temperature"`
 	Narrative      *string                   `json:"narrative"`
 	Confidence     *float32                  `json:"confidence"`
-	Indicator      bool                      `json:"indicator"`
-	Reportable     bool                      `json:"reportable"`
 }
 
 type Site struct {
@@ -211,4 +209,6 @@ type Species struct {
 	CommonName     string `json:"common_name"`
 	Native         bool   `json:"native"`
 	Taxa           Taxa   `json:"taxa"`
+	Indicator      bool   `json:"indicator"`
+	Reportable     bool   `json:"reportable"`
 }

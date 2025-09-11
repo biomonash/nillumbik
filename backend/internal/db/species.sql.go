@@ -21,9 +21,9 @@ func (q *Queries) CountSpecies(ctx context.Context) (int64, error) {
 }
 
 const createSpecies = `-- name: CreateSpecies :one
-INSERT INTO species (scientific_name, common_name, native, taxa)
-VALUES ($1, $2, $3, $4)
-RETURNING id, scientific_name, common_name, native, taxa
+INSERT INTO species (scientific_name, common_name, native, taxa, indicator, reportable)
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING id, scientific_name, common_name, native, taxa, indicator, reportable
 `
 
 type CreateSpeciesParams struct {
@@ -31,6 +31,8 @@ type CreateSpeciesParams struct {
 	CommonName     string `json:"common_name"`
 	Native         bool   `json:"native"`
 	Taxa           Taxa   `json:"taxa"`
+	Indicator      bool   `json:"indicator"`
+	Reportable     bool   `json:"reportable"`
 }
 
 func (q *Queries) CreateSpecies(ctx context.Context, arg CreateSpeciesParams) (Species, error) {
@@ -39,6 +41,8 @@ func (q *Queries) CreateSpecies(ctx context.Context, arg CreateSpeciesParams) (S
 		arg.CommonName,
 		arg.Native,
 		arg.Taxa,
+		arg.Indicator,
+		arg.Reportable,
 	)
 	var i Species
 	err := row.Scan(
@@ -47,6 +51,8 @@ func (q *Queries) CreateSpecies(ctx context.Context, arg CreateSpeciesParams) (S
 		&i.CommonName,
 		&i.Native,
 		&i.Taxa,
+		&i.Indicator,
+		&i.Reportable,
 	)
 	return i, err
 }
@@ -62,7 +68,7 @@ func (q *Queries) DeleteSpecies(ctx context.Context, id int64) error {
 }
 
 const getSpecies = `-- name: GetSpecies :one
-SELECT id, scientific_name, common_name, native, taxa FROM species
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable FROM species
 WHERE id = $1 LIMIT 1
 `
 
@@ -75,12 +81,14 @@ func (q *Queries) GetSpecies(ctx context.Context, id int64) (Species, error) {
 		&i.CommonName,
 		&i.Native,
 		&i.Taxa,
+		&i.Indicator,
+		&i.Reportable,
 	)
 	return i, err
 }
 
 const listSpecies = `-- name: ListSpecies :many
-SELECT id, scientific_name, common_name, native, taxa FROM species
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable FROM species
 ORDER BY scientific_name
 `
 
@@ -99,6 +107,8 @@ func (q *Queries) ListSpecies(ctx context.Context) ([]Species, error) {
 			&i.CommonName,
 			&i.Native,
 			&i.Taxa,
+			&i.Indicator,
+			&i.Reportable,
 		); err != nil {
 			return nil, err
 		}
@@ -111,7 +121,7 @@ func (q *Queries) ListSpecies(ctx context.Context) ([]Species, error) {
 }
 
 const searchSpecies = `-- name: SearchSpecies :many
-SELECT id, scientific_name, common_name, native, taxa FROM species
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable FROM species
 WHERE scientific_name ILIKE $1 OR common_name ILIKE $1
 ORDER BY scientific_name
 `
@@ -131,6 +141,8 @@ func (q *Queries) SearchSpecies(ctx context.Context, scientificName string) ([]S
 			&i.CommonName,
 			&i.Native,
 			&i.Taxa,
+			&i.Indicator,
+			&i.Reportable,
 		); err != nil {
 			return nil, err
 		}
@@ -144,9 +156,10 @@ func (q *Queries) SearchSpecies(ctx context.Context, scientificName string) ([]S
 
 const updateSpecies = `-- name: UpdateSpecies :one
 UPDATE species
-SET scientific_name = $2, common_name = $3, native = $4, taxa = $5
+SET scientific_name = $2, common_name = $3, native = $4,
+    taxa = $5, indicator = $6, reportable = $7
 WHERE id = $1
-RETURNING id, scientific_name, common_name, native, taxa
+RETURNING id, scientific_name, common_name, native, taxa, indicator, reportable
 `
 
 type UpdateSpeciesParams struct {
@@ -155,6 +168,8 @@ type UpdateSpeciesParams struct {
 	CommonName     string `json:"common_name"`
 	Native         bool   `json:"native"`
 	Taxa           Taxa   `json:"taxa"`
+	Indicator      bool   `json:"indicator"`
+	Reportable     bool   `json:"reportable"`
 }
 
 func (q *Queries) UpdateSpecies(ctx context.Context, arg UpdateSpeciesParams) (Species, error) {
@@ -164,6 +179,8 @@ func (q *Queries) UpdateSpecies(ctx context.Context, arg UpdateSpeciesParams) (S
 		arg.CommonName,
 		arg.Native,
 		arg.Taxa,
+		arg.Indicator,
+		arg.Reportable,
 	)
 	var i Species
 	err := row.Scan(
@@ -172,6 +189,8 @@ func (q *Queries) UpdateSpecies(ctx context.Context, arg UpdateSpeciesParams) (S
 		&i.CommonName,
 		&i.Native,
 		&i.Taxa,
+		&i.Indicator,
+		&i.Reportable,
 	)
 	return i, err
 }

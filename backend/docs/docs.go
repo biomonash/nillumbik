@@ -257,7 +257,13 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "indicator": {
+                    "type": "boolean"
+                },
                 "native": {
+                    "type": "boolean"
+                },
+                "reportable": {
                     "type": "boolean"
                 },
                 "scientific_name": {
