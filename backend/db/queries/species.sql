@@ -7,6 +7,10 @@ RETURNING *;
 SELECT * FROM species
 WHERE id = $1 LIMIT 1;
 
+-- name: GetSpeciesByCommonName :one
+SELECT * FROM species
+WHERE lower(common_name) = LOWER($1) LIMIT 1;
+
 -- name: ListSpecies :many
 SELECT * FROM species
 ORDER BY scientific_name;

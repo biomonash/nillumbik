@@ -2,6 +2,7 @@ package species
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lancatlin/nillumbik/internal/db"
@@ -52,6 +53,28 @@ func (u *Controller) GetSpeciesByID(c *gin.Context) {
 		c.AbortWithStatusJSON(400, gin.H{"message": "invalid id"})
 	}
 	species, err := u.q.GetSpecies(c.Request.Context(), int64(id))
+	if err != nil {
+		c.JSON(400, gin.H{"message": "Species not found"})
+		return
+	}
+
+	c.JSON(200, species)
+}
+
+// GetSpeciesByCommonName godoc
+//
+//	@Summary		Get species detail by common name
+//	@Description	Get species detail by common name. Case insensitive. Underscores will be replaced with spaces.
+//	@Tags			species
+//	@Param			name	path	string	true	"name of the species. Case insensitive."
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	db.Species
+//	@Router			/species/by-common-name/{name} [get]
+func (u *Controller) GetSpeciesByCommonName(c *gin.Context) {
+	name := c.Param("name")
+	cleanName := strings.ReplaceAll(name, "_", " ")
+	species, err := u.q.GetSpeciesByCommonName(c.Request.Context(), cleanName)
 	if err != nil {
 		c.JSON(400, gin.H{"message": "Species not found"})
 		return

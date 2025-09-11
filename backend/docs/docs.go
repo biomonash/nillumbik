@@ -166,6 +166,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/species/by-common-name/{name}": {
+            "get": {
+                "description": "Get species detail by common name. Case insensitive. Underscores will be replaced with spaces.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "species"
+                ],
+                "summary": "Get species detail by common name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "name of the species. Case insensitive.",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Species"
+                        }
+                    }
+                }
+            }
+        },
         "/species/{id}": {
             "get": {
                 "description": "Get species detail",

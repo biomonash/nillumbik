@@ -230,6 +230,28 @@ paths:
       summary: Get species detail
       tags:
       - species
+  /species/by-common-name/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Get species detail by common name. Case insensitive. Underscores
+        will be replaced with spaces.
+      parameters:
+      - description: name of the species. Case insensitive.
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Species'
+      summary: Get species detail by common name
+      tags:
+      - species
 securityDefinitions:
   BasicAuth:
     type: basic
