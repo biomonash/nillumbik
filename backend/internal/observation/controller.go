@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lancatlin/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/db"
 )
 
 type Controller struct {
@@ -17,6 +17,15 @@ func NewController(queries db.Querier) *Controller {
 	}
 }
 
+// ListObservations godoc
+//
+//	@Summary		List observations
+//	@Description	List observations
+//	@Tags			observation
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	[]Observation
+//	@Router			/observations [get]
 func (u *Controller) ListObservations(c *gin.Context) {
 	obs, err := u.q.ListObservations(c.Request.Context())
 	if err != nil {
@@ -26,6 +35,16 @@ func (u *Controller) ListObservations(c *gin.Context) {
 	c.JSON(200, obs)
 }
 
+// GetObservationDetail godoc
+//
+//	@Summary		Get Observation Detail
+//	@Description	Get the detail of an observation by ID
+//	@Tags			observation
+//	@Param			id	path	integer	True	"ID of the observation"
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	Observation
+//	@Router			/observations/{id} [get]
 func (u *Controller) GetObservationByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

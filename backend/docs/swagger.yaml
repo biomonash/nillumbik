@@ -1,0 +1,258 @@
+basePath: /api/
+definitions:
+  db.ForestType:
+    enum:
+    - dry
+    - wet
+    type: string
+    x-enum-varnames:
+    - ForestTypeDry
+    - ForestTypeWet
+  db.ObservationMethod:
+    enum:
+    - audio
+    - camera
+    - observed
+    type: string
+    x-enum-varnames:
+    - ObservationMethodAudio
+    - ObservationMethodCamera
+    - ObservationMethodObserved
+  db.Site:
+    properties:
+      block:
+        type: integer
+      code:
+        type: string
+      forest:
+        $ref: '#/definitions/db.ForestType'
+      id:
+        type: integer
+      location: {}
+      name:
+        type: string
+      tenure:
+        $ref: '#/definitions/db.TenureType'
+    type: object
+  db.Species:
+    properties:
+      common_name:
+        type: string
+      id:
+        type: integer
+      indicator:
+        type: boolean
+      native:
+        type: boolean
+      reportable:
+        type: boolean
+      scientific_name:
+        type: string
+      taxa:
+        $ref: '#/definitions/db.Taxa'
+    type: object
+  db.Taxa:
+    enum:
+    - bird
+    - mammal
+    - reptile
+    type: string
+    x-enum-varnames:
+    - TaxaBird
+    - TaxaMammal
+    - TaxaReptile
+  db.TenureType:
+    enum:
+    - public
+    - private
+    type: string
+    x-enum-varnames:
+    - TenureTypePublic
+    - TenureTypePrivate
+  observation.Observation:
+    properties:
+      appearance_time:
+        properties:
+          end:
+            type: integer
+          start:
+            type: integer
+        type: object
+      confidence:
+        type: number
+      id:
+        type: integer
+      indicator:
+        type: boolean
+      method:
+        $ref: '#/definitions/db.ObservationMethod'
+      narrative:
+        type: string
+      reportable:
+        type: boolean
+      site_id:
+        type: integer
+      species_id:
+        type: integer
+      temperature:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is the backend API for Nillumbik Shire project.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Nillubim Shire API
+  version: "1.0"
+paths:
+  /observations:
+    get:
+      consumes:
+      - application/json
+      description: List observations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/observation.Observation'
+            type: array
+      summary: List observations
+      tags:
+      - observation
+  /observations/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get the detail of an observation by ID
+      parameters:
+      - description: ID of the observation
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/observation.Observation'
+      summary: Get Observation Detail
+      tags:
+      - observation
+  /sites:
+    get:
+      consumes:
+      - application/json
+      description: List sites
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Site'
+            type: array
+      summary: List sites
+      tags:
+      - site
+  /sites/{code}:
+    get:
+      consumes:
+      - application/json
+      description: Get the detail of a site by ID
+      parameters:
+      - description: Code of the site
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Site'
+      summary: Get Site Detail
+      tags:
+      - site
+  /species:
+    get:
+      consumes:
+      - application/json
+      description: list all species
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Species'
+            type: array
+      summary: List species
+      tags:
+      - species
+  /species/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get species detail
+      parameters:
+      - description: id of the species
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Species'
+      summary: Get species detail
+      tags:
+      - species
+  /species/by-common-name/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Get species detail by common name. Case insensitive. Underscores
+        will be replaced with spaces.
+      parameters:
+      - description: name of the species. Case insensitive.
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Species'
+      summary: Get species detail by common name
+      tags:
+      - species
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

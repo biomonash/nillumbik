@@ -1,0 +1,37 @@
+$breakpoints: (
+	xs: 20em,
+	sm: 30em,
+	md: 50em,
+	lg: 75em,
+	xl: 100em,
+);
+
+$colors: (
+	"text": #eee,
+	"background": #1e232c,
+	"primary": #2f343d,
+	"secondary": #404a5a,
+	"accent": #00f3f3,
+);
+
+/**
+ * Use Utopia to generate responsive font sizes
+ * @link https://utopia.fyi/type/calculator
+ */
+$font-sizes: (
+	"300": 0.875rem,
+	"400": 1rem,
+	"500": 1.25rem,
+	"600": 1.5rem,
+	"700": 2rem,
+	"800": 2.5rem,
+	"900": 3.5rem,
+);
+
+$font-weights: (
+	"thin": 100,
+	"light": 300,
+	"regular": 400,
+	"bold": 700,
+	"black": 900,
+);

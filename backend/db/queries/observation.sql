@@ -1,6 +1,6 @@
 -- name: CreateObservation :one
-INSERT INTO observations (site_id, species_id, timestamp, method, appearance_time, temperature, narrative, confidence, indicator, reportable)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+INSERT INTO observations (site_id, species_id, timestamp, method, appearance_time, temperature, narrative, confidence)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING *;
 
 -- name: GetObservation :one
@@ -20,7 +20,7 @@ ORDER BY o.timestamp DESC;
 -- name: UpdateObservation :one
 UPDATE observations
 SET site_id = $2, species_id = $3, timestamp = $4, method = $5, appearance_time = $6, 
-    temperature = $7, narrative = $8, confidence = $9, indicator = $10, reportable = $11
+    temperature = $7, narrative = $8, confidence = $9
 WHERE id = $1
 RETURNING *;
 

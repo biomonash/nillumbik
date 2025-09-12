@@ -8,9 +8,9 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/importer"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/lancatlin/nillumbik/internal/db"
-	"github.com/lancatlin/nillumbik/internal/importer"
 )
 
 func main() {
