@@ -61,6 +61,8 @@ type CreateObservationParams struct {
 	Temperature    *int32                    `json:"temperature"`
 	Narrative      *string                   `json:"narrative"`
 	Confidence     *float32                  `json:"confidence"`
+	Indicator      bool                      `json:"indicator"`
+	Reportable     bool                      `json:"reportable"`
 }
 
 func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationParams) (Observation, error) {
