@@ -20,6 +20,8 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 	}
 	defer file.Close()
 
+	cache := NewCache(q)
+
 	reader := csv.NewReader(file)
 	reader.TrimLeadingSpace = true
 	records, err := reader.ReadAll()
@@ -86,8 +88,11 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		}
 
 		// Check if site exists
-		siteID, err := q.GetSiteIDByCode(ctx, siteCode)
-		if err != nil {
+		var siteID int64
+		site, err := cache.GetSite(ctx, siteCode)
+		if err == nil {
+			siteID = site.ID
+		} else {
 			if err == pgx.ErrNoRows {
 				// Site does not exist, insert and get full site
 				site, err := q.CreateSite(ctx, db.CreateSiteParams{
