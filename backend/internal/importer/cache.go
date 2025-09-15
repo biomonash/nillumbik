@@ -52,3 +52,7 @@ func (c *ImporterCache) GetSpecies(ctx context.Context, sciName string) (db.Spec
 	c.species[sciName] = species
 	return species, nil
 }
+
+func (c *ImporterCache) AddSpecies(species db.Species) {
+	c.species[species.ScientificName] = species
+}
