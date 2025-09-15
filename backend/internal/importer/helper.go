@@ -26,12 +26,18 @@ func parseTimestamp(dateStr, timeStr string) (time.Time, error) {
 	if strings.TrimSpace(dateStr) == "" || strings.TrimSpace(timeStr) == "" {
 		return time.Time{}, fmt.Errorf("missing year, date or time")
 	}
-	layout := "2-Jan-06 3:04 PM"
-	t, err := time.ParseInLocation(layout, dateStr+" "+timeStr, config.TIMEZONE)
-	if err != nil {
-		return time.Time{}, err
+	layouts := []string{
+		"2-Jan-06 3:04 PM",
+		"2-Jan-06 3:04:05 PM",
+		"2-Jan-06 15:04:05",
 	}
-	return t, nil
+	for _, layout := range layouts {
+		t, err := time.ParseInLocation(layout, dateStr+" "+timeStr, config.TIMEZONE)
+		if err == nil {
+			return t, nil
+		}
+	}
+	return time.Time{}, fmt.Errorf("failed to parse \"%s\" to any of the supported layout", dateStr+" "+timeStr)
 }
 
 func parseOptionalInt(s string) *int32 {
