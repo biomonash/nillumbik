@@ -29,6 +29,8 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 	}
 
 	const minCols = 23 // adjust if your CSV has more/less columns
+
+	batch := make([]db.CreateObservationsParams, 0, 1000)
 	for i, row := range records[:1000] {
 		if i == 0 {
 			continue // skip header
@@ -80,13 +82,13 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		if err != nil {
 			return fmt.Errorf("Row %d: failed to parse observation: %w", i, err)
 		}
-		obs, err := q.CreateObservation(ctx, params)
-		if err != nil {
-			return fmt.Errorf("insert observation failed: %s\n %w", params, err)
-		}
-
-		fmt.Println("Inserted observation ID:", obs.ID)
+		batch = append(batch, params)
 	}
+	count, err := q.CreateObservations(ctx, batch)
+	if err != nil {
+		return fmt.Errorf("Failed to insert observations: %w", err)
+	}
+	fmt.Printf("Successfully inserted %d observations\n", count)
 
 	return nil
 }
