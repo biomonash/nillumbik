@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS sites (
 CREATE TABLE IF NOT EXISTS species (
     id  BIGSERIAL PRIMARY KEY,
     scientific_name TEXT UNIQUE NOT NULL,
-    common_name TEXT UNIQUE NOT NULL,
+    common_name TEXT NOT NULL,
     native BOOLEAN NOT NULL,
     taxa taxa NOT NULL,
     indicator BOOLEAN NOT NULL,
