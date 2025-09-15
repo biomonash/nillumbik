@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS observations (
     id  BIGSERIAL PRIMARY KEY,
     site_id BIGINT NOT NULL REFERENCES sites(id),
     species_id BIGINT NOT NULL REFERENCES species(id),
-    "timestamp" TIMESTAMPTZ, -- allow NULL for missing timestamps
+    "timestamp" TIMESTAMPTZ NOT NULL,
     method observation_method NOT NULL,
     appearance_time int4range,
     temperature integer,

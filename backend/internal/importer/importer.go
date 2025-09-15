@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/biomonash/nillumbik/internal/config"
 	"github.com/biomonash/nillumbik/internal/db"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -29,7 +30,7 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 	}
 
 	const minCols = 23 // adjust if your CSV has more/less columns
-	for i, row := range records {
+	for i, row := range records[:10] {
 		if i == 0 {
 			continue // skip header
 		}
@@ -126,32 +127,15 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 			return fmt.Errorf("unknown taxa: %s", taxa)
 		}
 
-		// Try to find species by scientific name
-		// use pattern match for SearchSpecies
-		speciesList, err := q.SearchSpecies(ctx, "%"+scientific+"%")
-		if err != nil {
-			return fmt.Errorf("failed to search species: %w", err)
-		}
+		species, err := q.GetSpeciesByScientificName(ctx, scientific)
 
-		var species db.Species
-		if len(speciesList) > 0 {
-			s := speciesList[0]
-			species = db.Species{
-				ID:             s.ID,
-				ScientificName: s.ScientificName,
-				CommonName:     s.CommonName,
-				Native:         s.Native,
-				Taxa:           s.Taxa,
-				Indicator:      s.Indicator,
-				Reportable:     s.Reportable,
-			}
-		} else {
+		if err != nil {
 			// parse indicator/reportable from CSV
 			indicator := strings.ToLower(strings.TrimSpace(row[17])) == "y"
 			reportable := strings.ToLower(strings.TrimSpace(row[20])) == "y"
 
 			// Species does not exist, insert (include indicator/reportable)
-			createdSpec, err := q.CreateSpecies(ctx, db.CreateSpeciesParams{
+			species, err = q.CreateSpecies(ctx, db.CreateSpeciesParams{
 				ScientificName: scientific,
 				CommonName:     common,
 				Native:         native,
@@ -162,15 +146,6 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 			if err != nil {
 				return fmt.Errorf("insert species failed: %w", err)
 			}
-			species = db.Species{
-				ID:             createdSpec.ID,
-				ScientificName: createdSpec.ScientificName,
-				CommonName:     createdSpec.CommonName,
-				Native:         createdSpec.Native,
-				Taxa:           createdSpec.Taxa,
-				Indicator:      createdSpec.Indicator,
-				Reportable:     createdSpec.Reportable,
-			}
 		}
 		speciesID := species.ID
 
@@ -179,7 +154,7 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		var tsPG pgtype.Timestamptz
 		if err != nil {
 			// leave timestamp NULL if you prefer; or set fallback if schema requires NOT NULL
-			tsPG = pgtype.Timestamptz{Valid: false}
+			return fmt.Errorf("failed to parse timestamp: %w", err)
 		} else {
 			tsPG = pgtype.Timestamptz{Time: ts, Valid: true}
 		}
@@ -232,7 +207,7 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 
 		obs, err := q.CreateObservation(ctx, params)
 		if err != nil {
-			return fmt.Errorf("insert observation failed: %w", err)
+			return fmt.Errorf("insert observation failed: %s\n %w", params, err)
 		}
 
 		fmt.Println("Inserted observation ID:", obs.ID)
@@ -256,10 +231,10 @@ func parseCoords(latStr, lonStr string) (float64, float64, error) {
 
 func parseTimestamp(dateStr, timeStr string) (time.Time, error) {
 	if strings.TrimSpace(dateStr) == "" || strings.TrimSpace(timeStr) == "" {
-		return time.Time{}, fmt.Errorf("missing date or time")
+		return time.Time{}, fmt.Errorf("missing year, date or time")
 	}
-	layout := "2-Jan-06 3:04 pm"
-	t, err := time.Parse(layout, dateStr+" "+timeStr)
+	layout := "2-Jan-06 3:04 PM"
+	t, err := time.ParseInLocation(layout, dateStr+" "+timeStr, config.TIMEZONE)
 	if err != nil {
 		return time.Time{}, err
 	}
