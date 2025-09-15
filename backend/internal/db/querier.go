@@ -15,6 +15,7 @@ type Querier interface {
 	CountSites(ctx context.Context) (int64, error)
 	CountSpecies(ctx context.Context) (int64, error)
 	CreateObservation(ctx context.Context, arg CreateObservationParams) (Observation, error)
+	CreateObservations(ctx context.Context, arg []CreateObservationsParams) (int64, error)
 	CreateSite(ctx context.Context, arg CreateSiteParams) (Site, error)
 	CreateSpecies(ctx context.Context, arg CreateSpeciesParams) (Species, error)
 	DeleteObservation(ctx context.Context, id int64) error

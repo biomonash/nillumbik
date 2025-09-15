@@ -12,6 +12,19 @@ INSERT INTO observations (
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence;
 
+-- name: CreateObservations :copyfrom
+INSERT INTO observations (
+  site_id,
+  species_id,
+  "timestamp",
+  method,
+  appearance_time,
+  temperature,
+  narrative,
+  confidence
+)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+
 -- name: GetObservation :one
 SELECT id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence
 FROM observations

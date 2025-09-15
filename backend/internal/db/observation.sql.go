@@ -98,6 +98,17 @@ func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationPa
 	return i, err
 }
 
+type CreateObservationsParams struct {
+	SiteID         int64                     `json:"site_id"`
+	SpeciesID      int64                     `json:"species_id"`
+	Timestamp      pgtype.Timestamptz        `json:"timestamp"`
+	Method         ObservationMethod         `json:"method"`
+	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
+	Temperature    *int32                    `json:"temperature"`
+	Narrative      *string                   `json:"narrative"`
+	Confidence     *float32                  `json:"confidence"`
+}
+
 const deleteObservation = `-- name: DeleteObservation :exec
 DELETE FROM observations
 WHERE id = $1

@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func parseObservation(i int, row []string, siteID, speciesID int64) (param db.CreateObservationParams, err error) {
+func parseObservation(i int, row []string, siteID, speciesID int64) (param db.CreateObservationsParams, err error) {
 	ts, err := parseTimestamp(row[4], row[5])
 	var tsPG pgtype.Timestamptz
 	if err != nil {
@@ -56,7 +56,7 @@ func parseObservation(i int, row []string, siteID, speciesID int64) (param db.Cr
 		confidencePtr = &conf
 	}
 
-	return db.CreateObservationParams{
+	return db.CreateObservationsParams{
 		SiteID:         siteID,
 		SpeciesID:      speciesID,
 		Timestamp:      tsPG,
