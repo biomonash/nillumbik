@@ -43,25 +43,20 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		// --- Parse site ---
 		siteCode := strings.TrimSpace(row[1])
 		// Check if site exists
-		var siteID int64
 		site, err := cache.GetSite(ctx, siteCode)
-		if err == nil {
-			siteID = site.ID
-		} else {
-			if errors.Is(err, pgx.ErrNoRows) {
-				// Site does not exist, insert and get full site
-				siteParam, err := parseSite(i, row)
-				if err != nil {
-					return fmt.Errorf("parse site failed: %w", err)
-				}
-				site, err := q.CreateSite(ctx, siteParam)
-				if err != nil {
-					return fmt.Errorf("insert site failed: %w", err)
-				}
-				siteID = site.ID
-			} else {
-				return fmt.Errorf("failed to get site id by code: %w", err)
+		if errors.Is(err, pgx.ErrNoRows) {
+			// Site does not exist, insert and get full site
+			siteParam, err := parseSite(i, row)
+			if err != nil {
+				return fmt.Errorf("parse site failed: %w", err)
 			}
+			site, err = q.CreateSite(ctx, siteParam)
+			if err != nil {
+				return fmt.Errorf("insert site failed: %w", err)
+			}
+			cache.AddSite(site)
+		} else if err != nil {
+			return fmt.Errorf("failed to get site id by code: %w", err)
 		}
 
 		// --- Parse species ---
@@ -150,7 +145,7 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		}
 
 		params := db.CreateObservationParams{
-			SiteID:         siteID,
+			SiteID:         site.ID,
 			SpeciesID:      speciesID,
 			Timestamp:      tsPG,
 			Method:         method,

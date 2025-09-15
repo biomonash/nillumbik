@@ -35,6 +35,10 @@ func (c *ImporterCache) GetSite(ctx context.Context, code string) (db.Site, erro
 	return site, nil
 }
 
+func (c *ImporterCache) AddSite(site db.Site) {
+	c.sites[site.Code] = site
+}
+
 func (c *ImporterCache) GetSpecies(ctx context.Context, sciName string) (db.Species, error) {
 	species, ok := c.species[sciName]
 	if ok {
