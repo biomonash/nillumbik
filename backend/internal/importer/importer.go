@@ -42,52 +42,6 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 
 		// --- Parse site ---
 		siteCode := strings.TrimSpace(row[1])
-
-		blockInt, err := strconv.Atoi(strings.TrimSpace(row[21]))
-		if err != nil {
-			return fmt.Errorf("row %d: invalid block value %q: %w", i+1, row[21], err)
-		}
-		block := int32(blockInt)
-
-		forest := strings.ToLower(strings.TrimSpace(row[16]))
-		tenure := strings.ToLower(strings.TrimSpace(row[19]))
-
-		latStr, lonStr := strings.TrimSpace(row[2]), strings.TrimSpace(row[3])
-
-		// location for CreateSiteParams is interface{} in generated code.
-		// Provide WKT string when coords present, otherwise nil to insert NULL.
-		var location interface{}
-		if latStr != "" && lonStr != "" && latStr != "####" && lonStr != "####" {
-			lat, lon, err := parseCoords(latStr, lonStr)
-			if err != nil {
-				return fmt.Errorf("row %d: invalid coords %q,%q: %w", i+1, latStr, lonStr, err)
-			}
-			// WKT: POINT(lon lat)
-			location = fmt.Sprintf("POINT(%f %f)", lon, lat)
-		} else {
-			location = nil
-		}
-
-		var tenureEnum db.TenureType
-		switch tenure {
-		case "private":
-			tenureEnum = db.TenureTypePrivate
-		case "public":
-			tenureEnum = db.TenureTypePublic
-		default:
-			return fmt.Errorf("unknown tenure type: %s", tenure)
-		}
-
-		var forestEnum db.ForestType
-		switch forest {
-		case "dry":
-			forestEnum = db.ForestTypeDry
-		case "wet":
-			forestEnum = db.ForestTypeWet
-		default:
-			return fmt.Errorf("unknown forest type: %s", forest)
-		}
-
 		// Check if site exists
 		var siteID int64
 		site, err := cache.GetSite(ctx, siteCode)
@@ -96,14 +50,11 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		} else {
 			if errors.Is(err, pgx.ErrNoRows) {
 				// Site does not exist, insert and get full site
-				site, err := q.CreateSite(ctx, db.CreateSiteParams{
-					Code:     siteCode,
-					Block:    block,
-					Name:     &siteCode,
-					Tenure:   tenureEnum,
-					Forest:   forestEnum,
-					Location: location,
-				})
+				siteParam, err := parseSite(i, row)
+				if err != nil {
+					return fmt.Errorf("parse site failed: %w", err)
+				}
+				site, err := q.CreateSite(ctx, siteParam)
 				if err != nil {
 					return fmt.Errorf("insert site failed: %w", err)
 				}
