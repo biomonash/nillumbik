@@ -118,8 +118,7 @@ func (q *Queries) GetSiteByCode(ctx context.Context, code string) (Site, error) 
 }
 
 const getSiteIDByCode = `-- name: GetSiteIDByCode :one
-SELECT id FROM sites
-WHERE code = $1 LIMIT 1
+SELECT id FROM sites WHERE code = $1
 `
 
 func (q *Queries) GetSiteIDByCode(ctx context.Context, code string) (int64, error) {

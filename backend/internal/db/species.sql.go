@@ -68,7 +68,8 @@ func (q *Queries) DeleteSpecies(ctx context.Context, id int64) error {
 }
 
 const getSpecies = `-- name: GetSpecies :one
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable FROM species
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable
+FROM species
 WHERE id = $1 LIMIT 1
 `
 
@@ -88,7 +89,8 @@ func (q *Queries) GetSpecies(ctx context.Context, id int64) (Species, error) {
 }
 
 const getSpeciesByCommonName = `-- name: GetSpeciesByCommonName :one
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable FROM species
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable
+FROM species
 WHERE lower(common_name) = LOWER($1) LIMIT 1
 `
 
@@ -108,7 +110,8 @@ func (q *Queries) GetSpeciesByCommonName(ctx context.Context, lower string) (Spe
 }
 
 const listSpecies = `-- name: ListSpecies :many
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable FROM species
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable
+FROM species
 ORDER BY scientific_name
 `
 
@@ -141,7 +144,8 @@ func (q *Queries) ListSpecies(ctx context.Context) ([]Species, error) {
 }
 
 const searchSpecies = `-- name: SearchSpecies :many
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable FROM species
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable
+FROM species
 WHERE scientific_name ILIKE $1 OR common_name ILIKE $1
 ORDER BY scientific_name
 `

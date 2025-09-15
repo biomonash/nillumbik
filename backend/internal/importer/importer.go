@@ -127,24 +127,49 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		}
 
 		// Try to find species by scientific name
-		speciesList, err := q.SearchSpecies(ctx, scientific)
+		// use pattern match for SearchSpecies
+		speciesList, err := q.SearchSpecies(ctx, "%"+scientific+"%")
 		if err != nil {
 			return fmt.Errorf("failed to search species: %w", err)
 		}
 
 		var species db.Species
 		if len(speciesList) > 0 {
-			species = speciesList[0]
+			s := speciesList[0]
+			species = db.Species{
+				ID:             s.ID,
+				ScientificName: s.ScientificName,
+				CommonName:     s.CommonName,
+				Native:         s.Native,
+				Taxa:           s.Taxa,
+				Indicator:      s.Indicator,
+				Reportable:     s.Reportable,
+			}
 		} else {
-			// Species does not exist, insert
-			species, err = q.CreateSpecies(ctx, db.CreateSpeciesParams{
+			// parse indicator/reportable from CSV
+			indicator := strings.ToLower(strings.TrimSpace(row[17])) == "y"
+			reportable := strings.ToLower(strings.TrimSpace(row[20])) == "y"
+
+			// Species does not exist, insert (include indicator/reportable)
+			createdSpec, err := q.CreateSpecies(ctx, db.CreateSpeciesParams{
 				ScientificName: scientific,
 				CommonName:     common,
 				Native:         native,
 				Taxa:           taxaEnum,
+				Indicator:      indicator,
+				Reportable:     reportable,
 			})
 			if err != nil {
 				return fmt.Errorf("insert species failed: %w", err)
+			}
+			species = db.Species{
+				ID:             createdSpec.ID,
+				ScientificName: createdSpec.ScientificName,
+				CommonName:     createdSpec.CommonName,
+				Native:         createdSpec.Native,
+				Taxa:           createdSpec.Taxa,
+				Indicator:      createdSpec.Indicator,
+				Reportable:     createdSpec.Reportable,
 			}
 		}
 		speciesID := species.ID
@@ -153,8 +178,8 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		ts, err := parseTimestamp(row[4], row[5])
 		var tsPG pgtype.Timestamptz
 		if err != nil {
-			// fallback to now because DB requires NOT NULL
-			tsPG = pgtype.Timestamptz{Time: time.Now().UTC(), Valid: true}
+			// leave timestamp NULL if you prefer; or set fallback if schema requires NOT NULL
+			tsPG = pgtype.Timestamptz{Valid: false}
 		} else {
 			tsPG = pgtype.Timestamptz{Time: ts, Valid: true}
 		}
@@ -194,9 +219,6 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 			confidencePtr = &conf
 		}
 
-		indicator := strings.ToLower(row[17]) == "y"
-		reportable := strings.ToLower(row[20]) == "y"
-
 		params := db.CreateObservationParams{
 			SiteID:         siteID,
 			SpeciesID:      speciesID,
@@ -206,8 +228,6 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 			Temperature:    temp,
 			Narrative:      narrativePtr,
 			Confidence:     confidencePtr,
-			Indicator:      indicator,
-			Reportable:     reportable,
 		}
 
 		obs, err := q.CreateObservation(ctx, params)
