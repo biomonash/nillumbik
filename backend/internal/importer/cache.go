@@ -34,3 +34,17 @@ func (c *ImporterCache) GetSite(ctx context.Context, code string) (db.Site, erro
 	c.sites[code] = site
 	return site, nil
 }
+
+func (c *ImporterCache) GetSpecies(ctx context.Context, sciName string) (db.Species, error) {
+	species, ok := c.species[sciName]
+	if ok {
+		return species, nil
+	}
+
+	species, err := c.q.GetSpeciesByScientificName(ctx, sciName)
+	if err != nil {
+		return db.Species{}, fmt.Errorf("failed to get species by scientific name: %w", err)
+	}
+	c.species[sciName] = species
+	return species, nil
+}

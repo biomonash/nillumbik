@@ -3,6 +3,7 @@ package importer
 import (
 	"context"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -30,7 +31,7 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 	}
 
 	const minCols = 23 // adjust if your CSV has more/less columns
-	for i, row := range records[:10] {
+	for i, row := range records[:1000] {
 		if i == 0 {
 			continue // skip header
 		}
@@ -93,7 +94,7 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		if err == nil {
 			siteID = site.ID
 		} else {
-			if err == pgx.ErrNoRows {
+			if errors.Is(err, pgx.ErrNoRows) {
 				// Site does not exist, insert and get full site
 				site, err := q.CreateSite(ctx, db.CreateSiteParams{
 					Code:     siteCode,
@@ -130,7 +131,7 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 			return fmt.Errorf("unknown taxa: %s", taxa)
 		}
 
-		species, err := q.GetSpeciesByScientificName(ctx, scientific)
+		species, err := cache.GetSpecies(ctx, scientific)
 
 		if err != nil {
 			// parse indicator/reportable from CSV
