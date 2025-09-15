@@ -5,12 +5,15 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
 	"github.com/biomonash/nillumbik/internal/db"
 	"github.com/jackc/pgx/v5"
 )
+
+const BATCH_SIZE = 1000
 
 func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 	file, err := os.Open(filename)
@@ -23,16 +26,22 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 
 	reader := csv.NewReader(file)
 	reader.TrimLeadingSpace = true
-	records, err := reader.ReadAll()
-	if err != nil {
-		return fmt.Errorf("failed to read CSV: %w", err)
-	}
+	// records, err := reader.ReadAll()
 
 	const minCols = 23 // adjust if your CSV has more/less columns
 
-	batch := make([]db.CreateObservationsParams, 0, 1000)
-	for i, row := range records[:1000] {
+	batch := make([]db.CreateObservationsParams, 0, BATCH_SIZE)
+	i := 0
+	for {
+		row, err := reader.Read()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return fmt.Errorf("failed to read CSV: %w", err)
+		}
 		if i == 0 {
+			i++
 			continue // skip header
 		}
 
@@ -83,12 +92,17 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 			return fmt.Errorf("Row %d: failed to parse observation: %w", i, err)
 		}
 		batch = append(batch, params)
+
+		if len(batch) == BATCH_SIZE {
+			count, err := q.CreateObservations(ctx, batch)
+			if err != nil {
+				return fmt.Errorf("Failed to insert observations: %w", err)
+			}
+			fmt.Printf("Successfully inserted %d observations to row %d\n", count, i)
+			batch = make([]db.CreateObservationsParams, 0, BATCH_SIZE)
+		}
+		i++
 	}
-	count, err := q.CreateObservations(ctx, batch)
-	if err != nil {
-		return fmt.Errorf("Failed to insert observations: %w", err)
-	}
-	fmt.Printf("Successfully inserted %d observations\n", count)
 
 	return nil
 }
