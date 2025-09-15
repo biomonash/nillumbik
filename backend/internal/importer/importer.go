@@ -79,7 +79,7 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 			}
 			species, err = q.CreateSpecies(ctx, speciesParam)
 			if err != nil {
-				return fmt.Errorf("insert species failed: %w", err)
+				return fmt.Errorf("Row: %d insert species failed: %w\n%s", i, err, speciesParam)
 			}
 			cache.AddSpecies(species)
 		} else if err != nil {
@@ -102,6 +102,14 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 			batch = make([]db.CreateObservationsParams, 0, BATCH_SIZE)
 		}
 		i++
+	}
+
+	if len(batch) != 0 {
+		count, err := q.CreateObservations(ctx, batch)
+		if err != nil {
+			return fmt.Errorf("Failed to insert observations: %w", err)
+		}
+		fmt.Printf("Successfully inserted %d observations to row %d\n", count, i)
 	}
 
 	return nil
