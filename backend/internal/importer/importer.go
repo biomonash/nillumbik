@@ -59,45 +59,23 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 			return fmt.Errorf("failed to get site id by code: %w", err)
 		}
 
-		// --- Parse species ---
 		scientific := row[14]
-		common := row[15]
-		native := strings.ToLower(row[18]) == "native"
-		taxa := strings.ToLower(row[22])
-
-		var taxaEnum db.Taxa
-		switch taxa {
-		case "bird":
-			taxaEnum = db.TaxaBird
-		case "mammal":
-			taxaEnum = db.TaxaMammal
-		case "reptile":
-			taxaEnum = db.TaxaReptile
-		default:
-			return fmt.Errorf("unknown taxa: %s", taxa)
-		}
-
+		// --- Parse species ---
 		species, err := cache.GetSpecies(ctx, scientific)
 
-		if err != nil {
-			// parse indicator/reportable from CSV
-			indicator := strings.ToLower(strings.TrimSpace(row[17])) == "y"
-			reportable := strings.ToLower(strings.TrimSpace(row[20])) == "y"
-
-			// Species does not exist, insert (include indicator/reportable)
-			species, err = q.CreateSpecies(ctx, db.CreateSpeciesParams{
-				ScientificName: scientific,
-				CommonName:     common,
-				Native:         native,
-				Taxa:           taxaEnum,
-				Indicator:      indicator,
-				Reportable:     reportable,
-			})
+		if errors.Is(err, pgx.ErrNoRows) {
+			speciesParam, err := parseSpecies(i, row)
+			if err != nil {
+				return fmt.Errorf("Failed to parse species: %w", err)
+			}
+			species, err = q.CreateSpecies(ctx, speciesParam)
 			if err != nil {
 				return fmt.Errorf("insert species failed: %w", err)
 			}
+			cache.AddSpecies(species)
+		} else if err != nil {
+			panic(err)
 		}
-		speciesID := species.ID
 
 		// --- Parse observation ---
 		ts, err := parseTimestamp(row[4], row[5])
@@ -146,7 +124,7 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 
 		params := db.CreateObservationParams{
 			SiteID:         site.ID,
-			SpeciesID:      speciesID,
+			SpeciesID:      species.ID,
 			Timestamp:      tsPG,
 			Method:         method,
 			AppearanceTime: appearance,
