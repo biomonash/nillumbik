@@ -109,6 +109,27 @@ func (q *Queries) GetSpeciesByCommonName(ctx context.Context, lower string) (Spe
 	return i, err
 }
 
+const getSpeciesByScientificName = `-- name: GetSpeciesByScientificName :one
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable
+FROM species
+WHERE lower(scientific_name) = LOWER($1) LIMIT 1
+`
+
+func (q *Queries) GetSpeciesByScientificName(ctx context.Context, lower string) (Species, error) {
+	row := q.db.QueryRow(ctx, getSpeciesByScientificName, lower)
+	var i Species
+	err := row.Scan(
+		&i.ID,
+		&i.ScientificName,
+		&i.CommonName,
+		&i.Native,
+		&i.Taxa,
+		&i.Indicator,
+		&i.Reportable,
+	)
+	return i, err
+}
+
 const listSpecies = `-- name: ListSpecies :many
 SELECT id, scientific_name, common_name, native, taxa, indicator, reportable
 FROM species

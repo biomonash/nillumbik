@@ -13,6 +13,11 @@ SELECT id, scientific_name, common_name, native, taxa, indicator, reportable
 FROM species
 WHERE lower(common_name) = LOWER($1) LIMIT 1;
 
+-- name: GetSpeciesByScientificName :one
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable
+FROM species
+WHERE lower(scientific_name) = LOWER($1) LIMIT 1;
+
 -- name: ListSpecies :many
 SELECT id, scientific_name, common_name, native, taxa, indicator, reportable
 FROM species

@@ -27,6 +27,7 @@ type Querier interface {
 	GetSiteIDByCode(ctx context.Context, code string) (int64, error)
 	GetSpecies(ctx context.Context, id int64) (Species, error)
 	GetSpeciesByCommonName(ctx context.Context, lower string) (Species, error)
+	GetSpeciesByScientificName(ctx context.Context, lower string) (Species, error)
 	ListObservations(ctx context.Context) ([]Observation, error)
 	ListSites(ctx context.Context) ([]Site, error)
 	ListSpecies(ctx context.Context) ([]Species, error)
