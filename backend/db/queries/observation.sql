@@ -1,28 +1,52 @@
 -- name: CreateObservation :one
-INSERT INTO observations (site_id, species_id, timestamp, method, appearance_time, temperature, narrative, confidence)
+INSERT INTO observations (
+  site_id,
+  species_id,
+  "timestamp",
+  method,
+  appearance_time,
+  temperature,
+  narrative,
+  confidence
+)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-RETURNING *;
+RETURNING id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence;
+
+-- name: CreateObservations :copyfrom
+INSERT INTO observations (
+  site_id,
+  species_id,
+  "timestamp",
+  method,
+  appearance_time,
+  temperature,
+  narrative,
+  confidence
+)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
 
 -- name: GetObservation :one
-SELECT sqlc.embed(s), sqlc.embed(sp), sqlc.embed(o)
-FROM observations o
-JOIN sites s ON o.site_id = s.id
-JOIN species sp ON o.species_id = sp.id
-WHERE o.id = $1 LIMIT 1;
+SELECT id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence
+FROM observations
+WHERE id = $1 LIMIT 1;
 
 -- name: ListObservations :many
-SELECT sqlc.embed(s), sqlc.embed(sp), sqlc.embed(o)
-FROM observations o
-JOIN sites s ON o.site_id = s.id
-JOIN species sp ON o.species_id = sp.id
-ORDER BY o.timestamp DESC;
+SELECT id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence
+FROM observations
+ORDER BY id;
 
 -- name: UpdateObservation :one
 UPDATE observations
-SET site_id = $2, species_id = $3, timestamp = $4, method = $5, appearance_time = $6, 
-    temperature = $7, narrative = $8, confidence = $9
+SET site_id = $2,
+    species_id = $3,
+    "timestamp" = $4,
+    method = $5,
+    appearance_time = $6,
+    temperature = $7,
+    narrative = $8,
+    confidence = $9
 WHERE id = $1
-RETURNING *;
+RETURNING id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence;
 
 -- name: DeleteObservation :exec
 DELETE FROM observations

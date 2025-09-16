@@ -15,18 +15,21 @@ type Querier interface {
 	CountSites(ctx context.Context) (int64, error)
 	CountSpecies(ctx context.Context) (int64, error)
 	CreateObservation(ctx context.Context, arg CreateObservationParams) (Observation, error)
+	CreateObservations(ctx context.Context, arg []CreateObservationsParams) (int64, error)
 	CreateSite(ctx context.Context, arg CreateSiteParams) (Site, error)
 	CreateSpecies(ctx context.Context, arg CreateSpeciesParams) (Species, error)
 	DeleteObservation(ctx context.Context, id int64) error
 	DeleteSite(ctx context.Context, id int64) error
 	DeleteSiteByCode(ctx context.Context, code string) error
 	DeleteSpecies(ctx context.Context, id int64) error
-	GetObservation(ctx context.Context, id int64) (GetObservationRow, error)
+	GetObservation(ctx context.Context, id int64) (Observation, error)
 	GetSite(ctx context.Context, id int64) (Site, error)
 	GetSiteByCode(ctx context.Context, code string) (Site, error)
+	GetSiteIDByCode(ctx context.Context, code string) (int64, error)
 	GetSpecies(ctx context.Context, id int64) (Species, error)
 	GetSpeciesByCommonName(ctx context.Context, lower string) (Species, error)
-	ListObservations(ctx context.Context) ([]ListObservationsRow, error)
+	GetSpeciesByScientificName(ctx context.Context, lower string) (Species, error)
+	ListObservations(ctx context.Context) ([]Observation, error)
 	ListSites(ctx context.Context) ([]Site, error)
 	ListSpecies(ctx context.Context) ([]Species, error)
 	SearchObservations(ctx context.Context, scientificName string) ([]SearchObservationsRow, error)
