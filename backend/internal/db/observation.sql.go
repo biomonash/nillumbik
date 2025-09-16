@@ -178,6 +178,48 @@ func (q *Queries) ListObservations(ctx context.Context) ([]Observation, error) {
 	return items, nil
 }
 
+const listObservationsPaged = `-- name: ListObservationsPaged :many
+SELECT id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence
+FROM observations
+ORDER BY id
+LIMIT $1 OFFSET $2
+`
+
+type ListObservationsPagedParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListObservationsPaged(ctx context.Context, arg ListObservationsPagedParams) ([]Observation, error) {
+	rows, err := q.db.Query(ctx, listObservationsPaged, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Observation
+	for rows.Next() {
+		var i Observation
+		if err := rows.Scan(
+			&i.ID,
+			&i.SiteID,
+			&i.SpeciesID,
+			&i.Timestamp,
+			&i.Method,
+			&i.AppearanceTime,
+			&i.Temperature,
+			&i.Narrative,
+			&i.Confidence,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const searchObservations = `-- name: SearchObservations :many
 SELECT o.id, o.site_id, o.species_id, o.timestamp, o.method, o.appearance_time, o.temperature, o.narrative, o.confidence, s.code as site_code, s.name as site_name, sp.scientific_name, sp.common_name, sp.taxa
 FROM observations o

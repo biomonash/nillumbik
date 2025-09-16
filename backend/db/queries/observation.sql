@@ -35,6 +35,12 @@ SELECT id, site_id, species_id, "timestamp", method, appearance_time, temperatur
 FROM observations
 ORDER BY id;
 
+-- name: ListObservationsPaged :many
+SELECT id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence
+FROM observations
+ORDER BY id
+LIMIT $1 OFFSET $2;
+
 -- name: UpdateObservation :one
 UPDATE observations
 SET site_id = $2,

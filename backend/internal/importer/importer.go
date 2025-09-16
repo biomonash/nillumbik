@@ -75,11 +75,11 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		if errors.Is(err, pgx.ErrNoRows) {
 			speciesParam, err := parseSpecies(i, row)
 			if err != nil {
-				return fmt.Errorf("Failed to parse species: %w", err)
+				return fmt.Errorf("failed to parse species: %w", err)
 			}
 			species, err = q.CreateSpecies(ctx, speciesParam)
 			if err != nil {
-				return fmt.Errorf("Row: %d insert species failed: %w\n%s", i, err, speciesParam)
+				return fmt.Errorf("row: %d insert species failed: %w\n%s", i, err, fmt.Sprintf("%+v", speciesParam))
 			}
 			cache.AddSpecies(species)
 		} else if err != nil {
@@ -89,14 +89,14 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		// --- Parse observation ---
 		params, err := parseObservation(i, row, site.ID, species.ID)
 		if err != nil {
-			return fmt.Errorf("Row %d: failed to parse observation: %w", i, err)
+			return fmt.Errorf("row %d: failed to parse observation: %w", i, err)
 		}
 		batch = append(batch, params)
 
 		if len(batch) == BATCH_SIZE {
 			count, err := q.CreateObservations(ctx, batch)
 			if err != nil {
-				return fmt.Errorf("Failed to insert observations: %w", err)
+				return fmt.Errorf("failed to insert observations: %w", err)
 			}
 			fmt.Printf("Successfully inserted %d observations to row %d\n", count, i)
 			batch = make([]db.CreateObservationsParams, 0, BATCH_SIZE)
@@ -107,7 +107,7 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 	if len(batch) != 0 {
 		count, err := q.CreateObservations(ctx, batch)
 		if err != nil {
-			return fmt.Errorf("Failed to insert observations: %w", err)
+			return fmt.Errorf("failed to insert observations: %w", err)
 		}
 		fmt.Printf("Successfully inserted %d observations to row %d\n", count, i)
 	}

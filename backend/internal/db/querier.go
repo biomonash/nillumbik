@@ -30,6 +30,7 @@ type Querier interface {
 	GetSpeciesByCommonName(ctx context.Context, lower string) (Species, error)
 	GetSpeciesByScientificName(ctx context.Context, lower string) (Species, error)
 	ListObservations(ctx context.Context) ([]Observation, error)
+	ListObservationsPaged(ctx context.Context, arg ListObservationsPagedParams) ([]Observation, error)
 	ListSites(ctx context.Context) ([]Site, error)
 	ListSpecies(ctx context.Context) ([]Species, error)
 	SearchObservations(ctx context.Context, scientificName string) ([]SearchObservationsRow, error)
