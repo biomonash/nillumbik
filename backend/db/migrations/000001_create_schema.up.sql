@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS observations (
     species_id BIGINT NOT NULL REFERENCES species(id),
     "timestamp" TIMESTAMP NOT NULL,
     method observation_method NOT NULL,
-    appearance_time int4range,
+    appearance_start integer,
+    appearance_end integer,
     temperature integer,
     narrative text,
     confidence real

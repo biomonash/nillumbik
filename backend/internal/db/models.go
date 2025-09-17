@@ -8,8 +8,6 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"time"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type ForestType string
@@ -251,15 +249,16 @@ func AllTenureTypeValues() []TenureType {
 }
 
 type Observation struct {
-	ID             int64                     `json:"id"`
-	SiteID         int64                     `json:"site_id"`
-	SpeciesID      int64                     `json:"species_id"`
-	Timestamp      time.Time                 `json:"timestamp"`
-	Method         ObservationMethod         `json:"method"`
-	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
-	Temperature    *int32                    `json:"temperature"`
-	Narrative      *string                   `json:"narrative"`
-	Confidence     *float32                  `json:"confidence"`
+	ID              int64             `json:"id"`
+	SiteID          int64             `json:"site_id"`
+	SpeciesID       int64             `json:"species_id"`
+	Timestamp       time.Time         `json:"timestamp"`
+	Method          ObservationMethod `json:"method"`
+	AppearanceStart *int32            `json:"appearance_start"`
+	AppearanceEnd   *int32            `json:"appearance_end"`
+	Temperature     *int32            `json:"temperature"`
+	Narrative       *string           `json:"narrative"`
+	Confidence      *float32          `json:"confidence"`
 }
 
 type Site struct {

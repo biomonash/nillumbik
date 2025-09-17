@@ -33,7 +33,8 @@ func (r iteratorForCreateObservations) Values() ([]interface{}, error) {
 		r.rows[0].SpeciesID,
 		r.rows[0].Timestamp,
 		r.rows[0].Method,
-		r.rows[0].AppearanceTime,
+		r.rows[0].AppearanceStart,
+		r.rows[0].AppearanceEnd,
 		r.rows[0].Temperature,
 		r.rows[0].Narrative,
 		r.rows[0].Confidence,
@@ -45,5 +46,5 @@ func (r iteratorForCreateObservations) Err() error {
 }
 
 func (q *Queries) CreateObservations(ctx context.Context, arg []CreateObservationsParams) (int64, error) {
-	return q.db.CopyFrom(ctx, []string{"observations"}, []string{"site_id", "species_id", "timestamp", "method", "appearance_time", "temperature", "narrative", "confidence"}, &iteratorForCreateObservations{rows: arg})
+	return q.db.CopyFrom(ctx, []string{"observations"}, []string{"site_id", "species_id", "timestamp", "method", "appearance_start", "appearance_end", "temperature", "narrative", "confidence"}, &iteratorForCreateObservations{rows: arg})
 }
