@@ -25,17 +25,27 @@ It should be only used to create executive file and relative logic, like create 
 The backend follows a domain-driven design with these modules:
 
 - **`internal/config/`**: Configuration management
-- **`internal/db/`**: Generated database queries (via SQLC) **DO NOT EDIT MANUALLY**, update it using `make sqlc-generate`
+- **`internal/db/`**: Generated database queries (via SQLC)
+  - **DO NOT EDIT MANUALLY**
+  - Update by `make sqlc-generate`
 - **`internal/observation/`**: Wildlife observation management
+  - Handles `/api/observations/*`
 - **`internal/site/`**: Monitoring site management
+  - Handles `/api/sites/*`
 - **`internal/species/`**: Species catalog management
+  - Handles `/api/species/*`
 - **`internal/importer/`**: Data import logic
+  - Used by `cmd/importer`
 - **`internal/utils/`**: Shared utilities
 
 ### Database (`/db`)
 - **`db/migrations/`**: SQL schema migrations
+  - Use `make db-migrate-up` (or `-down`) to run the migrations
+  - Use `make db-migrate-create` to create a new migration file
 - **`db/queries/`**: Raw SQL queries for SQLC generation
 - **`db/seed.sql`**: Initial data seeding
+
+**Every time updating `*.sql` should run `make sqlc-generate`.**
 
 ### Documentation (`/docs`)
 - Auto-generated Swagger documentation files
