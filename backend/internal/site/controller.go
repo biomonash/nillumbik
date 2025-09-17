@@ -1,8 +1,13 @@
 package site
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 )
 
 type Controller struct {
@@ -27,7 +32,7 @@ func NewController(queries db.Querier) *Controller {
 func (u *Controller) ListSites(c *gin.Context) {
 	sites, err := u.q.ListSites(c.Request.Context())
 	if err != nil {
-		c.AbortWithError(500, err)
+		c.AbortWithError(500, fmt.Errorf("failed to list sites: %w", err))
 		return
 	}
 	c.JSON(200, sites)
@@ -46,8 +51,11 @@ func (u *Controller) ListSites(c *gin.Context) {
 func (u *Controller) GetSiteByCode(c *gin.Context) {
 	code := c.Param("code")
 	site, err := u.q.GetSiteByCode(c.Request.Context(), code)
-	if err != nil {
-		c.JSON(400, gin.H{"message": "Author not found"})
+	if errors.Is(err, pgx.ErrNoRows) {
+		utils.RespondError(c, 404, fmt.Errorf("Site %s not found", code))
+		return
+	} else if err != nil {
+		c.AbortWithError(500, err)
 		return
 	}
 

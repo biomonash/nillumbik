@@ -1,10 +1,12 @@
 package species
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,7 +32,7 @@ func NewController(queries db.Querier) *Controller {
 func (u *Controller) ListSpecies(c *gin.Context) {
 	species, err := u.q.ListSpecies(c.Request.Context())
 	if err != nil {
-		c.AbortWithError(500, err)
+		c.AbortWithError(500, fmt.Errorf("failed to list species: %w", err))
 		return
 	}
 	c.JSON(200, species)
@@ -50,11 +52,12 @@ func (u *Controller) GetSpeciesByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.AbortWithStatusJSON(400, gin.H{"message": "invalid id"})
+		utils.RespondError(c, 400, fmt.Errorf("invalid id: %s", idStr))
+		return
 	}
 	species, err := u.q.GetSpecies(c.Request.Context(), int64(id))
 	if err != nil {
-		c.JSON(400, gin.H{"message": "Species not found"})
+		utils.RespondError(c, 404, fmt.Errorf("species not found: %s", idStr))
 		return
 	}
 
@@ -76,7 +79,7 @@ func (u *Controller) GetSpeciesByCommonName(c *gin.Context) {
 	cleanName := strings.ReplaceAll(name, "_", " ")
 	species, err := u.q.GetSpeciesByCommonName(c.Request.Context(), cleanName)
 	if err != nil {
-		c.JSON(400, gin.H{"message": "Species not found"})
+		utils.RespondError(c, 404, fmt.Errorf("species not found: %s", cleanName))
 		return
 	}
 
