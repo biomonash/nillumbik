@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/biomonash/nillumbik/internal/db"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func parseObservation(i int, row []string, siteID, speciesID int64) (param db.CreateObservationsParams, err error) {
@@ -23,14 +22,8 @@ func parseObservation(i int, row []string, siteID, speciesID int64) (param db.Cr
 		return
 	}
 
-	start, _ := strconv.Atoi(row[8])
-	end, _ := strconv.Atoi(row[9])
-	appearance := pgtype.Range[pgtype.Int4]{
-		Lower:     pgtype.Int4{Int32: int32(start), Valid: true},
-		Upper:     pgtype.Int4{Int32: int32(end), Valid: true},
-		LowerType: pgtype.Inclusive,
-		UpperType: pgtype.Inclusive,
-	}
+	start := parseOptionalInt(row[8])
+	end := parseOptionalInt(row[9])
 
 	temp := parseOptionalInt(row[10])
 
@@ -47,13 +40,14 @@ func parseObservation(i int, row []string, siteID, speciesID int64) (param db.Cr
 	}
 
 	return db.CreateObservationsParams{
-		SiteID:         siteID,
-		SpeciesID:      speciesID,
-		Timestamp:      timestamp,
-		Method:         method,
-		AppearanceTime: appearance,
-		Temperature:    temp,
-		Narrative:      narrativePtr,
-		Confidence:     confidencePtr,
+		SiteID:          siteID,
+		SpeciesID:       speciesID,
+		Timestamp:       timestamp,
+		Method:          method,
+		AppearanceStart: start,
+		AppearanceEnd:   end,
+		Temperature:     temp,
+		Narrative:       narrativePtr,
+		Confidence:      confidencePtr,
 	}, nil
 }

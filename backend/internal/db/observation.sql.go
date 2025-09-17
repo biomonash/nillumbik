@@ -8,8 +8,6 @@ package db
 import (
 	"context"
 	"time"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const countObservations = `-- name: CountObservations :one
@@ -53,24 +51,26 @@ INSERT INTO observations (
   species_id,
   "timestamp",
   method,
-  appearance_time,
+  appearance_start,
+  appearance_end,
   temperature,
   narrative,
   confidence
 )
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-RETURNING id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
 `
 
 type CreateObservationParams struct {
-	SiteID         int64                     `json:"site_id"`
-	SpeciesID      int64                     `json:"species_id"`
-	Timestamp      time.Time                 `json:"timestamp"`
-	Method         ObservationMethod         `json:"method"`
-	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
-	Temperature    *int32                    `json:"temperature"`
-	Narrative      *string                   `json:"narrative"`
-	Confidence     *float32                  `json:"confidence"`
+	SiteID          int64             `json:"site_id"`
+	SpeciesID       int64             `json:"species_id"`
+	Timestamp       time.Time         `json:"timestamp"`
+	Method          ObservationMethod `json:"method"`
+	AppearanceStart *int32            `json:"appearance_start"`
+	AppearanceEnd   *int32            `json:"appearance_end"`
+	Temperature     *int32            `json:"temperature"`
+	Narrative       *string           `json:"narrative"`
+	Confidence      *float32          `json:"confidence"`
 }
 
 func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationParams) (Observation, error) {
@@ -79,7 +79,8 @@ func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationPa
 		arg.SpeciesID,
 		arg.Timestamp,
 		arg.Method,
-		arg.AppearanceTime,
+		arg.AppearanceStart,
+		arg.AppearanceEnd,
 		arg.Temperature,
 		arg.Narrative,
 		arg.Confidence,
@@ -91,7 +92,8 @@ func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationPa
 		&i.SpeciesID,
 		&i.Timestamp,
 		&i.Method,
-		&i.AppearanceTime,
+		&i.AppearanceStart,
+		&i.AppearanceEnd,
 		&i.Temperature,
 		&i.Narrative,
 		&i.Confidence,
@@ -100,14 +102,15 @@ func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationPa
 }
 
 type CreateObservationsParams struct {
-	SiteID         int64                     `json:"site_id"`
-	SpeciesID      int64                     `json:"species_id"`
-	Timestamp      time.Time                 `json:"timestamp"`
-	Method         ObservationMethod         `json:"method"`
-	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
-	Temperature    *int32                    `json:"temperature"`
-	Narrative      *string                   `json:"narrative"`
-	Confidence     *float32                  `json:"confidence"`
+	SiteID          int64             `json:"site_id"`
+	SpeciesID       int64             `json:"species_id"`
+	Timestamp       time.Time         `json:"timestamp"`
+	Method          ObservationMethod `json:"method"`
+	AppearanceStart *int32            `json:"appearance_start"`
+	AppearanceEnd   *int32            `json:"appearance_end"`
+	Temperature     *int32            `json:"temperature"`
+	Narrative       *string           `json:"narrative"`
+	Confidence      *float32          `json:"confidence"`
 }
 
 const deleteObservation = `-- name: DeleteObservation :exec
@@ -121,7 +124,7 @@ func (q *Queries) DeleteObservation(ctx context.Context, id int64) error {
 }
 
 const getObservation = `-- name: GetObservation :one
-SELECT id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence
+SELECT id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
 FROM observations
 WHERE id = $1 LIMIT 1
 `
@@ -135,7 +138,8 @@ func (q *Queries) GetObservation(ctx context.Context, id int64) (Observation, er
 		&i.SpeciesID,
 		&i.Timestamp,
 		&i.Method,
-		&i.AppearanceTime,
+		&i.AppearanceStart,
+		&i.AppearanceEnd,
 		&i.Temperature,
 		&i.Narrative,
 		&i.Confidence,
@@ -144,7 +148,7 @@ func (q *Queries) GetObservation(ctx context.Context, id int64) (Observation, er
 }
 
 const listObservations = `-- name: ListObservations :many
-SELECT id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence
+SELECT id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
 FROM observations
 ORDER BY timestamp
 LIMIT $1
@@ -171,7 +175,8 @@ func (q *Queries) ListObservations(ctx context.Context, arg ListObservationsPara
 			&i.SpeciesID,
 			&i.Timestamp,
 			&i.Method,
-			&i.AppearanceTime,
+			&i.AppearanceStart,
+			&i.AppearanceEnd,
 			&i.Temperature,
 			&i.Narrative,
 			&i.Confidence,
@@ -187,7 +192,7 @@ func (q *Queries) ListObservations(ctx context.Context, arg ListObservationsPara
 }
 
 const searchObservations = `-- name: SearchObservations :many
-SELECT o.id, o.site_id, o.species_id, o.timestamp, o.method, o.appearance_time, o.temperature, o.narrative, o.confidence, s.code as site_code, s.name as site_name, sp.scientific_name, sp.common_name, sp.taxa
+SELECT o.id, o.site_id, o.species_id, o.timestamp, o.method, o.appearance_start, o.appearance_end, o.temperature, o.narrative, o.confidence, s.code as site_code, s.name as site_name, sp.scientific_name, sp.common_name, sp.taxa
 FROM observations o
 JOIN sites s ON o.site_id = s.id
 JOIN species sp ON o.species_id = sp.id
@@ -196,20 +201,21 @@ ORDER BY o.timestamp DESC
 `
 
 type SearchObservationsRow struct {
-	ID             int64                     `json:"id"`
-	SiteID         int64                     `json:"site_id"`
-	SpeciesID      int64                     `json:"species_id"`
-	Timestamp      time.Time                 `json:"timestamp"`
-	Method         ObservationMethod         `json:"method"`
-	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
-	Temperature    *int32                    `json:"temperature"`
-	Narrative      *string                   `json:"narrative"`
-	Confidence     *float32                  `json:"confidence"`
-	SiteCode       string                    `json:"site_code"`
-	SiteName       *string                   `json:"site_name"`
-	ScientificName string                    `json:"scientific_name"`
-	CommonName     string                    `json:"common_name"`
-	Taxa           Taxa                      `json:"taxa"`
+	ID              int64             `json:"id"`
+	SiteID          int64             `json:"site_id"`
+	SpeciesID       int64             `json:"species_id"`
+	Timestamp       time.Time         `json:"timestamp"`
+	Method          ObservationMethod `json:"method"`
+	AppearanceStart *int32            `json:"appearance_start"`
+	AppearanceEnd   *int32            `json:"appearance_end"`
+	Temperature     *int32            `json:"temperature"`
+	Narrative       *string           `json:"narrative"`
+	Confidence      *float32          `json:"confidence"`
+	SiteCode        string            `json:"site_code"`
+	SiteName        *string           `json:"site_name"`
+	ScientificName  string            `json:"scientific_name"`
+	CommonName      string            `json:"common_name"`
+	Taxa            Taxa              `json:"taxa"`
 }
 
 func (q *Queries) SearchObservations(ctx context.Context, scientificName string) ([]SearchObservationsRow, error) {
@@ -227,7 +233,8 @@ func (q *Queries) SearchObservations(ctx context.Context, scientificName string)
 			&i.SpeciesID,
 			&i.Timestamp,
 			&i.Method,
-			&i.AppearanceTime,
+			&i.AppearanceStart,
+			&i.AppearanceEnd,
 			&i.Temperature,
 			&i.Narrative,
 			&i.Confidence,
@@ -253,24 +260,26 @@ SET site_id = $2,
     species_id = $3,
     "timestamp" = $4,
     method = $5,
-    appearance_time = $6,
-    temperature = $7,
-    narrative = $8,
-    confidence = $9
+    appearance_start = $6,
+    appearance_end = $7,
+    temperature = $8,
+    narrative = $9,
+    confidence = $10
 WHERE id = $1
-RETURNING id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence
+RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
 `
 
 type UpdateObservationParams struct {
-	ID             int64                     `json:"id"`
-	SiteID         int64                     `json:"site_id"`
-	SpeciesID      int64                     `json:"species_id"`
-	Timestamp      time.Time                 `json:"timestamp"`
-	Method         ObservationMethod         `json:"method"`
-	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
-	Temperature    *int32                    `json:"temperature"`
-	Narrative      *string                   `json:"narrative"`
-	Confidence     *float32                  `json:"confidence"`
+	ID              int64             `json:"id"`
+	SiteID          int64             `json:"site_id"`
+	SpeciesID       int64             `json:"species_id"`
+	Timestamp       time.Time         `json:"timestamp"`
+	Method          ObservationMethod `json:"method"`
+	AppearanceStart *int32            `json:"appearance_start"`
+	AppearanceEnd   *int32            `json:"appearance_end"`
+	Temperature     *int32            `json:"temperature"`
+	Narrative       *string           `json:"narrative"`
+	Confidence      *float32          `json:"confidence"`
 }
 
 func (q *Queries) UpdateObservation(ctx context.Context, arg UpdateObservationParams) (Observation, error) {
@@ -280,7 +289,8 @@ func (q *Queries) UpdateObservation(ctx context.Context, arg UpdateObservationPa
 		arg.SpeciesID,
 		arg.Timestamp,
 		arg.Method,
-		arg.AppearanceTime,
+		arg.AppearanceStart,
+		arg.AppearanceEnd,
 		arg.Temperature,
 		arg.Narrative,
 		arg.Confidence,
@@ -292,7 +302,8 @@ func (q *Queries) UpdateObservation(ctx context.Context, arg UpdateObservationPa
 		&i.SpeciesID,
 		&i.Timestamp,
 		&i.Method,
-		&i.AppearanceTime,
+		&i.AppearanceStart,
+		&i.AppearanceEnd,
 		&i.Temperature,
 		&i.Narrative,
 		&i.Confidence,

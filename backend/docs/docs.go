@@ -59,10 +59,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/observation.Observation"
-                            }
+                            "$ref": "#/definitions/observation.ListObservationsResponse"
                         }
                     }
                 }
@@ -261,6 +258,41 @@ const docTemplate = `{
                 "ForestTypeWet"
             ]
         },
+        "db.Observation": {
+            "type": "object",
+            "properties": {
+                "appearance_end": {
+                    "type": "integer"
+                },
+                "appearance_start": {
+                    "type": "integer"
+                },
+                "confidence": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "method": {
+                    "$ref": "#/definitions/db.ObservationMethod"
+                },
+                "narrative": {
+                    "type": "string"
+                },
+                "site_id": {
+                    "type": "integer"
+                },
+                "species_id": {
+                    "type": "integer"
+                },
+                "temperature": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
         "db.ObservationMethod": {
             "type": "string",
             "enum": [
@@ -347,6 +379,20 @@ const docTemplate = `{
                 "TenureTypePublic",
                 "TenureTypePrivate"
             ]
+        },
+        "observation.ListObservationsResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "observations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/db.Observation"
+                    }
+                }
+            }
         },
         "observation.Observation": {
             "type": "object",
