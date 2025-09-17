@@ -37,14 +37,8 @@ func parseSite(i int, row []string) (site db.CreateSiteParams, err error) {
 		location = nil
 	}
 
-	var tenureEnum db.TenureType
-
-	switch tenure {
-	case "private":
-		tenureEnum = db.TenureTypePrivate
-	case "public":
-		tenureEnum = db.TenureTypePublic
-	default:
+	tenureEnum := db.TenureType(tenure)
+	if !tenureEnum.Valid() {
 		err = fmt.Errorf("unknown tenure type: %s", tenure)
 		return
 	}

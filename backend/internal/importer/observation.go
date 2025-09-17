@@ -20,15 +20,8 @@ func parseObservation(i int, row []string, siteID, speciesID int64) (param db.Cr
 		tsPG = pgtype.Timestamptz{Time: ts, Valid: true}
 	}
 
-	var method db.ObservationMethod
-	switch strings.ToLower(row[6]) {
-	case "audio":
-		method = db.ObservationMethodAudio
-	case "camera":
-		method = db.ObservationMethodCamera
-	case "observed":
-		method = db.ObservationMethodObserved
-	default:
+	method := db.ObservationMethod(strings.ToLower(row[6]))
+	if !method.Valid() {
 		err = fmt.Errorf("unknown observation method: %s", row[6])
 		return
 	}

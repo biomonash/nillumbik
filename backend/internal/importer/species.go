@@ -13,15 +13,8 @@ func parseSpecies(i int, row []string) (species db.CreateSpeciesParams, err erro
 	native := strings.ToLower(row[18]) == "native"
 	taxa := strings.ToLower(row[22])
 
-	var taxaEnum db.Taxa
-	switch taxa {
-	case "bird":
-		taxaEnum = db.TaxaBird
-	case "mammal":
-		taxaEnum = db.TaxaMammal
-	case "reptile":
-		taxaEnum = db.TaxaReptile
-	default:
+	taxaEnum := db.Taxa(taxa)
+	if !taxaEnum.Valid() {
 		err = fmt.Errorf("unknown taxa: %s", taxa)
 		return
 	}

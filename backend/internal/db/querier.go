@@ -29,7 +29,7 @@ type Querier interface {
 	GetSpecies(ctx context.Context, id int64) (Species, error)
 	GetSpeciesByCommonName(ctx context.Context, lower string) (Species, error)
 	GetSpeciesByScientificName(ctx context.Context, lower string) (Species, error)
-	ListObservations(ctx context.Context) ([]Observation, error)
+	ListObservations(ctx context.Context, arg ListObservationsParams) ([]Observation, error)
 	ListSites(ctx context.Context) ([]Site, error)
 	ListSpecies(ctx context.Context) ([]Species, error)
 	SearchObservations(ctx context.Context, scientificName string) ([]SearchObservationsRow, error)
