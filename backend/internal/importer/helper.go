@@ -30,6 +30,7 @@ func parseTimestamp(dateStr, timeStr string) (time.Time, error) {
 		"2-Jan-06 3:04 PM",
 		"2-Jan-06 3:04:05 PM",
 		"2-Jan-06 15:04:05",
+		"2-Jan-06 3:04 pm",
 	}
 	for _, layout := range layouts {
 		t, err := time.ParseInLocation(layout, dateStr+" "+timeStr, config.TIMEZONE)
