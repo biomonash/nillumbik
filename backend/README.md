@@ -2,6 +2,18 @@
 
 The Nillumbik backend is a **Go-based REST API** built for the Nillumbik Shire project, designed to manage ecological observation data including sites, species, and wildlife observations. The backend follows a **clean architecture pattern** with clear separation of concerns.
 
+## Quick start
+
+Make sure you follow the *Quick start* in [Project README](../README.md)
+
+Run backend server (auto restart by Air):
+
+```bash
+make dev-backend
+```
+
+And open http://localhost:8000/swagger/index.html to test the API.
+
 ## Technology Stack
 
 The backend uses modern Go technologies:
