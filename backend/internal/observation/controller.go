@@ -1,10 +1,11 @@
 package observation
 
 import (
+	"log"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/gin-gonic/gin"
 )
 
 type Controller struct {
@@ -17,6 +18,16 @@ func NewController(queries db.Querier) *Controller {
 	}
 }
 
+type ListObservationsRequest struct {
+	Limit  int32 `form:"limit,required"`
+	Offset int32 `form:"offset,required"`
+}
+
+type ListObservationsResponse struct {
+	Count        int              `json:"count"`
+	Observations []db.Observation `json:"observations"`
+}
+
 // ListObservations godoc
 //
 //	@Summary		List observations
@@ -24,15 +35,30 @@ func NewController(queries db.Querier) *Controller {
 //	@Tags			observation
 //	@Accept			json
 //	@Produce		json
-//	@Success		200	{object}	[]Observation
+//	@Param			limit	query		int	True	"Result limit"	default(100)
+//	@Param			offset	query		int	True	"Result offset"	default(0)
+//	@Success		200		{object}	ListObservationsResponse
 //	@Router			/observations [get]
 func (u *Controller) ListObservations(c *gin.Context) {
-	obs, err := u.q.ListObservations(c.Request.Context())
+	var params ListObservationsRequest
+	err := c.BindQuery(&params)
+	if err != nil {
+		c.AbortWithError(400, err)
+		return
+	}
+	obs, err := u.q.ListObservations(c.Request.Context(), db.ListObservationsParams{
+		Limit:  params.Limit,
+		Offset: params.Offset,
+	})
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
 	}
-	c.JSON(200, obs)
+	log.Println(obs, err, params)
+	c.JSON(200, ListObservationsResponse{
+		Count:        len(obs),
+		Observations: obs,
+	})
 }
 
 // GetObservationDetail godoc

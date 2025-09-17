@@ -33,7 +33,10 @@ WHERE id = $1 LIMIT 1;
 -- name: ListObservations :many
 SELECT id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence
 FROM observations
-ORDER BY id;
+ORDER BY timestamp
+LIMIT $1
+OFFSET $2;
+
 
 -- name: UpdateObservation :one
 UPDATE observations

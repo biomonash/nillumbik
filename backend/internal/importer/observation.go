@@ -10,14 +10,11 @@ import (
 )
 
 func parseObservation(i int, row []string, siteID, speciesID int64) (param db.CreateObservationsParams, err error) {
-	ts, err := parseTimestamp(row[4], row[5])
-	var tsPG pgtype.Timestamptz
+	timestamp, err := parseTimestamp(row[4], row[5])
 	if err != nil {
 		// leave timestamp NULL if you prefer; or set fallback if schema requires NOT NULL
 		err = fmt.Errorf("failed to parse timestamp: %w", err)
 		return
-	} else {
-		tsPG = pgtype.Timestamptz{Time: ts, Valid: true}
 	}
 
 	method := db.ObservationMethod(strings.ToLower(row[6]))
@@ -52,7 +49,7 @@ func parseObservation(i int, row []string, siteID, speciesID int64) (param db.Cr
 	return db.CreateObservationsParams{
 		SiteID:         siteID,
 		SpeciesID:      speciesID,
-		Timestamp:      tsPG,
+		Timestamp:      timestamp,
 		Method:         method,
 		AppearanceTime: appearance,
 		Temperature:    temp,
