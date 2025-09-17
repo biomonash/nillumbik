@@ -8,6 +8,29 @@ definitions:
     x-enum-varnames:
     - ForestTypeDry
     - ForestTypeWet
+  db.Observation:
+    properties:
+      appearance_end:
+        type: integer
+      appearance_start:
+        type: integer
+      confidence:
+        type: number
+      id:
+        type: integer
+      method:
+        $ref: '#/definitions/db.ObservationMethod'
+      narrative:
+        type: string
+      site_id:
+        type: integer
+      species_id:
+        type: integer
+      temperature:
+        type: integer
+      timestamp:
+        type: string
+    type: object
   db.ObservationMethod:
     enum:
     - audio
@@ -69,6 +92,15 @@ definitions:
     x-enum-varnames:
     - TenureTypePublic
     - TenureTypePrivate
+  observation.ListObservationsResponse:
+    properties:
+      count:
+        type: integer
+      observations:
+        items:
+          $ref: '#/definitions/db.Observation'
+        type: array
+    type: object
   observation.Observation:
     properties:
       appearance_time:
@@ -140,9 +172,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/observation.Observation'
-            type: array
+            $ref: '#/definitions/observation.ListObservationsResponse'
       summary: List observations
       tags:
       - observation

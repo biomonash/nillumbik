@@ -79,7 +79,7 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 			}
 			species, err = q.CreateSpecies(ctx, speciesParam)
 			if err != nil {
-				return fmt.Errorf("Row: %d insert species failed: %w\n%s", i, err, speciesParam)
+				return fmt.Errorf("Row: %d insert species failed: %w\n%v", i, err, speciesParam)
 			}
 			cache.AddSpecies(species)
 		} else if err != nil {
