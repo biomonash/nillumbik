@@ -145,11 +145,18 @@ func (q *Queries) GetObservation(ctx context.Context, id int64) (Observation, er
 const listObservations = `-- name: ListObservations :many
 SELECT id, site_id, species_id, "timestamp", method, appearance_time, temperature, narrative, confidence
 FROM observations
-ORDER BY id
+ORDER BY timestamp
+LIMIT $1
+OFFSET $2
 `
 
-func (q *Queries) ListObservations(ctx context.Context) ([]Observation, error) {
-	rows, err := q.db.Query(ctx, listObservations)
+type ListObservationsParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListObservations(ctx context.Context, arg ListObservationsParams) ([]Observation, error) {
+	rows, err := q.db.Query(ctx, listObservations, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

@@ -53,6 +53,22 @@ func (ns NullForestType) Value() (driver.Value, error) {
 	return string(ns.ForestType), nil
 }
 
+func (e ForestType) Valid() bool {
+	switch e {
+	case ForestTypeDry,
+		ForestTypeWet:
+		return true
+	}
+	return false
+}
+
+func AllForestTypeValues() []ForestType {
+	return []ForestType{
+		ForestTypeDry,
+		ForestTypeWet,
+	}
+}
+
 type ObservationMethod string
 
 const (
@@ -94,6 +110,24 @@ func (ns NullObservationMethod) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.ObservationMethod), nil
+}
+
+func (e ObservationMethod) Valid() bool {
+	switch e {
+	case ObservationMethodAudio,
+		ObservationMethodCamera,
+		ObservationMethodObserved:
+		return true
+	}
+	return false
+}
+
+func AllObservationMethodValues() []ObservationMethod {
+	return []ObservationMethod{
+		ObservationMethodAudio,
+		ObservationMethodCamera,
+		ObservationMethodObserved,
+	}
 }
 
 type Taxa string
@@ -139,6 +173,24 @@ func (ns NullTaxa) Value() (driver.Value, error) {
 	return string(ns.Taxa), nil
 }
 
+func (e Taxa) Valid() bool {
+	switch e {
+	case TaxaBird,
+		TaxaMammal,
+		TaxaReptile:
+		return true
+	}
+	return false
+}
+
+func AllTaxaValues() []Taxa {
+	return []Taxa{
+		TaxaBird,
+		TaxaMammal,
+		TaxaReptile,
+	}
+}
+
 type TenureType string
 
 const (
@@ -179,6 +231,22 @@ func (ns NullTenureType) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.TenureType), nil
+}
+
+func (e TenureType) Valid() bool {
+	switch e {
+	case TenureTypePublic,
+		TenureTypePrivate:
+		return true
+	}
+	return false
+}
+
+func AllTenureTypeValues() []TenureType {
+	return []TenureType{
+		TenureTypePublic,
+		TenureTypePrivate,
+	}
 }
 
 type Observation struct {
