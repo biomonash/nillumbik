@@ -1,7 +1,6 @@
 package observation
 
 import (
-	"log"
 	"strconv"
 
 	"github.com/biomonash/nillumbik/internal/db"
@@ -19,8 +18,8 @@ func NewController(queries db.Querier) *Controller {
 }
 
 type ListObservationsRequest struct {
-	Limit  int32 `form:"limit,required"`
-	Offset int32 `form:"offset,required"`
+	Limit  int32 `form:"limit" binding:"required,max=1000,min=1"`
+	Offset int32 `form:"offset" binding:"min=0"`
 }
 
 type ListObservationsResponse struct {
@@ -38,23 +37,24 @@ type ListObservationsResponse struct {
 //	@Param			limit	query		int	True	"Result limit"	default(100)
 //	@Param			offset	query		int	True	"Result offset"	default(0)
 //	@Success		200		{object}	ListObservationsResponse
+//	@Error			400 	{object}	gin.H
 //	@Router			/observations [get]
 func (u *Controller) ListObservations(c *gin.Context) {
 	var params ListObservationsRequest
-	err := c.BindQuery(&params)
-	if err != nil {
-		c.AbortWithError(400, err)
+	if err := c.ShouldBind(&params); err != nil {
+		c.JSON(400, gin.H{"message": err.Error()})
 		return
 	}
+
 	obs, err := u.q.ListObservations(c.Request.Context(), db.ListObservationsParams{
 		Limit:  params.Limit,
 		Offset: params.Offset,
 	})
 	if err != nil {
-		c.AbortWithError(500, err)
+		c.JSON(500, gin.H{"message": err.Error()})
 		return
 	}
-	log.Println(obs, err, params)
+
 	c.JSON(200, ListObservationsResponse{
 		Count:        len(obs),
 		Observations: obs,
