@@ -1,9 +1,11 @@
 package observation
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,8 +43,8 @@ type ListObservationsResponse struct {
 //	@Router			/observations [get]
 func (u *Controller) ListObservations(c *gin.Context) {
 	var params ListObservationsRequest
-	if err := c.ShouldBind(&params); err != nil {
-		c.JSON(400, gin.H{"message": err.Error()})
+	if err := c.ShouldBindQuery(&params); err != nil {
+		utils.RespondError(c, 400, fmt.Errorf("Validation failed: %w", err))
 		return
 	}
 
@@ -51,7 +53,7 @@ func (u *Controller) ListObservations(c *gin.Context) {
 		Offset: params.Offset,
 	})
 	if err != nil {
-		c.JSON(500, gin.H{"message": err.Error()})
+		c.AbortWithError(500, err)
 		return
 	}
 
@@ -75,11 +77,12 @@ func (u *Controller) GetObservationByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.AbortWithStatusJSON(400, gin.H{"message": "invalid id"})
+		utils.RespondError(c, 400, fmt.Errorf("Invalid id: %w", err))
+		return
 	}
 	ob, err := u.q.GetObservation(c.Request.Context(), int64(id))
 	if err != nil {
-		c.JSON(400, gin.H{"message": "Species not found"})
+		utils.RespondError(c, 404, fmt.Errorf("Observation not found"))
 		return
 	}
 
