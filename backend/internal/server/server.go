@@ -37,6 +37,8 @@ type Server struct {
 func New(querier db.Querier) *Server {
 	r := gin.Default()
 
+	r.Use(errorHandler())
+
 	api := r.Group("/api")
 
 	site.Register(api, site.NewController(querier))
