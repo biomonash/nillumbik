@@ -121,6 +121,19 @@ paths:
       consumes:
       - application/json
       description: List observations
+      parameters:
+      - default: 100
+        description: Result limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - default: 0
+        description: Result offset
+        in: query
+        name: offset
+        required: true
+        type: integer
       produces:
       - application/json
       responses:

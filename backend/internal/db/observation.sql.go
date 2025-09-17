@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -64,7 +65,7 @@ RETURNING id, site_id, species_id, "timestamp", method, appearance_time, tempera
 type CreateObservationParams struct {
 	SiteID         int64                     `json:"site_id"`
 	SpeciesID      int64                     `json:"species_id"`
-	Timestamp      pgtype.Timestamptz        `json:"timestamp"`
+	Timestamp      time.Time                 `json:"timestamp"`
 	Method         ObservationMethod         `json:"method"`
 	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
 	Temperature    *int32                    `json:"temperature"`
@@ -101,7 +102,7 @@ func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationPa
 type CreateObservationsParams struct {
 	SiteID         int64                     `json:"site_id"`
 	SpeciesID      int64                     `json:"species_id"`
-	Timestamp      pgtype.Timestamptz        `json:"timestamp"`
+	Timestamp      time.Time                 `json:"timestamp"`
 	Method         ObservationMethod         `json:"method"`
 	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
 	Temperature    *int32                    `json:"temperature"`
@@ -198,7 +199,7 @@ type SearchObservationsRow struct {
 	ID             int64                     `json:"id"`
 	SiteID         int64                     `json:"site_id"`
 	SpeciesID      int64                     `json:"species_id"`
-	Timestamp      pgtype.Timestamptz        `json:"timestamp"`
+	Timestamp      time.Time                 `json:"timestamp"`
 	Method         ObservationMethod         `json:"method"`
 	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
 	Temperature    *int32                    `json:"temperature"`
@@ -264,7 +265,7 @@ type UpdateObservationParams struct {
 	ID             int64                     `json:"id"`
 	SiteID         int64                     `json:"site_id"`
 	SpeciesID      int64                     `json:"species_id"`
-	Timestamp      pgtype.Timestamptz        `json:"timestamp"`
+	Timestamp      time.Time                 `json:"timestamp"`
 	Method         ObservationMethod         `json:"method"`
 	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
 	Temperature    *int32                    `json:"temperature"`

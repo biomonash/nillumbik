@@ -7,6 +7,7 @@ package db
 import (
 	"database/sql/driver"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -253,7 +254,7 @@ type Observation struct {
 	ID             int64                     `json:"id"`
 	SiteID         int64                     `json:"site_id"`
 	SpeciesID      int64                     `json:"species_id"`
-	Timestamp      pgtype.Timestamptz        `json:"timestamp"`
+	Timestamp      time.Time                 `json:"timestamp"`
 	Method         ObservationMethod         `json:"method"`
 	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
 	Temperature    *int32                    `json:"temperature"`
