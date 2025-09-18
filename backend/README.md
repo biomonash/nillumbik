@@ -62,6 +62,7 @@ The backend follows a domain-driven design with these modules:
 ### Documentation (`/docs`)
 - Auto-generated Swagger documentation files
 - Written as doc comments in each controller function
+- Run `make gen-doc` each time you modify the comment
 
 ## Database Schema
 
@@ -95,3 +96,10 @@ The API follows RESTful principles with:
 3. **Species Management**: Native/non-native classification, conservation indicators
 4. **Flexible Observations**: Multiple detection methods (audio, camera, visual)
 5. **Data Import Pipeline**: Dedicated importer for bulk data loading
+
+## Dev References
+
+* [Gin API](https://gin-gonic.com/en/docs/): Especially [Data binding](https://gin-gonic.com/en/docs/examples/bind-query-or-post/)
+* [Validator](https://pkg.go.dev/github.com/go-playground/validator/v10#section-readme): Write `binding:` struct tags for controllers
+* [SQLC](https://docs.sqlc.dev/en/stable/index.html): Especially [Configuration](https://docs.sqlc.dev/en/stable/reference/config.html) and [Data type](https://docs.sqlc.dev/en/stable/reference/datatypes.html)
+* [Swaggo declarative comments format](https://github.com/swaggo/swag?tab=readme-ov-file#declarative-comments-format)
