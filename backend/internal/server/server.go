@@ -5,7 +5,7 @@ import (
 	"github.com/biomonash/nillumbik/internal/observation"
 	"github.com/biomonash/nillumbik/internal/site"
 	"github.com/biomonash/nillumbik/internal/species"
-	"github.com/biomonash/nillumbik/internal/statistics"
+	"github.com/biomonash/nillumbik/internal/stats"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -48,7 +48,7 @@ func New(querier db.Querier) *Server {
 
 	observation.Register(api, observation.NewController(querier))
 
-	statistics.Register(api, statistics.NewController(querier))
+	stats.Register(api, stats.NewController(querier))
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

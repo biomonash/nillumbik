@@ -131,7 +131,13 @@ definitions:
       timestamp:
         type: string
     type: object
-  statistics.SpeciesOverviewResponse:
+  stats.ObservationOverviewResponse:
+    type: object
+  stats.ObservationTimeSeriesResponse:
+    type: object
+  stats.SpeciesOverviewResponse:
+    type: object
+  stats.SpeciesTimeSeriesResponse:
     type: object
 externalDocs:
   description: OpenAPI
@@ -297,7 +303,37 @@ paths:
       summary: Get species detail by common name
       tags:
       - species
-  /statistics/species:
+  /stats/observations:
+    get:
+      consumes:
+      - application/json
+      description: Observation overview
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/stats.ObservationOverviewResponse'
+      summary: Observation overview
+      tags:
+      - statistics
+  /stats/observations/timeseries:
+    get:
+      consumes:
+      - application/json
+      description: Observation time series
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/stats.ObservationTimeSeriesResponse'
+      summary: Observation time series
+      tags:
+      - statistics
+  /stats/species:
     get:
       consumes:
       - application/json
@@ -308,8 +344,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/statistics.SpeciesOverviewResponse'
+            $ref: '#/definitions/stats.SpeciesOverviewResponse'
       summary: Species overview
+      tags:
+      - statistics
+  /stats/species/timeseries:
+    get:
+      consumes:
+      - application/json
+      description: Species time series
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/stats.SpeciesTimeSeriesResponse'
+      summary: Species time series
       tags:
       - statistics
 securityDefinitions:
