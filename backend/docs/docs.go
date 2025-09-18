@@ -244,6 +244,29 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/statistics/species": {
+            "get": {
+                "description": "Species overview",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Species overview",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/statistics.SpeciesOverviewResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -439,6 +462,9 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "statistics.SpeciesOverviewResponse": {
+            "type": "object"
         }
     },
     "securityDefinitions": {

@@ -131,6 +131,8 @@ definitions:
       timestamp:
         type: string
     type: object
+  statistics.SpeciesOverviewResponse:
+    type: object
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
@@ -295,6 +297,21 @@ paths:
       summary: Get species detail by common name
       tags:
       - species
+  /statistics/species:
+    get:
+      consumes:
+      - application/json
+      description: Species overview
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/statistics.SpeciesOverviewResponse'
+      summary: Species overview
+      tags:
+      - statistics
 securityDefinitions:
   BasicAuth:
     type: basic
