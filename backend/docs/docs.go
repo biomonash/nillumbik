@@ -245,7 +245,53 @@ const docTemplate = `{
                 }
             }
         },
-        "/statistics/species": {
+        "/stats/observations": {
+            "get": {
+                "description": "Observation overview",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Observation overview",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/stats.ObservationOverviewResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/stats/observations/timeseries": {
+            "get": {
+                "description": "Observation time series",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Observation time series",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/stats.ObservationTimeSeriesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/stats/species": {
             "get": {
                 "description": "Species overview",
                 "consumes": [
@@ -262,7 +308,30 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/statistics.SpeciesOverviewResponse"
+                            "$ref": "#/definitions/stats.SpeciesOverviewResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/stats/species/timeseries": {
+            "get": {
+                "description": "Species time series",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Species time series",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/stats.SpeciesTimeSeriesResponse"
                         }
                     }
                 }
@@ -463,7 +532,16 @@ const docTemplate = `{
                 }
             }
         },
-        "statistics.SpeciesOverviewResponse": {
+        "stats.ObservationOverviewResponse": {
+            "type": "object"
+        },
+        "stats.ObservationTimeSeriesResponse": {
+            "type": "object"
+        },
+        "stats.SpeciesOverviewResponse": {
+            "type": "object"
+        },
+        "stats.SpeciesTimeSeriesResponse": {
             "type": "object"
         }
     },
