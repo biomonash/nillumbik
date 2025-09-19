@@ -9,6 +9,10 @@ import (
 )
 
 type Querier interface {
+	CountActiveMonitoringSites(ctx context.Context) (int64, error)
+	CountDetectionEvents(ctx context.Context) (int64, error)
+	CountDistinctNativeSpeciesObserved(ctx context.Context) (int64, error)
+	CountDistinctSpeciesObserved(ctx context.Context) (int64, error)
 	CountObservations(ctx context.Context) (int64, error)
 	CountObservationsBySite(ctx context.Context, siteID int64) (int64, error)
 	CountObservationsBySpecies(ctx context.Context, speciesID int64) (int64, error)

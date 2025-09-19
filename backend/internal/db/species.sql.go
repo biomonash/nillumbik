@@ -9,6 +9,53 @@ import (
 	"context"
 )
 
+const countActiveMonitoringSites = `-- name: CountActiveMonitoringSites :one
+SELECT COUNT(DISTINCT site_id) FROM observations
+`
+
+func (q *Queries) CountActiveMonitoringSites(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countActiveMonitoringSites)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countDetectionEvents = `-- name: CountDetectionEvents :one
+SELECT COUNT(*) FROM observations
+`
+
+func (q *Queries) CountDetectionEvents(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countDetectionEvents)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countDistinctNativeSpeciesObserved = `-- name: CountDistinctNativeSpeciesObserved :one
+SELECT COUNT(DISTINCT o.species_id)
+FROM observations o
+JOIN species s ON o.species_id = s.id
+WHERE s.native = TRUE
+`
+
+func (q *Queries) CountDistinctNativeSpeciesObserved(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countDistinctNativeSpeciesObserved)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countDistinctSpeciesObserved = `-- name: CountDistinctSpeciesObserved :one
+SELECT COUNT(DISTINCT species_id) FROM observations
+`
+
+func (q *Queries) CountDistinctSpeciesObserved(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countDistinctSpeciesObserved)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countSpecies = `-- name: CountSpecies :one
 SELECT COUNT(*) FROM species
 `
