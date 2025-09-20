@@ -42,3 +42,48 @@ SELECT id, scientific_name, common_name, native, taxa, indicator, reportable
 FROM species
 WHERE scientific_name ILIKE $1 OR common_name ILIKE $1
 ORDER BY scientific_name;
+
+-- name: CountDistinctSpeciesObserved :one
+SELECT COUNT(DISTINCT species_id) FROM observations;
+
+-- name: CountActiveMonitoringSites :one
+SELECT COUNT(DISTINCT site_id) FROM observations;
+
+-- name: CountDetectionEvents :one
+SELECT COUNT(*) FROM observations;
+
+-- name: CountDistinctNativeSpeciesObserved :one
+SELECT COUNT(DISTINCT o.species_id)
+FROM observations o
+JOIN species s ON o.species_id = s.id
+WHERE s.native = TRUE;
+
+-- name: CountDistinctSpeciesObservedInPeriod :one
+SELECT COUNT(DISTINCT species_id)
+FROM observations
+WHERE ($1::timestamptz IS NULL OR "timestamp" >= $1::timestamptz)
+  AND ($2::timestamptz IS NULL OR "timestamp" <= $2::timestamptz);
+
+-- name: CountDistinctNativeSpeciesObservedInPeriod :one
+SELECT COUNT(DISTINCT o.species_id)
+FROM observations o
+JOIN species s ON o.species_id = s.id
+WHERE s.native = TRUE
+  AND ($1::timestamptz IS NULL OR o."timestamp" >= $1::timestamptz)
+  AND ($2::timestamptz IS NULL OR o."timestamp" <= $2::timestamptz);
+
+-- name: ListSpeciesCountByTaxaInPeriod :many
+SELECT s.taxa, COUNT(DISTINCT o.species_id) AS count
+FROM observations o
+JOIN species s ON o.species_id = s.id
+WHERE ($1::timestamptz IS NULL OR o."timestamp" >= $1::timestamptz)
+  AND ($2::timestamptz IS NULL OR o."timestamp" <= $2::timestamptz)
+GROUP BY s.taxa;
+
+-- name: SpeciesObservationTimeSeries :many
+SELECT date_trunc('month', "timestamp")::timestamp AS month, COUNT(*) AS count
+FROM observations
+WHERE ($1::timestamptz IS NULL OR "timestamp" >= $1::timestamptz)
+  AND ($2::timestamptz IS NULL OR "timestamp" <= $2::timestamptz)
+GROUP BY month
+ORDER BY month;
