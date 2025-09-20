@@ -2,7 +2,6 @@ package stats
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,8 +11,7 @@ import (
 // --- Structs ---
 
 type SpeciesOverviewRequest struct {
-	From *time.Time `form:"from" time_format:"2006-01-02T15:04:05Z07:00"`
-	To   *time.Time `form:"to"   time_format:"2006-01-02T15:04:05Z07:00"`
+	TimePeriodRequest
 }
 
 type SpeciesOverviewResponse struct {
