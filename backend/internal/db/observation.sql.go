@@ -8,6 +8,8 @@ package db
 import (
 	"context"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const countObservations = `-- name: CountObservations :one
@@ -181,6 +183,45 @@ func (q *Queries) ListObservations(ctx context.Context, arg ListObservationsPara
 			&i.Narrative,
 			&i.Confidence,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const observationTimeSeries = `-- name: ObservationTimeSeries :many
+SELECT date_trunc('month', "timestamp")::timestamp AS month, COUNT(*) AS count
+FROM observations
+WHERE ($1::timestamptz IS NULL OR "timestamp" >= $1::timestamptz)
+  AND ($2::timestamptz IS NULL OR "timestamp" <= $2::timestamptz)
+GROUP BY month
+ORDER BY month
+`
+
+type ObservationTimeSeriesParams struct {
+	Column1 pgtype.Timestamptz `json:"column_1"`
+	Column2 pgtype.Timestamptz `json:"column_2"`
+}
+
+type ObservationTimeSeriesRow struct {
+	Month time.Time `json:"month"`
+	Count int64     `json:"count"`
+}
+
+func (q *Queries) ObservationTimeSeries(ctx context.Context, arg ObservationTimeSeriesParams) ([]ObservationTimeSeriesRow, error) {
+	rows, err := q.db.Query(ctx, observationTimeSeries, arg.Column1, arg.Column2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ObservationTimeSeriesRow
+	for rows.Next() {
+		var i ObservationTimeSeriesRow
+		if err := rows.Scan(&i.Month, &i.Count); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
