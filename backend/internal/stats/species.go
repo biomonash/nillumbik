@@ -9,6 +9,18 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+// --- Helpers ---
+func toPgTimestamptz(t *time.Time) pgtype.Timestamptz {
+	var ts pgtype.Timestamptz
+	if t != nil {
+		ts.Time = *t
+		ts.Valid = true
+	} else {
+		ts.Valid = false
+	}
+	return ts
+}
+
 // --- Structs ---
 
 type SpeciesOverviewRequest struct {
@@ -31,17 +43,6 @@ type SpeciesStatsResponse struct {
 	ActiveMonitoringSites int64   `json:"active_monitoring_sites"`
 	DetectionEvents       int64   `json:"detection_events"`
 	NativeSpeciesPercent  float64 `json:"native_species_percent"`
-}
-
-func toPgTimestamptz(t *time.Time) pgtype.Timestamptz {
-	var ts pgtype.Timestamptz
-	if t != nil {
-		ts.Time = *t
-		ts.Valid = true
-	} else {
-		ts.Valid = false
-	}
-	return ts
 }
 
 // SpeciesOverview godoc
