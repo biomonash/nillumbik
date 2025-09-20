@@ -196,15 +196,15 @@ func (q *Queries) ListObservations(ctx context.Context, arg ListObservationsPara
 const observationTimeSeries = `-- name: ObservationTimeSeries :many
 SELECT date_trunc('month', "timestamp")::timestamp AS month, COUNT(*) AS count
 FROM observations
-WHERE ($1::timestamptz IS NULL OR "timestamp" >= $1::timestamptz)
-  AND ($2::timestamptz IS NULL OR "timestamp" <= $2::timestamptz)
+WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
+  AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
 GROUP BY month
 ORDER BY month
 `
 
 type ObservationTimeSeriesParams struct {
-	Column1 pgtype.Timestamptz `json:"column_1"`
-	Column2 pgtype.Timestamptz `json:"column_2"`
+	From pgtype.Timestamp `json:"from"`
+	To   pgtype.Timestamp `json:"to"`
 }
 
 type ObservationTimeSeriesRow struct {
@@ -213,7 +213,7 @@ type ObservationTimeSeriesRow struct {
 }
 
 func (q *Queries) ObservationTimeSeries(ctx context.Context, arg ObservationTimeSeriesParams) ([]ObservationTimeSeriesRow, error) {
-	rows, err := q.db.Query(ctx, observationTimeSeries, arg.Column1, arg.Column2)
+	rows, err := q.db.Query(ctx, observationTimeSeries, arg.From, arg.To)
 	if err != nil {
 		return nil, err
 	}

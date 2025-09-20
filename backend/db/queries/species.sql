@@ -61,29 +61,29 @@ WHERE s.native = TRUE;
 -- name: CountDistinctSpeciesObservedInPeriod :one
 SELECT COUNT(DISTINCT species_id)
 FROM observations
-WHERE ($1::timestamptz IS NULL OR "timestamp" >= $1::timestamptz)
-  AND ($2::timestamptz IS NULL OR "timestamp" <= $2::timestamptz);
+WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from')::timestamp)
+  AND (sqlc.narg('to')::timestamp IS NULL OR "timestamp" <= sqlc.narg('to')::timestamp);
 
 -- name: CountDistinctNativeSpeciesObservedInPeriod :one
 SELECT COUNT(DISTINCT o.species_id)
 FROM observations o
 JOIN species s ON o.species_id = s.id
 WHERE s.native = TRUE
-  AND ($1::timestamptz IS NULL OR o."timestamp" >= $1::timestamptz)
-  AND ($2::timestamptz IS NULL OR o."timestamp" <= $2::timestamptz);
+  AND (sqlc.narg('from')::timestamp IS NULL OR o."timestamp" >= sqlc.narg('from')::timestamp)
+  AND (sqlc.narg('to')::timestamp IS NULL OR o."timestamp" <= sqlc.narg('to')::timestamp);
 
 -- name: ListSpeciesCountByTaxaInPeriod :many
 SELECT s.taxa, COUNT(DISTINCT o.species_id) AS count
 FROM observations o
 JOIN species s ON o.species_id = s.id
-WHERE ($1::timestamptz IS NULL OR o."timestamp" >= $1::timestamptz)
-  AND ($2::timestamptz IS NULL OR o."timestamp" <= $2::timestamptz)
+WHERE (sqlc.narg('from')::timestamp IS NULL OR o."timestamp" >= sqlc.narg('from')::timestamp)
+  AND (sqlc.narg('to')::timestamp IS NULL OR o."timestamp" <= sqlc.narg('to')::timestamp)
 GROUP BY s.taxa;
 
 -- name: SpeciesObservationTimeSeries :many
 SELECT date_trunc('month', "timestamp")::timestamp AS month, COUNT(*) AS count
 FROM observations
-WHERE ($1::timestamptz IS NULL OR "timestamp" >= $1::timestamptz)
-  AND ($2::timestamptz IS NULL OR "timestamp" <= $2::timestamptz)
+WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from')::timestamp)
+  AND (sqlc.narg('to')::timestamp IS NULL OR "timestamp" <= sqlc.narg('to')::timestamp)
 GROUP BY month
 ORDER BY month;

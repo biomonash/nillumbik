@@ -132,12 +132,64 @@ definitions:
         type: string
     type: object
   stats.ObservationOverviewResponse:
+    properties:
+      active_monitoring_sites:
+        type: integer
+      count_by_category:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
+      detection_events:
+        type: integer
+      native_species_percent:
+        type: number
+      total_species_detected:
+        type: integer
     type: object
   stats.ObservationTimeSeriesResponse:
+    properties:
+      series:
+        items:
+          $ref: '#/definitions/stats.TimeSeriesPoint'
+        type: array
     type: object
   stats.SpeciesOverviewResponse:
+    properties:
+      count_by_category:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
+      native_count:
+        type: integer
+      total_count:
+        type: integer
+    type: object
+  stats.SpeciesStatsResponse:
+    properties:
+      active_monitoring_sites:
+        type: integer
+      detection_events:
+        type: integer
+      native_species_percent:
+        type: number
+      total_species_detected:
+        type: integer
     type: object
   stats.SpeciesTimeSeriesResponse:
+    properties:
+      series:
+        items:
+          $ref: '#/definitions/stats.TimeSeriesPoint'
+        type: array
+    type: object
+  stats.TimeSeriesPoint:
+    properties:
+      timestamp:
+        type: string
+      value:
+        type: integer
     type: object
 externalDocs:
   description: OpenAPI
@@ -346,6 +398,21 @@ paths:
           schema:
             $ref: '#/definitions/stats.SpeciesOverviewResponse'
       summary: Species overview
+      tags:
+      - statistics
+  /stats/species/stats:
+    get:
+      consumes:
+      - application/json
+      description: Species statistics
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/stats.SpeciesStatsResponse'
+      summary: Species statistics
       tags:
       - statistics
   /stats/species/timeseries:

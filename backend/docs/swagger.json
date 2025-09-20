@@ -308,6 +308,29 @@
                 }
             }
         },
+        "/stats/species/stats": {
+            "get": {
+                "description": "Species statistics",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Species statistics",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/stats.SpeciesStatsResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/species/timeseries": {
             "get": {
                 "description": "Species time series",
@@ -527,16 +550,96 @@
             }
         },
         "stats.ObservationOverviewResponse": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "active_monitoring_sites": {
+                    "type": "integer"
+                },
+                "count_by_category": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "detection_events": {
+                    "type": "integer"
+                },
+                "native_species_percent": {
+                    "type": "number"
+                },
+                "total_species_detected": {
+                    "type": "integer"
+                }
+            }
         },
         "stats.ObservationTimeSeriesResponse": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/stats.TimeSeriesPoint"
+                    }
+                }
+            }
         },
         "stats.SpeciesOverviewResponse": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "count_by_category": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "native_count": {
+                    "type": "integer"
+                },
+                "total_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "stats.SpeciesStatsResponse": {
+            "type": "object",
+            "properties": {
+                "active_monitoring_sites": {
+                    "type": "integer"
+                },
+                "detection_events": {
+                    "type": "integer"
+                },
+                "native_species_percent": {
+                    "type": "number"
+                },
+                "total_species_detected": {
+                    "type": "integer"
+                }
+            }
         },
         "stats.SpeciesTimeSeriesResponse": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/stats.TimeSeriesPoint"
+                    }
+                }
+            }
+        },
+        "stats.TimeSeriesPoint": {
+            "type": "object",
+            "properties": {
+                "timestamp": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "integer"
+                }
+            }
         }
     },
     "securityDefinitions": {
