@@ -3,6 +3,7 @@ package stats
 import (
 	"net/http"
 
+	"github.com/biomonash/nillumbik/internal/db"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,9 +16,9 @@ type SpeciesOverviewRequest struct {
 }
 
 type SpeciesOverviewResponse struct {
-	TotalCount      int64            `json:"total_count"`
-	NativeCount     int64            `json:"native_count"`
-	CountByCategory map[string]int64 `json:"count_by_category"`
+	TotalCount      int64             `json:"total_count"`
+	NativeCount     int64             `json:"native_count"`
+	CountByCategory map[db.Taxa]int64 `json:"count_by_category"`
 }
 
 type SpeciesTimeSeriesResponse struct {
