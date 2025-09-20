@@ -9,6 +9,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// --- Structs ---
+type ObservationTimeSeriesRequest struct {
+	From *time.Time `form:"from" time_format:"2006-01-02T15:04:05Z07:00"`
+	To   *time.Time `form:"to"   time_format:"2006-01-02T15:04:05Z07:00"`
+}
+
+type ObservationTimeSeriesResponse struct {
+	Series []TimeSeriesPoint `json:"series"`
+}
 type TimeSeriesPoint struct {
 	Timestamp string `json:"timestamp"`
 	Value     int64  `json:"value"`
@@ -93,15 +102,6 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 		CountByCategory: countByCategory,
 	}
 	c.JSON(http.StatusOK, resp)
-}
-
-type ObservationTimeSeriesRequest struct {
-	From *time.Time `form:"from" time_format:"2006-01-02T15:04:05Z07:00"`
-	To   *time.Time `form:"to"   time_format:"2006-01-02T15:04:05Z07:00"`
-}
-
-type ObservationTimeSeriesResponse struct {
-	Series []TimeSeriesPoint `json:"series"`
 }
 
 // ObservationTimeSeries godoc
