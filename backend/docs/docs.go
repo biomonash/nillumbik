@@ -258,6 +258,22 @@ const docTemplate = `{
                     "statistics"
                 ],
                 "summary": "Observation overview",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
