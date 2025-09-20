@@ -4,22 +4,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/biomonash/nillumbik/internal/db"
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 // --- Helpers ---
-func toPgTimestamptz(t *time.Time) pgtype.Timestamptz {
-	var ts pgtype.Timestamptz
-	if t != nil {
-		ts.Time = *t
-		ts.Valid = true
-	} else {
-		ts.Valid = false
-	}
-	return ts
-}
 
 // --- Structs ---
 
@@ -47,64 +35,15 @@ type SpeciesStatsResponse struct {
 
 // SpeciesOverview godoc
 //
-// @Summary		Species overview
-// @Description	Species overview
-// @Tags			statistics
-// @Accept			json
-// @Produce		json
-// @Success		200		{object}	SpeciesOverviewResponse
-// @Error			400 	{object}	gin.H
-// @Router			/stats/species/overview [get]
+//	@Summary		Species overview
+//	@Description	Species overview
+//	@Tags			statistics
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	SpeciesOverviewResponse
+//	@Error			400 	{object}	gin.H
+//	@Router			/stats/species [get]
 func (u *Controller) SpeciesOverview(c *gin.Context) {
-	var req SpeciesOverviewRequest
-	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters"})
-		return
-	}
-	ctx := c.Request.Context()
-
-	// Total distinct species observed in period
-	totalCount, err := u.q.CountDistinctSpeciesObservedInPeriod(ctx, db.CountDistinctSpeciesObservedInPeriodParams{
-		Column1: toPgTimestamptz(req.From),
-		Column2: toPgTimestamptz(req.To),
-	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count distinct species",
-			"details": err.Error()})
-		return
-	}
-
-	// Native species count in period
-	nativeCount, err := u.q.CountDistinctNativeSpeciesObservedInPeriod(ctx, db.CountDistinctNativeSpeciesObservedInPeriodParams{
-		Column1: toPgTimestamptz(req.From),
-		Column2: toPgTimestamptz(req.To),
-	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count native species",
-			"details": err.Error()})
-		return
-	}
-
-	// Species count by category in period
-	rows, err := u.q.ListSpeciesCountByTaxaInPeriod(ctx, db.ListSpeciesCountByTaxaInPeriodParams{
-		Column1: toPgTimestamptz(req.From),
-		Column2: toPgTimestamptz(req.To),
-	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count species by category", "details": err.Error()})
-		return
-	}
-	countByCategory := map[string]int64{}
-	for _, row := range rows {
-		countByCategory[string(row.Taxa)] = row.Count
-	}
-
-	resp := SpeciesOverviewResponse{
-		TotalCount:      totalCount,
-		NativeCount:     nativeCount,
-		CountByCategory: countByCategory,
-	}
-	c.JSON(http.StatusOK, resp)
 }
 
 // SpeciesStats godoc
@@ -170,28 +109,4 @@ func (u *Controller) SpeciesStats(c *gin.Context) {
 //	@Error			400 	{object}	gin.H
 //	@Router			/stats/species/timeseries [get]
 func (u *Controller) SpeciesTimeSeries(c *gin.Context) {
-	var req SpeciesOverviewRequest
-	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters", "details": err.Error()})
-		return
-	}
-	ctx := c.Request.Context()
-
-	rows, err := u.q.SpeciesObservationTimeSeries(ctx, db.SpeciesObservationTimeSeriesParams{
-		Column1: toPgTimestamptz(req.From),
-		Column2: toPgTimestamptz(req.To),
-	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch time series", "details": err.Error()})
-		return
-	}
-	series := make([]TimeSeriesPoint, 0, len(rows))
-	for _, row := range rows {
-		series = append(series, TimeSeriesPoint{
-			Timestamp: row.Month.Format(time.RFC3339),
-			Value:     row.Count,
-		})
-	}
-	resp := SpeciesTimeSeriesResponse{Series: series}
-	c.JSON(http.StatusOK, resp)
 }

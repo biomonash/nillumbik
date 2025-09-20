@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -60,8 +61,8 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 
 	// Example: filter observations by date range
 	paramsDistinct := db.CountDistinctSpeciesObservedInPeriodParams{
-		Column1: toPgTimestamptz(from),
-		Column2: toPgTimestamptz(to),
+		From: utils.ToPgTimestamp(from),
+		To:   utils.ToPgTimestamp(to),
 	}
 	totalCount, err := u.q.CountDistinctSpeciesObservedInPeriod(ctx, paramsDistinct)
 	if err != nil {
@@ -71,8 +72,8 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 	}
 
 	paramsNative := db.CountDistinctNativeSpeciesObservedInPeriodParams{
-		Column1: toPgTimestamptz(from),
-		Column2: toPgTimestamptz(to),
+		From: utils.ToPgTimestamp(from),
+		To:   utils.ToPgTimestamp(to),
 	}
 	nativeCount, err := u.q.CountDistinctNativeSpeciesObservedInPeriod(ctx, paramsNative)
 	if err != nil {
@@ -82,8 +83,8 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 	}
 
 	params := db.ListSpeciesCountByTaxaInPeriodParams{
-		Column1: toPgTimestamptz(from),
-		Column2: toPgTimestamptz(to),
+		From: utils.ToPgTimestamp(from),
+		To:   utils.ToPgTimestamp(to),
 	}
 	countByCategoryRows, err := u.q.ListSpeciesCountByTaxaInPeriod(ctx, params)
 	if err != nil {
@@ -124,8 +125,8 @@ func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 
 	// Use req.From and req.To to filter your SQL query
 	params := db.ObservationTimeSeriesParams{
-		Column1: toPgTimestamptz(req.From),
-		Column2: toPgTimestamptz(req.To),
+		From: utils.ToPgTimestamp(req.From),
+		To:   utils.ToPgTimestamp(req.To),
 	}
 	rows, err := u.q.ObservationTimeSeries(ctx, params)
 	if err != nil {

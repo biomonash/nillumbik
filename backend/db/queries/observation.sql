@@ -80,7 +80,7 @@ ORDER BY o.timestamp DESC;
 -- name: ObservationTimeSeries :many
 SELECT date_trunc('month', "timestamp")::timestamp AS month, COUNT(*) AS count
 FROM observations
-WHERE ($1::timestamptz IS NULL OR "timestamp" >= $1::timestamptz)
-  AND ($2::timestamptz IS NULL OR "timestamp" <= $2::timestamptz)
+WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from')::timestamp)
+  AND (sqlc.narg('to')::timestamp IS NULL OR "timestamp" <= sqlc.narg('to')::timestamp)
 GROUP BY month
 ORDER BY month;
