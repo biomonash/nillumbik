@@ -50,51 +50,48 @@ type ObservationOverviewResponse struct {
 func (u *Controller) ObservationOverview(c *gin.Context) {
 	var req ObservationOverviewRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
-		utils.RespondError(c, 400, err)
+		utils.RespondError(c, http.StatusBadRequest, fmt.Errorf("failed to parse input: %w", err))
 		return
 	}
 	ctx := c.Request.Context()
 
 	// Use from/to for filtering
-	from := req.From
-	to := req.To
+	from := utils.ToPgTimestamp(req.From)
+	to := utils.ToPgTimestamp(req.To)
 
 	// Example: filter observations by date range
 	paramsDistinct := db.CountDistinctSpeciesObservedInPeriodParams{
-		From: utils.ToPgTimestamp(from),
-		To:   utils.ToPgTimestamp(to),
+		From: from,
+		To:   to,
 	}
 	totalCount, err := u.q.CountDistinctSpeciesObservedInPeriod(ctx, paramsDistinct)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count distinct species",
-			"details": err.Error()})
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("Failed to count distinct species: %w", err))
 		return
 	}
 
 	paramsNative := db.CountDistinctNativeSpeciesObservedInPeriodParams{
-		From: utils.ToPgTimestamp(from),
-		To:   utils.ToPgTimestamp(to),
+		From: from,
+		To:   to,
 	}
 	nativeCount, err := u.q.CountDistinctNativeSpeciesObservedInPeriod(ctx, paramsNative)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count native species",
-			"details": err.Error()})
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("Failed to count native species: %w", err))
 		return
 	}
 
 	params := db.ListSpeciesCountByTaxaInPeriodParams{
-		From: utils.ToPgTimestamp(from),
-		To:   utils.ToPgTimestamp(to),
+		From: from,
+		To:   to,
 	}
 	countByCategoryRows, err := u.q.ListSpeciesCountByTaxaInPeriod(ctx, params)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count species by category",
-			"details": err.Error()})
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("Failed to count species by category: %w", err))
 		return
 	}
-	countByCategory := map[string]int64{}
+	countByCategory := map[db.Taxa]int64{}
 	for _, row := range countByCategoryRows {
-		countByCategory[fmt.Sprintf("%v", row.Taxa)] = row.Count
+		countByCategory[row.Taxa] = row.Count
 	}
 
 	resp := SpeciesOverviewResponse{
