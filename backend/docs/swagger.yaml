@@ -360,6 +360,17 @@ paths:
       consumes:
       - application/json
       description: Observation overview
+      parameters:
+      - description: Search start from
+        format: date
+        in: query
+        name: from
+        type: string
+      - description: Search start from
+        format: date
+        in: query
+        name: to
+        type: string
       produces:
       - application/json
       responses:

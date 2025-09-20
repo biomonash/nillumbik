@@ -12,8 +12,7 @@ import (
 
 // --- Structs ---
 type ObservationTimeSeriesRequest struct {
-	From *time.Time `form:"from" time_format:"2006-01-02T15:04:05Z07:00"`
-	To   *time.Time `form:"to"   time_format:"2006-01-02T15:04:05Z07:00"`
+	TimePeriodRequest
 }
 
 type ObservationTimeSeriesResponse struct {
@@ -25,8 +24,7 @@ type TimeSeriesPoint struct {
 }
 
 type ObservationOverviewRequest struct {
-	From *string `form:"from"`
-	To   *string `form:"to"`
+	TimePeriodRequest
 }
 
 type ObservationOverviewResponse struct {
@@ -44,13 +42,15 @@ type ObservationOverviewResponse struct {
 //	@Tags			statistics
 //	@Accept			json
 //	@Produce		json
+//	@Param			from	query		string	False	"Search start from"	format(date)
+//	@Param			to		query		string	False	"Search start from"	format(date)
 //	@Success		200		{object}	ObservationOverviewResponse
 //	@Error			400 	{object}	gin.H
 //	@Router			/stats/observations [get]
 func (u *Controller) ObservationOverview(c *gin.Context) {
-	var req SpeciesOverviewRequest
+	var req ObservationOverviewRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters"})
+		utils.RespondError(c, 400, err)
 		return
 	}
 	ctx := c.Request.Context()
