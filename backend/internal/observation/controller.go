@@ -1,7 +1,6 @@
 package observation
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/biomonash/nillumbik/internal/db"
@@ -44,7 +43,8 @@ type ListObservationsResponse struct {
 func (u *Controller) ListObservations(c *gin.Context) {
 	var params ListObservationsRequest
 	if err := c.ShouldBindQuery(&params); err != nil {
-		utils.RespondError(c, 400, fmt.Errorf("Validation failed: %w", err))
+		// c.Error(err)
+		c.Error(utils.NewHttpError(400, "validation failed", err))
 		return
 	}
 
@@ -53,7 +53,7 @@ func (u *Controller) ListObservations(c *gin.Context) {
 		Offset: params.Offset,
 	})
 	if err != nil {
-		c.AbortWithError(500, err)
+		c.Error(err)
 		return
 	}
 
@@ -77,12 +77,12 @@ func (u *Controller) GetObservationByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		utils.RespondError(c, 400, fmt.Errorf("Invalid id: %w", err))
+		c.Error(utils.NewHttpError(400, "Invalid id", err))
 		return
 	}
 	ob, err := u.q.GetObservation(c.Request.Context(), int64(id))
 	if err != nil {
-		utils.RespondError(c, 404, fmt.Errorf("Observation not found"))
+		c.Error(utils.NewHttpError(404, "Observation not found", err))
 		return
 	}
 

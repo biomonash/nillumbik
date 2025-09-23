@@ -52,7 +52,7 @@ func (u *Controller) GetSiteByCode(c *gin.Context) {
 	code := c.Param("code")
 	site, err := u.q.GetSiteByCode(c.Request.Context(), code)
 	if errors.Is(err, pgx.ErrNoRows) {
-		utils.RespondError(c, 404, fmt.Errorf("Site %s not found", code))
+		c.Error(utils.NewHttpError(404, "Site code not found", err))
 		return
 	} else if err != nil {
 		c.AbortWithError(500, err)

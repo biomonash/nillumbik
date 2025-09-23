@@ -52,12 +52,12 @@ func (u *Controller) GetSpeciesByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		utils.RespondError(c, 400, fmt.Errorf("invalid id: %s", idStr))
+		c.Error(utils.NewHttpError(400, "invalid id", err))
 		return
 	}
 	species, err := u.q.GetSpecies(c.Request.Context(), int64(id))
 	if err != nil {
-		utils.RespondError(c, 404, fmt.Errorf("species not found: %s", idStr))
+		c.Error(utils.NewHttpError(404, "species not found", err))
 		return
 	}
 
@@ -79,7 +79,7 @@ func (u *Controller) GetSpeciesByCommonName(c *gin.Context) {
 	cleanName := strings.ReplaceAll(name, "_", " ")
 	species, err := u.q.GetSpeciesByCommonName(c.Request.Context(), cleanName)
 	if err != nil {
-		utils.RespondError(c, 404, fmt.Errorf("species not found: %s", cleanName))
+		c.Error(utils.NewHttpError(404, "species not found", err))
 		return
 	}
 
