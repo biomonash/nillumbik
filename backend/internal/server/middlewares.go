@@ -16,7 +16,8 @@ func errorHandler() gin.HandlerFunc {
 			err := c.Errors.Last().Err
 			switch e := err.(type) {
 			case utils.HttpError:
-				c.AbortWithStatusJSON(e.Code, e)
+				c.JSON(e.Code, e)
+				c.Errors = []*gin.Error{} // Ignore user level error
 			default:
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"code":    http.StatusInternalServerError,

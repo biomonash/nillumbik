@@ -38,6 +38,7 @@ type Server struct {
 func New(querier db.Querier) *Server {
 	r := gin.New()
 
+	r.Use(gin.Logger())
 	r.Use(panicRecovery())
 	r.Use(errorHandler())
 
