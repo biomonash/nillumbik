@@ -36,8 +36,9 @@ type Server struct {
 // @externalDocs.description	OpenAPI
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func New(querier db.Querier) *Server {
-	r := gin.Default()
+	r := gin.New()
 
+	r.Use(panicRecovery())
 	r.Use(errorHandler())
 
 	api := r.Group("/api")
