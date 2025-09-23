@@ -50,7 +50,7 @@ type ObservationOverviewResponse struct {
 func (u *Controller) ObservationOverview(c *gin.Context) {
 	var req ObservationOverviewRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
-		utils.RespondError(c, http.StatusBadRequest, fmt.Errorf("failed to parse input: %w", err))
+		c.Error(utils.NewHttpError(http.StatusBadRequest, "failed to parse input", err))
 		return
 	}
 	ctx := c.Request.Context()
