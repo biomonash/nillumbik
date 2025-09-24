@@ -142,7 +142,7 @@ func (q *Queries) ListSpecies(ctx context.Context) ([]Species, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Species
+	items := []Species{}
 	for rows.Next() {
 		var i Species
 		if err := rows.Scan(
@@ -177,7 +177,7 @@ func (q *Queries) SearchSpecies(ctx context.Context, scientificName string) ([]S
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Species
+	items := []Species{}
 	for rows.Next() {
 		var i Species
 		if err := rows.Scan(

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/biomonash/nillumbik/internal/db"
-	"github.com/biomonash/nillumbik/internal/species"
 	"github.com/biomonash/nillumbik/internal/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -71,14 +70,8 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 	var resp ObservationOverviewResponse
 
 	// Use from/to for filtering
-	from := utils.ToPgTimestamp(req.From)
-	to := utils.ToPgTimestamp(req.To)
-	taxa := db.NullTaxa{Valid: false}
-	if req.Taxa != nil {
-		taxa.Taxa = *req.Taxa
-		taxa.Valid = true
-	}
-	commonName := species.CleanOptionalName(req.CommonName)
+
+	from, to, taxa, commonName := parseObservationStatsInput(req.ObservationStatsInput)
 
 	paramsNative := db.CountSpeciesByNativeParams{
 		From:       from,
@@ -147,15 +140,8 @@ func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 	}
 	ctx := c.Request.Context()
 
-	// Use req.From and req.To to filter your SQL query
-	from := utils.ToPgTimestamp(req.From)
-	to := utils.ToPgTimestamp(req.To)
-	taxa := db.NullTaxa{Valid: false}
-	if req.Taxa != nil {
-		taxa.Taxa = *req.Taxa
-		taxa.Valid = true
-	}
-	commonName := species.CleanOptionalName(req.CommonName)
+	// Parse common input parameters
+	from, to, taxa, commonName := parseObservationStatsInput(req.ObservationStatsInput)
 
 	params := db.ObservationTimeSeriesGroupByNativeParams{
 		From:       from,
@@ -165,6 +151,7 @@ func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 		Taxa:       taxa,
 		CommonName: commonName,
 	}
+
 	rows, err := u.q.ObservationTimeSeriesGroupByNative(ctx, params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch time series",
@@ -216,15 +203,8 @@ func (u *Controller) ObservationBySites(c *gin.Context) {
 	}
 	ctx := c.Request.Context()
 
-	// Use req.From and req.To to filter your SQL query
-	from := utils.ToPgTimestamp(req.From)
-	to := utils.ToPgTimestamp(req.To)
-	taxa := db.NullTaxa{Valid: false}
-	if req.Taxa != nil {
-		taxa.Taxa = *req.Taxa
-		taxa.Valid = true
-	}
-	commonName := species.CleanOptionalName(req.CommonName)
+	// Parse common input parameters
+	from, to, taxa, commonName := parseObservationStatsInput(req.ObservationStatsInput)
 
 	params := db.ObservationGroupBySitesParams{
 		From:       from,

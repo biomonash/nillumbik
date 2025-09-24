@@ -71,7 +71,7 @@ func (q *Queries) CountSpeciesByNative(ctx context.Context, arg CountSpeciesByNa
 		return nil, err
 	}
 	defer rows.Close()
-	var items []CountSpeciesByNativeRow
+	items := []CountSpeciesByNativeRow{}
 	for rows.Next() {
 		var i CountSpeciesByNativeRow
 		if err := rows.Scan(&i.IsNative, &i.SpeciesCount, &i.ObservationCount); err != nil {
@@ -124,7 +124,7 @@ func (q *Queries) ListSpeciesCountByTaxa(ctx context.Context, arg ListSpeciesCou
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListSpeciesCountByTaxaRow
+	items := []ListSpeciesCountByTaxaRow{}
 	for rows.Next() {
 		var i ListSpeciesCountByTaxaRow
 		if err := rows.Scan(&i.Taxa, &i.Count); err != nil {
@@ -178,7 +178,7 @@ func (q *Queries) ObservationGroupBySites(ctx context.Context, arg ObservationGr
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ObservationGroupBySitesRow
+	items := []ObservationGroupBySitesRow{}
 	for rows.Next() {
 		var i ObservationGroupBySitesRow
 		if err := rows.Scan(&i.SiteCode, &i.SpeciesCount, &i.ObservationCount); err != nil {
@@ -234,7 +234,7 @@ func (q *Queries) ObservationTimeSeriesGroupByNative(ctx context.Context, arg Ob
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ObservationTimeSeriesGroupByNativeRow
+	items := []ObservationTimeSeriesGroupByNativeRow{}
 	for rows.Next() {
 		var i ObservationTimeSeriesGroupByNativeRow
 		if err := rows.Scan(

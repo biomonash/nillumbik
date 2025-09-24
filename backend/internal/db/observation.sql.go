@@ -142,7 +142,7 @@ func (q *Queries) ListObservations(ctx context.Context, arg ListObservationsPara
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Observation
+	items := []Observation{}
 	for rows.Next() {
 		var i Observation
 		if err := rows.Scan(
@@ -200,7 +200,7 @@ func (q *Queries) SearchObservations(ctx context.Context, scientificName string)
 		return nil, err
 	}
 	defer rows.Close()
-	var items []SearchObservationsRow
+	items := []SearchObservationsRow{}
 	for rows.Next() {
 		var i SearchObservationsRow
 		if err := rows.Scan(
