@@ -372,6 +372,10 @@ paths:
         in: query
         name: site_code
         type: string
+      - description: Filter by taxa
+        in: query
+        name: taxa
+        type: string
       produces:
       - application/json
       responses:

@@ -38,6 +38,7 @@ WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
   AND ($3::int IS NULL OR block = $3::int)
   AND ($4::text IS NULL OR site_code = $4)
+  AND ($5::taxa IS NULL OR taxa = $5::taxa)
 GROUP BY native
 `
 
@@ -46,6 +47,7 @@ type CountSpeciesByNativeParams struct {
 	To       pgtype.Timestamp `json:"to"`
 	Block    *int32           `json:"block"`
 	SiteCode *string          `json:"site_code"`
+	Taxa     NullTaxa         `json:"taxa"`
 }
 
 type CountSpeciesByNativeRow struct {
@@ -60,6 +62,7 @@ func (q *Queries) CountSpeciesByNative(ctx context.Context, arg CountSpeciesByNa
 		arg.To,
 		arg.Block,
 		arg.SiteCode,
+		arg.Taxa,
 	)
 	if err != nil {
 		return nil, err
@@ -86,6 +89,7 @@ WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
   AND ($3::int IS NULL OR block = $3::int)
   AND ($4::text IS NULL OR site_code = $4)
+  AND ($5::taxa IS NULL OR taxa = $5::taxa)
 GROUP BY taxa
 `
 
@@ -94,6 +98,7 @@ type ListSpeciesCountByTaxaParams struct {
 	To       pgtype.Timestamp `json:"to"`
 	Block    *int32           `json:"block"`
 	SiteCode *string          `json:"site_code"`
+	Taxa     NullTaxa         `json:"taxa"`
 }
 
 type ListSpeciesCountByTaxaRow struct {
@@ -107,6 +112,7 @@ func (q *Queries) ListSpeciesCountByTaxa(ctx context.Context, arg ListSpeciesCou
 		arg.To,
 		arg.Block,
 		arg.SiteCode,
+		arg.Taxa,
 	)
 	if err != nil {
 		return nil, err

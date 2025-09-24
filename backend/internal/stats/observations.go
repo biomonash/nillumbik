@@ -45,6 +45,7 @@ type ObservationOverviewResponse struct {
 //	@Param			to			query		string	False	"Search start from"	format(date)
 //	@Param			block		query		integer	False	"Filter by site block"
 //	@Param			site_code	query		string	False	"Filter by site code"
+//	@Param			taxa query		string	False	"Filter by taxa"
 //	@Success		200			{object}	ObservationOverviewResponse
 //	@Error			400 		{object}	gin.H
 //	@Router			/stats/observations [get]
@@ -61,12 +62,18 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 	// Use from/to for filtering
 	from := utils.ToPgTimestamp(req.From)
 	to := utils.ToPgTimestamp(req.To)
+	taxa := db.NullTaxa{Valid: false}
+	if req.Taxa != nil {
+		taxa.Taxa = *req.Taxa
+		taxa.Valid = true
+	}
 
 	paramsNative := db.CountSpeciesByNativeParams{
 		From:     from,
 		To:       to,
 		Block:    req.Block,
 		SiteCode: req.SiteCode,
+		Taxa:     taxa,
 	}
 
 	speciesGroups, err := u.q.CountSpeciesByNative(ctx, paramsNative)
@@ -87,6 +94,7 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 		To:       to,
 		Block:    req.Block,
 		SiteCode: req.SiteCode,
+		Taxa:     taxa,
 	}
 	countByCategoryRows, err := u.q.ListSpeciesCountByTaxa(ctx, params)
 	if err != nil {

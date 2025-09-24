@@ -284,6 +284,12 @@ const docTemplate = `{
                         "description": "Filter by site code",
                         "name": "site_code",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by taxa",
+                        "name": "taxa",
+                        "in": "query"
                     }
                 ],
                 "responses": {
