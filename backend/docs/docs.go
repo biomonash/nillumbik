@@ -321,6 +321,46 @@ const docTemplate = `{
                     "statistics"
                 ],
                 "summary": "Observation time series",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by site block",
+                        "name": "block",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by site code",
+                        "name": "site_code",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by taxa",
+                        "name": "taxa",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by species common_name",
+                        "name": "common_name",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -620,9 +660,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "series": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/stats.TimeSeriesPoint"
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/stats.TimeSeriesPoint"
+                        }
                     }
                 }
             }

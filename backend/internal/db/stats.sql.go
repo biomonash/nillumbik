@@ -138,35 +138,51 @@ func (q *Queries) ListSpeciesCountByTaxa(ctx context.Context, arg ListSpeciesCou
 	return items, nil
 }
 
-const speciesObservationTimeSeries = `-- name: SpeciesObservationTimeSeries :many
-SELECT date_trunc('month', "timestamp")::timestamp AS month, COUNT(*) AS count
-FROM observations
+const observationTimeSeriesGroupByNative = `-- name: ObservationTimeSeriesGroupByNative :many
+SELECT native as is_native, date_trunc('year', "timestamp")::timestamp AS year, COUNT(*) AS count
+FROM observations_with_details
 WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
-GROUP BY month
-ORDER BY month
+  AND ($3::int IS NULL OR block = $3::int)
+  AND ($4::text IS NULL OR site_code = $4)
+  AND ($5::taxa IS NULL OR taxa = $5::taxa)
+  AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
+GROUP BY year, native
+ORDER BY year
 `
 
-type SpeciesObservationTimeSeriesParams struct {
-	From pgtype.Timestamp `json:"from"`
-	To   pgtype.Timestamp `json:"to"`
+type ObservationTimeSeriesGroupByNativeParams struct {
+	From       pgtype.Timestamp `json:"from"`
+	To         pgtype.Timestamp `json:"to"`
+	Block      *int32           `json:"block"`
+	SiteCode   *string          `json:"site_code"`
+	Taxa       NullTaxa         `json:"taxa"`
+	CommonName *string          `json:"common_name"`
 }
 
-type SpeciesObservationTimeSeriesRow struct {
-	Month time.Time `json:"month"`
-	Count int64     `json:"count"`
+type ObservationTimeSeriesGroupByNativeRow struct {
+	IsNative bool      `json:"is_native"`
+	Year     time.Time `json:"year"`
+	Count    int64     `json:"count"`
 }
 
-func (q *Queries) SpeciesObservationTimeSeries(ctx context.Context, arg SpeciesObservationTimeSeriesParams) ([]SpeciesObservationTimeSeriesRow, error) {
-	rows, err := q.db.Query(ctx, speciesObservationTimeSeries, arg.From, arg.To)
+func (q *Queries) ObservationTimeSeriesGroupByNative(ctx context.Context, arg ObservationTimeSeriesGroupByNativeParams) ([]ObservationTimeSeriesGroupByNativeRow, error) {
+	rows, err := q.db.Query(ctx, observationTimeSeriesGroupByNative,
+		arg.From,
+		arg.To,
+		arg.Block,
+		arg.SiteCode,
+		arg.Taxa,
+		arg.CommonName,
+	)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []SpeciesObservationTimeSeriesRow
+	var items []ObservationTimeSeriesGroupByNativeRow
 	for rows.Next() {
-		var i SpeciesObservationTimeSeriesRow
-		if err := rows.Scan(&i.Month, &i.Count); err != nil {
+		var i ObservationTimeSeriesGroupByNativeRow
+		if err := rows.Scan(&i.IsNative, &i.Year, &i.Count); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

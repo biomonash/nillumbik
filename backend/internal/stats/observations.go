@@ -13,12 +13,13 @@ import (
 
 // --- Structs ---
 type ObservationTimeSeriesRequest struct {
-	TimePeriodRequest
+	ObservationStatsInput
 }
 
 type ObservationTimeSeriesResponse struct {
-	Series []TimeSeriesPoint `json:"series"`
+	Series map[string][]TimeSeriesPoint `json:"series"`
 }
+
 type TimeSeriesPoint struct {
 	Timestamp string `json:"timestamp"`
 	Value     int64  `json:"value"`
@@ -49,7 +50,7 @@ type ObservationOverviewResponse struct {
 //	@Param			taxa		query		string	False	"Filter by taxa"
 //	@Param			common_name	query		string	False	"Filter by species common_name"
 //	@Success		200			{object}	ObservationOverviewResponse
-//	@Error			400 								{object}	gin.H
+//	@Error			400 											{object}	gin.H
 //	@Router			/stats/observations [get]
 func (u *Controller) ObservationOverview(c *gin.Context) {
 	var req ObservationOverviewRequest
@@ -121,8 +122,14 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 //	@Tags			statistics
 //	@Accept			json
 //	@Produce		json
-//	@Success		200		{object}	ObservationTimeSeriesResponse
-//	@Error			400 	{object}	gin.H
+//	@Param			from		query		string	False	"Search start from"	format(date)
+//	@Param			to			query		string	False	"Search start from"	format(date)
+//	@Param			block		query		integer	False	"Filter by site block"
+//	@Param			site_code	query		string	False	"Filter by site code"
+//	@Param			taxa		query		string	False	"Filter by taxa"
+//	@Param			common_name	query		string	False	"Filter by species common_name"
+//	@Success		200			{object}	ObservationTimeSeriesResponse
+//	@Error			400 		{object}	gin.H
 //	@Router			/stats/observations/timeseries [get]
 func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 	var req ObservationTimeSeriesRequest
@@ -133,20 +140,40 @@ func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	// Use req.From and req.To to filter your SQL query
-	params := db.ObservationTimeSeriesParams{
-		From: utils.ToPgTimestamp(req.From),
-		To:   utils.ToPgTimestamp(req.To),
+	from := utils.ToPgTimestamp(req.From)
+	to := utils.ToPgTimestamp(req.To)
+	taxa := db.NullTaxa{Valid: false}
+	if req.Taxa != nil {
+		taxa.Taxa = *req.Taxa
+		taxa.Valid = true
 	}
-	rows, err := u.q.ObservationTimeSeries(ctx, params)
+	commonName := species.CleanOptionalName(req.CommonName)
+
+	params := db.ObservationTimeSeriesGroupByNativeParams{
+		From:       from,
+		To:         to,
+		Block:      req.Block,
+		SiteCode:   req.SiteCode,
+		Taxa:       taxa,
+		CommonName: commonName,
+	}
+	rows, err := u.q.ObservationTimeSeriesGroupByNative(ctx, params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch time series",
 			"details": err.Error()})
 		return
 	}
-	series := make([]TimeSeriesPoint, 0, len(rows))
+	series := map[string][]TimeSeriesPoint{
+		"native":     make([]TimeSeriesPoint, 0, len(rows)),
+		"non-native": make([]TimeSeriesPoint, 0, len(rows)),
+	}
 	for _, row := range rows {
-		series = append(series, TimeSeriesPoint{
-			Timestamp: row.Month.Format(time.RFC3339),
+		key := "native"
+		if !row.IsNative {
+			key = "non-native"
+		}
+		series[key] = append(series[key], TimeSeriesPoint{
+			Timestamp: row.Year.Format(time.RFC3339),
 			Value:     row.Count,
 		})
 	}

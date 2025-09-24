@@ -76,11 +76,3 @@ JOIN sites s ON o.site_id = s.id
 JOIN species sp ON o.species_id = sp.id
 WHERE sp.scientific_name ILIKE $1 OR sp.common_name ILIKE $1 OR o.narrative ILIKE $1
 ORDER BY o.timestamp DESC;
-
--- name: ObservationTimeSeries :many
-SELECT date_trunc('month', "timestamp")::timestamp AS month, COUNT(*) AS count
-FROM observations
-WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from')::timestamp)
-  AND (sqlc.narg('to')::timestamp IS NULL OR "timestamp" <= sqlc.narg('to')::timestamp)
-GROUP BY month
-ORDER BY month;

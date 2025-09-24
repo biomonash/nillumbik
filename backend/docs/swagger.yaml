@@ -148,9 +148,11 @@ definitions:
   stats.ObservationTimeSeriesResponse:
     properties:
       series:
-        items:
-          $ref: '#/definitions/stats.TimeSeriesPoint'
-        type: array
+        additionalProperties:
+          items:
+            $ref: '#/definitions/stats.TimeSeriesPoint'
+          type: array
+        type: object
     type: object
   stats.SpeciesOverviewResponse:
     properties:
@@ -395,6 +397,33 @@ paths:
       consumes:
       - application/json
       description: Observation time series
+      parameters:
+      - description: Search start from
+        format: date
+        in: query
+        name: from
+        type: string
+      - description: Search start from
+        format: date
+        in: query
+        name: to
+        type: string
+      - description: Filter by site block
+        in: query
+        name: block
+        type: integer
+      - description: Filter by site code
+        in: query
+        name: site_code
+        type: string
+      - description: Filter by taxa
+        in: query
+        name: taxa
+        type: string
+      - description: Filter by species common_name
+        in: query
+        name: common_name
+        type: string
       produces:
       - application/json
       responses:
