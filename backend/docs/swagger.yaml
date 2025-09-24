@@ -133,18 +133,16 @@ definitions:
     type: object
   stats.ObservationOverviewResponse:
     properties:
-      active_monitoring_sites:
-        type: integer
-      count_by_category:
+      count_by_taxa:
         additionalProperties:
           format: int64
           type: integer
         type: object
-      detection_events:
+      native_species_count:
         type: integer
-      native_species_percent:
-        type: number
-      total_species_detected:
+      observation_count:
+        type: integer
+      total_species_count:
         type: integer
     type: object
   stats.ObservationTimeSeriesResponse:
@@ -156,15 +154,10 @@ definitions:
     type: object
   stats.SpeciesOverviewResponse:
     properties:
-      count_by_category:
-        additionalProperties:
-          format: int64
-          type: integer
-        type: object
-      native_count:
-        type: integer
-      total_count:
-        type: integer
+      from:
+        type: string
+      to:
+        type: string
     type: object
   stats.SpeciesStatsResponse:
     properties:

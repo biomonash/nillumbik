@@ -30,8 +30,8 @@ type ObservationOverviewRequest struct {
 type ObservationOverviewResponse struct {
 	ObservationCount  int64             `json:"observation_count"`
 	TotalSpeciesCount int64             `json:"total_species_count"`
-	NativeCount       int64             `json:"native_count"`
-	CountByCategory   map[db.Taxa]int64 `json:"count_by_category"`
+	NativeCount       int64             `json:"native_species_count"`
+	CountByTaxa       map[db.Taxa]int64 `json:"count_by_taxa"`
 }
 
 // ObservationOverview godoc
@@ -54,50 +54,44 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 	}
 	ctx := c.Request.Context()
 
+	var resp ObservationOverviewResponse
+
 	// Use from/to for filtering
 	from := utils.ToPgTimestamp(req.From)
 	to := utils.ToPgTimestamp(req.To)
 
-	// Example: filter observations by date range
-	paramsDistinct := db.CountDistinctSpeciesObservedInPeriodParams{
+	paramsNative := db.CountSpeciesByNativeParams{
 		From: from,
 		To:   to,
-	}
-	totalCount, err := u.q.CountDistinctSpeciesObservedInPeriod(ctx, paramsDistinct)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("Failed to count distinct species: %w", err))
-		return
 	}
 
-	paramsNative := db.CountDistinctNativeSpeciesObservedInPeriodParams{
-		From: from,
-		To:   to,
-	}
-	nativeCount, err := u.q.CountDistinctNativeSpeciesObservedInPeriod(ctx, paramsNative)
+	speciesGroups, err := u.q.CountSpeciesByNative(ctx, paramsNative)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("Failed to count native species: %w", err))
+		c.Error(fmt.Errorf("Failed to count native species: %w", err))
 		return
+	}
+	for _, group := range speciesGroups {
+		resp.ObservationCount += group.ObservationCount
+		resp.TotalSpeciesCount += group.SpeciesCount
+		if group.IsNative {
+			resp.NativeCount = group.SpeciesCount
+		}
 	}
 
-	params := db.ListSpeciesCountByTaxaInPeriodParams{
+	params := db.ListSpeciesCountByTaxaParams{
 		From: from,
 		To:   to,
 	}
-	countByCategoryRows, err := u.q.ListSpeciesCountByTaxaInPeriod(ctx, params)
+	countByCategoryRows, err := u.q.ListSpeciesCountByTaxa(ctx, params)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("Failed to count species by category: %w", err))
+		c.Error(fmt.Errorf("Failed to count species by category: %w", err))
 		return
 	}
-	countByCategory := map[db.Taxa]int64{}
+	resp.CountByTaxa = make(map[db.Taxa]int64)
 	for _, row := range countByCategoryRows {
-		countByCategory[row.Taxa] = row.Count
+		resp.CountByTaxa[row.Taxa] = row.Count
 	}
 
-	resp := ObservationOverviewResponse{
-		TotalSpeciesCount: totalCount,
-		NativeCount:       nativeCount,
-		CountByCategory:   countByCategory,
-	}
 	c.JSON(http.StatusOK, resp)
 }
 

@@ -574,23 +574,20 @@ const docTemplate = `{
         "stats.ObservationOverviewResponse": {
             "type": "object",
             "properties": {
-                "active_monitoring_sites": {
-                    "type": "integer"
-                },
-                "count_by_category": {
+                "count_by_taxa": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "integer",
                         "format": "int64"
                     }
                 },
-                "detection_events": {
+                "native_species_count": {
                     "type": "integer"
                 },
-                "native_species_percent": {
-                    "type": "number"
+                "observation_count": {
+                    "type": "integer"
                 },
-                "total_species_detected": {
+                "total_species_count": {
                     "type": "integer"
                 }
             }
@@ -609,18 +606,11 @@ const docTemplate = `{
         "stats.SpeciesOverviewResponse": {
             "type": "object",
             "properties": {
-                "count_by_category": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "integer",
-                        "format": "int64"
-                    }
+                "from": {
+                    "type": "string"
                 },
-                "native_count": {
-                    "type": "integer"
-                },
-                "total_count": {
-                    "type": "integer"
+                "to": {
+                    "type": "string"
                 }
             }
         },

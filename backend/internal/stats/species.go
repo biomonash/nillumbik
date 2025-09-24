@@ -3,6 +3,7 @@ package stats
 import (
 	"net/http"
 
+	"github.com/biomonash/nillumbik/internal/db"
 	"github.com/gin-gonic/gin"
 )
 
@@ -11,6 +12,10 @@ import (
 // --- Structs ---
 
 type SpeciesOverviewRequest struct {
+	TimePeriodRequest
+}
+
+type SpeciesOverviewResponse struct {
 	TimePeriodRequest
 }
 
@@ -52,7 +57,7 @@ func (u *Controller) SpeciesStats(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	// Total distinct species observed
-	totalSpecies, err := u.q.CountDistinctSpeciesObserved(ctx)
+	totalSpecies, err := u.q.CountDistinctSpeciesObserved(ctx, db.CountDistinctSpeciesObservedParams{})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count distinct species",
 			"details": err.Error()})
@@ -60,32 +65,32 @@ func (u *Controller) SpeciesStats(c *gin.Context) {
 	}
 
 	// Active monitoring sites
-	activeSites, err := u.q.CountActiveMonitoringSites(ctx)
+	activeSites, err := u.q.CountSites(ctx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count active sites", "details": err.Error()})
 		return
 	}
 
 	// Detection events
-	detectionEvents, err := u.q.CountDetectionEvents(ctx)
+	detectionEvents, err := u.q.CountObservations(ctx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count detection events", "details": err.Error()})
 		return
 	}
 
 	// Native species percent
-	nativeSpecies, err := u.q.CountDistinctNativeSpeciesObserved(ctx)
-	if err != nil || totalSpecies == 0 {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count native species", "details": err.Error()})
-		return
-	}
-	nativePercent := float64(nativeSpecies) / float64(totalSpecies) * 100
+	// nativeSpecies, err := u.q.CountDistinctNativeSpeciesObserved(ctx, db.CountDistinctNativeSpeciesObservedParams{})
+	// if err != nil || totalSpecies == 0 {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count native species", "details": err.Error()})
+	// 	return
+	// }
+	// nativePercent := float64(nativeSpecies) / float64(totalSpecies) * 100
 
 	resp := SpeciesStatsResponse{
 		TotalSpeciesDetected:  totalSpecies,
 		ActiveMonitoringSites: activeSites,
 		DetectionEvents:       detectionEvents,
-		NativeSpeciesPercent:  nativePercent,
+		// NativeSpeciesPercent:  nativePercent,
 	}
 	c.JSON(http.StatusOK, resp)
 }
