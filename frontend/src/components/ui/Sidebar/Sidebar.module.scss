@@ -1,16 +1,21 @@
 .navbar {
 	width: 80px;
-	height: 110vh;
+	min-height: 100vh; 
 	padding: var(--mantine-spacing-md);
 	display: flex;
 	flex-direction: column;
 	background-color: #216869;
+	align-self: stretch;
+	position: fixed;
+	top: 0;
+	bottom: 100%;
 }
 
 .navbarMain {
 	flex: 1;
 	margin-top: 50px;
 }
+
 
 .link {
 	width: 50px;
