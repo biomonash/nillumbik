@@ -39,15 +39,17 @@ WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($3::int IS NULL OR block = $3::int)
   AND ($4::text IS NULL OR site_code = $4)
   AND ($5::taxa IS NULL OR taxa = $5::taxa)
+  AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
 GROUP BY native
 `
 
 type CountSpeciesByNativeParams struct {
-	From     pgtype.Timestamp `json:"from"`
-	To       pgtype.Timestamp `json:"to"`
-	Block    *int32           `json:"block"`
-	SiteCode *string          `json:"site_code"`
-	Taxa     NullTaxa         `json:"taxa"`
+	From       pgtype.Timestamp `json:"from"`
+	To         pgtype.Timestamp `json:"to"`
+	Block      *int32           `json:"block"`
+	SiteCode   *string          `json:"site_code"`
+	Taxa       NullTaxa         `json:"taxa"`
+	CommonName *string          `json:"common_name"`
 }
 
 type CountSpeciesByNativeRow struct {
@@ -63,6 +65,7 @@ func (q *Queries) CountSpeciesByNative(ctx context.Context, arg CountSpeciesByNa
 		arg.Block,
 		arg.SiteCode,
 		arg.Taxa,
+		arg.CommonName,
 	)
 	if err != nil {
 		return nil, err
@@ -90,15 +93,17 @@ WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($3::int IS NULL OR block = $3::int)
   AND ($4::text IS NULL OR site_code = $4)
   AND ($5::taxa IS NULL OR taxa = $5::taxa)
+  AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
 GROUP BY taxa
 `
 
 type ListSpeciesCountByTaxaParams struct {
-	From     pgtype.Timestamp `json:"from"`
-	To       pgtype.Timestamp `json:"to"`
-	Block    *int32           `json:"block"`
-	SiteCode *string          `json:"site_code"`
-	Taxa     NullTaxa         `json:"taxa"`
+	From       pgtype.Timestamp `json:"from"`
+	To         pgtype.Timestamp `json:"to"`
+	Block      *int32           `json:"block"`
+	SiteCode   *string          `json:"site_code"`
+	Taxa       NullTaxa         `json:"taxa"`
+	CommonName *string          `json:"common_name"`
 }
 
 type ListSpeciesCountByTaxaRow struct {
@@ -113,6 +118,7 @@ func (q *Queries) ListSpeciesCountByTaxa(ctx context.Context, arg ListSpeciesCou
 		arg.Block,
 		arg.SiteCode,
 		arg.Taxa,
+		arg.CommonName,
 	)
 	if err != nil {
 		return nil, err

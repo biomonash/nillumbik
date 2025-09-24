@@ -3,7 +3,6 @@ package species
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/biomonash/nillumbik/internal/db"
 	"github.com/biomonash/nillumbik/internal/utils"
@@ -76,7 +75,7 @@ func (u *Controller) GetSpeciesByID(c *gin.Context) {
 //	@Router			/species/by-common-name/{name} [get]
 func (u *Controller) GetSpeciesByCommonName(c *gin.Context) {
 	name := c.Param("name")
-	cleanName := strings.ReplaceAll(name, "_", " ")
+	cleanName := CleanName(name)
 	species, err := u.q.GetSpeciesByCommonName(c.Request.Context(), cleanName)
 	if err != nil {
 		c.Error(utils.NewHttpError(404, "species not found", err))

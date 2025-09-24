@@ -13,8 +13,8 @@ type TimePeriodRequest struct {
 
 type ObservationStatsInput struct {
 	TimePeriodRequest
-	Block     *int32   `form:"block"`
-	SiteCode  *string  `form:"site_code"`
-	Taxa      *db.Taxa `form:"taxa"`
-	SpeciesId *string  `form:"species_id"`
+	Block      *int32   `form:"block"`
+	SiteCode   *string  `form:"site_code"`
+	Taxa       *db.Taxa `form:"taxa"`
+	CommonName *string  `form:"common_name"`
 }

@@ -290,6 +290,12 @@ const docTemplate = `{
                         "description": "Filter by taxa",
                         "name": "taxa",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by species common_name",
+                        "name": "common_name",
+                        "in": "query"
                     }
                 ],
                 "responses": {

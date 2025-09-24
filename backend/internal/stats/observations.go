@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/species"
 	"github.com/biomonash/nillumbik/internal/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -45,9 +46,10 @@ type ObservationOverviewResponse struct {
 //	@Param			to			query		string	False	"Search start from"	format(date)
 //	@Param			block		query		integer	False	"Filter by site block"
 //	@Param			site_code	query		string	False	"Filter by site code"
-//	@Param			taxa query		string	False	"Filter by taxa"
+//	@Param			taxa		query		string	False	"Filter by taxa"
+//	@Param			common_name	query		string	False	"Filter by species common_name"
 //	@Success		200			{object}	ObservationOverviewResponse
-//	@Error			400 		{object}	gin.H
+//	@Error			400 								{object}	gin.H
 //	@Router			/stats/observations [get]
 func (u *Controller) ObservationOverview(c *gin.Context) {
 	var req ObservationOverviewRequest
@@ -67,13 +69,15 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 		taxa.Taxa = *req.Taxa
 		taxa.Valid = true
 	}
+	commonName := species.CleanOptionalName(req.CommonName)
 
 	paramsNative := db.CountSpeciesByNativeParams{
-		From:     from,
-		To:       to,
-		Block:    req.Block,
-		SiteCode: req.SiteCode,
-		Taxa:     taxa,
+		From:       from,
+		To:         to,
+		Block:      req.Block,
+		SiteCode:   req.SiteCode,
+		Taxa:       taxa,
+		CommonName: commonName,
 	}
 
 	speciesGroups, err := u.q.CountSpeciesByNative(ctx, paramsNative)
@@ -90,11 +94,12 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 	}
 
 	params := db.ListSpeciesCountByTaxaParams{
-		From:     from,
-		To:       to,
-		Block:    req.Block,
-		SiteCode: req.SiteCode,
-		Taxa:     taxa,
+		From:       from,
+		To:         to,
+		Block:      req.Block,
+		SiteCode:   req.SiteCode,
+		Taxa:       taxa,
+		CommonName: commonName,
 	}
 	countByCategoryRows, err := u.q.ListSpeciesCountByTaxa(ctx, params)
 	if err != nil {

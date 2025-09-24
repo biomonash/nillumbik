@@ -12,6 +12,7 @@ WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from'):
   AND (sqlc.narg('block')::int IS NULL OR block = sqlc.narg('block')::int)
   AND (sqlc.narg('site_code')::text IS NULL OR site_code = sqlc.narg('site_code'))
   AND (sqlc.narg('taxa')::taxa IS NULL OR taxa = sqlc.narg('taxa')::taxa)
+  AND (sqlc.narg('common_name')::text IS NULL OR LOWER(common_name) = LOWER(sqlc.narg('common_name')::text))
 GROUP BY native;
 
 -- name: ListSpeciesCountByTaxa :many
@@ -22,6 +23,7 @@ WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from'):
   AND (sqlc.narg('block')::int IS NULL OR block = sqlc.narg('block')::int)
   AND (sqlc.narg('site_code')::text IS NULL OR site_code = sqlc.narg('site_code'))
   AND (sqlc.narg('taxa')::taxa IS NULL OR taxa = sqlc.narg('taxa')::taxa)
+  AND (sqlc.narg('common_name')::text IS NULL OR LOWER(common_name) = LOWER(sqlc.narg('common_name')::text))
 GROUP BY taxa;
 
 -- name: SpeciesObservationTimeSeries :many
