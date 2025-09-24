@@ -275,9 +275,14 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "format": "date",
                         "description": "Filter by site block",
                         "name": "block",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by site code",
+                        "name": "site_code",
                         "in": "query"
                     }
                 ],

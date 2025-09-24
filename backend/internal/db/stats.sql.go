@@ -37,13 +37,15 @@ FROM observations_with_details
 WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
   AND ($3::int IS NULL OR block = $3::int)
+  AND ($4::text IS NULL OR site_code = $4)
 GROUP BY native
 `
 
 type CountSpeciesByNativeParams struct {
-	From  pgtype.Timestamp `json:"from"`
-	To    pgtype.Timestamp `json:"to"`
-	Block *int32           `json:"block"`
+	From     pgtype.Timestamp `json:"from"`
+	To       pgtype.Timestamp `json:"to"`
+	Block    *int32           `json:"block"`
+	SiteCode *string          `json:"site_code"`
 }
 
 type CountSpeciesByNativeRow struct {
@@ -53,7 +55,12 @@ type CountSpeciesByNativeRow struct {
 }
 
 func (q *Queries) CountSpeciesByNative(ctx context.Context, arg CountSpeciesByNativeParams) ([]CountSpeciesByNativeRow, error) {
-	rows, err := q.db.Query(ctx, countSpeciesByNative, arg.From, arg.To, arg.Block)
+	rows, err := q.db.Query(ctx, countSpeciesByNative,
+		arg.From,
+		arg.To,
+		arg.Block,
+		arg.SiteCode,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -78,13 +85,15 @@ FROM observations_with_details
 WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
   AND ($3::int IS NULL OR block = $3::int)
+  AND ($4::text IS NULL OR site_code = $4)
 GROUP BY taxa
 `
 
 type ListSpeciesCountByTaxaParams struct {
-	From  pgtype.Timestamp `json:"from"`
-	To    pgtype.Timestamp `json:"to"`
-	Block *int32           `json:"block"`
+	From     pgtype.Timestamp `json:"from"`
+	To       pgtype.Timestamp `json:"to"`
+	Block    *int32           `json:"block"`
+	SiteCode *string          `json:"site_code"`
 }
 
 type ListSpeciesCountByTaxaRow struct {
@@ -93,7 +102,12 @@ type ListSpeciesCountByTaxaRow struct {
 }
 
 func (q *Queries) ListSpeciesCountByTaxa(ctx context.Context, arg ListSpeciesCountByTaxaParams) ([]ListSpeciesCountByTaxaRow, error) {
-	rows, err := q.db.Query(ctx, listSpeciesCountByTaxa, arg.From, arg.To, arg.Block)
+	rows, err := q.db.Query(ctx, listSpeciesCountByTaxa,
+		arg.From,
+		arg.To,
+		arg.Block,
+		arg.SiteCode,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -10,6 +10,7 @@ FROM observations_with_details
 WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from')::timestamp)
   AND (sqlc.narg('to')::timestamp IS NULL OR "timestamp" <= sqlc.narg('to')::timestamp)
   AND (sqlc.narg('block')::int IS NULL OR block = sqlc.narg('block')::int)
+  AND (sqlc.narg('site_code')::text IS NULL OR site_code = sqlc.narg('site_code'))
 GROUP BY native;
 
 -- name: ListSpeciesCountByTaxa :many
@@ -18,6 +19,7 @@ FROM observations_with_details
 WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from')::timestamp)
   AND (sqlc.narg('to')::timestamp IS NULL OR "timestamp" <= sqlc.narg('to')::timestamp)
   AND (sqlc.narg('block')::int IS NULL OR block = sqlc.narg('block')::int)
+  AND (sqlc.narg('site_code')::text IS NULL OR site_code = sqlc.narg('site_code'))
 GROUP BY taxa;
 
 -- name: SpeciesObservationTimeSeries :many

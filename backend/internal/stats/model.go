@@ -14,7 +14,7 @@ type TimePeriodRequest struct {
 type ObservationStatsInput struct {
 	TimePeriodRequest
 	Block     *int32   `form:"block"`
-	Zone      *string  `form:"zone"`
+	SiteCode  *string  `form:"site_code"`
 	Taxa      *db.Taxa `form:"taxa"`
 	SpeciesId *string  `form:"species_id"`
 }

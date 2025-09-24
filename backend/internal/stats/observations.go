@@ -41,11 +41,12 @@ type ObservationOverviewResponse struct {
 //	@Tags			statistics
 //	@Accept			json
 //	@Produce		json
-//	@Param			from	query		string	False	"Search start from"		format(date)
-//	@Param			to		query		string	False	"Search start from"		format(date)
-//	@Param			block	query		integer	False	"Filter by site block"	format(date)
-//	@Success		200		{object}	ObservationOverviewResponse
-//	@Error			400 	{object}	gin.H
+//	@Param			from		query		string	False	"Search start from"	format(date)
+//	@Param			to			query		string	False	"Search start from"	format(date)
+//	@Param			block		query		integer	False	"Filter by site block"
+//	@Param			site_code	query		string	False	"Filter by site code"
+//	@Success		200			{object}	ObservationOverviewResponse
+//	@Error			400 		{object}	gin.H
 //	@Router			/stats/observations [get]
 func (u *Controller) ObservationOverview(c *gin.Context) {
 	var req ObservationOverviewRequest
@@ -62,9 +63,10 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 	to := utils.ToPgTimestamp(req.To)
 
 	paramsNative := db.CountSpeciesByNativeParams{
-		From:  from,
-		To:    to,
-		Block: req.Block,
+		From:     from,
+		To:       to,
+		Block:    req.Block,
+		SiteCode: req.SiteCode,
 	}
 
 	speciesGroups, err := u.q.CountSpeciesByNative(ctx, paramsNative)
@@ -81,9 +83,10 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 	}
 
 	params := db.ListSpeciesCountByTaxaParams{
-		From:  from,
-		To:    to,
-		Block: req.Block,
+		From:     from,
+		To:       to,
+		Block:    req.Block,
+		SiteCode: req.SiteCode,
 	}
 	countByCategoryRows, err := u.q.ListSpeciesCountByTaxa(ctx, params)
 	if err != nil {
