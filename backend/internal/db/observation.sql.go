@@ -21,30 +21,6 @@ func (q *Queries) CountObservations(ctx context.Context) (int64, error) {
 	return count, err
 }
 
-const countObservationsBySite = `-- name: CountObservationsBySite :one
-SELECT COUNT(*) FROM observations
-WHERE site_id = $1
-`
-
-func (q *Queries) CountObservationsBySite(ctx context.Context, siteID int64) (int64, error) {
-	row := q.db.QueryRow(ctx, countObservationsBySite, siteID)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const countObservationsBySpecies = `-- name: CountObservationsBySpecies :one
-SELECT COUNT(*) FROM observations
-WHERE species_id = $1
-`
-
-func (q *Queries) CountObservationsBySpecies(ctx context.Context, speciesID int64) (int64, error) {
-	row := q.db.QueryRow(ctx, countObservationsBySpecies, speciesID)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
 const createObservation = `-- name: CreateObservation :one
 INSERT INTO observations (
   site_id,

@@ -131,6 +131,13 @@ definitions:
       timestamp:
         type: string
     type: object
+  stats.ObservationBySitesResponse:
+    properties:
+      sites:
+        items:
+          $ref: '#/definitions/stats.SiteResponse'
+        type: array
+    type: object
   stats.ObservationOverviewResponse:
     properties:
       count_by_taxa:
@@ -142,7 +149,7 @@ definitions:
         type: integer
       observation_count:
         type: integer
-      total_species_count:
+      species_count:
         type: integer
     type: object
   stats.ObservationTimeSeriesResponse:
@@ -153,6 +160,15 @@ definitions:
             $ref: '#/definitions/stats.TimeSeriesPoint'
           type: array
         type: object
+    type: object
+  stats.SiteResponse:
+    properties:
+      observation_count:
+        type: integer
+      site_code:
+        type: string
+      species_count:
+        type: integer
     type: object
   stats.SpeciesOverviewResponse:
     properties:
@@ -181,10 +197,12 @@ definitions:
     type: object
   stats.TimeSeriesPoint:
     properties:
+      observation_count:
+        type: integer
+      species_count:
+        type: integer
       timestamp:
         type: string
-      value:
-        type: integer
     type: object
 externalDocs:
   description: OpenAPI
@@ -390,6 +408,48 @@ paths:
           schema:
             $ref: '#/definitions/stats.ObservationOverviewResponse'
       summary: Observation overview
+      tags:
+      - statistics
+  /stats/observations/sites:
+    get:
+      consumes:
+      - application/json
+      description: Observation stats group by sites
+      parameters:
+      - description: Search start from
+        format: date
+        in: query
+        name: from
+        type: string
+      - description: Search start from
+        format: date
+        in: query
+        name: to
+        type: string
+      - description: Filter by site block
+        in: query
+        name: block
+        type: integer
+      - description: Filter by site code
+        in: query
+        name: site_code
+        type: string
+      - description: Filter by taxa
+        in: query
+        name: taxa
+        type: string
+      - description: Filter by species common_name
+        in: query
+        name: common_name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/stats.ObservationBySitesResponse'
+      summary: Observation stats group by sites
       tags:
       - statistics
   /stats/observations/timeseries:

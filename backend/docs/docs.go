@@ -308,6 +308,69 @@ const docTemplate = `{
                 }
             }
         },
+        "/stats/observations/sites": {
+            "get": {
+                "description": "Observation stats group by sites",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Observation stats group by sites",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by site block",
+                        "name": "block",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by site code",
+                        "name": "site_code",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by taxa",
+                        "name": "taxa",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by species common_name",
+                        "name": "common_name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/stats.ObservationBySitesResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/observations/timeseries": {
             "get": {
                 "description": "Observation time series",
@@ -635,6 +698,17 @@ const docTemplate = `{
                 }
             }
         },
+        "stats.ObservationBySitesResponse": {
+            "type": "object",
+            "properties": {
+                "sites": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/stats.SiteResponse"
+                    }
+                }
+            }
+        },
         "stats.ObservationOverviewResponse": {
             "type": "object",
             "properties": {
@@ -651,7 +725,7 @@ const docTemplate = `{
                 "observation_count": {
                     "type": "integer"
                 },
-                "total_species_count": {
+                "species_count": {
                     "type": "integer"
                 }
             }
@@ -667,6 +741,20 @@ const docTemplate = `{
                             "$ref": "#/definitions/stats.TimeSeriesPoint"
                         }
                     }
+                }
+            }
+        },
+        "stats.SiteResponse": {
+            "type": "object",
+            "properties": {
+                "observation_count": {
+                    "type": "integer"
+                },
+                "site_code": {
+                    "type": "string"
+                },
+                "species_count": {
+                    "type": "integer"
                 }
             }
         },
@@ -712,11 +800,14 @@ const docTemplate = `{
         "stats.TimeSeriesPoint": {
             "type": "object",
             "properties": {
+                "observation_count": {
+                    "type": "integer"
+                },
+                "species_count": {
+                    "type": "integer"
+                },
                 "timestamp": {
                     "type": "string"
-                },
-                "value": {
-                    "type": "integer"
                 }
             }
         }
