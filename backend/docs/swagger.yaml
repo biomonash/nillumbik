@@ -364,6 +364,11 @@ paths:
         in: query
         name: to
         type: string
+      - description: Filter by site block
+        format: date
+        in: query
+        name: block
+        type: integer
       produces:
       - application/json
       responses:

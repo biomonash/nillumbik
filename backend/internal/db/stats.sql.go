@@ -35,14 +35,17 @@ const countSpeciesByNative = `-- name: CountSpeciesByNative :many
 SELECT s.native AS is_native, COUNT(DISTINCT o.species_id) AS species_count, COUNT(*) AS observation_count
 FROM observations o
 JOIN species s ON o.species_id = s.id
+JOIN sites si ON o.site_id = si.id
 WHERE ($1::timestamp IS NULL OR o."timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR o."timestamp" <= $2::timestamp)
+  AND ($3::int IS NULL OR si.block = $3::int)
 GROUP BY s.native
 `
 
 type CountSpeciesByNativeParams struct {
-	From pgtype.Timestamp `json:"from"`
-	To   pgtype.Timestamp `json:"to"`
+	From  pgtype.Timestamp `json:"from"`
+	To    pgtype.Timestamp `json:"to"`
+	Block *int32           `json:"block"`
 }
 
 type CountSpeciesByNativeRow struct {
@@ -52,7 +55,7 @@ type CountSpeciesByNativeRow struct {
 }
 
 func (q *Queries) CountSpeciesByNative(ctx context.Context, arg CountSpeciesByNativeParams) ([]CountSpeciesByNativeRow, error) {
-	rows, err := q.db.Query(ctx, countSpeciesByNative, arg.From, arg.To)
+	rows, err := q.db.Query(ctx, countSpeciesByNative, arg.From, arg.To, arg.Block)
 	if err != nil {
 		return nil, err
 	}
@@ -75,14 +78,17 @@ const listSpeciesCountByTaxa = `-- name: ListSpeciesCountByTaxa :many
 SELECT s.taxa, COUNT(DISTINCT o.species_id) AS count
 FROM observations o
 JOIN species s ON o.species_id = s.id
+JOIN sites si ON o.site_id = si.id
 WHERE ($1::timestamp IS NULL OR o."timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR o."timestamp" <= $2::timestamp)
+  AND ($3::int IS NULL OR si.block = $3::int)
 GROUP BY s.taxa
 `
 
 type ListSpeciesCountByTaxaParams struct {
-	From pgtype.Timestamp `json:"from"`
-	To   pgtype.Timestamp `json:"to"`
+	From  pgtype.Timestamp `json:"from"`
+	To    pgtype.Timestamp `json:"to"`
+	Block *int32           `json:"block"`
 }
 
 type ListSpeciesCountByTaxaRow struct {
@@ -91,7 +97,7 @@ type ListSpeciesCountByTaxaRow struct {
 }
 
 func (q *Queries) ListSpeciesCountByTaxa(ctx context.Context, arg ListSpeciesCountByTaxaParams) ([]ListSpeciesCountByTaxaRow, error) {
-	rows, err := q.db.Query(ctx, listSpeciesCountByTaxa, arg.From, arg.To)
+	rows, err := q.db.Query(ctx, listSpeciesCountByTaxa, arg.From, arg.To, arg.Block)
 	if err != nil {
 		return nil, err
 	}

@@ -24,7 +24,7 @@ type TimeSeriesPoint struct {
 }
 
 type ObservationOverviewRequest struct {
-	TimePeriodRequest
+	ObservationStatsInput
 }
 
 type ObservationOverviewResponse struct {
@@ -41,8 +41,9 @@ type ObservationOverviewResponse struct {
 //	@Tags			statistics
 //	@Accept			json
 //	@Produce		json
-//	@Param			from	query		string	False	"Search start from"	format(date)
-//	@Param			to		query		string	False	"Search start from"	format(date)
+//	@Param			from	query		string	False	"Search start from"		format(date)
+//	@Param			to		query		string	False	"Search start from"		format(date)
+//	@Param			block	query		integer	False	"Filter by site block"	format(date)
 //	@Success		200		{object}	ObservationOverviewResponse
 //	@Error			400 	{object}	gin.H
 //	@Router			/stats/observations [get]
@@ -61,8 +62,9 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 	to := utils.ToPgTimestamp(req.To)
 
 	paramsNative := db.CountSpeciesByNativeParams{
-		From: from,
-		To:   to,
+		From:  from,
+		To:    to,
+		Block: req.Block,
 	}
 
 	speciesGroups, err := u.q.CountSpeciesByNative(ctx, paramsNative)
@@ -79,8 +81,9 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 	}
 
 	params := db.ListSpeciesCountByTaxaParams{
-		From: from,
-		To:   to,
+		From:  from,
+		To:    to,
+		Block: req.Block,
 	}
 	countByCategoryRows, err := u.q.ListSpeciesCountByTaxa(ctx, params)
 	if err != nil {

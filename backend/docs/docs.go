@@ -272,6 +272,13 @@ const docTemplate = `{
                         "description": "Search start from",
                         "name": "to",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "date",
+                        "description": "Filter by site block",
+                        "name": "block",
+                        "in": "query"
                     }
                 ],
                 "responses": {
