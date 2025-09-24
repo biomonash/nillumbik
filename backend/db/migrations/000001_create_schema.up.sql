@@ -40,4 +40,31 @@ CREATE TABLE IF NOT EXISTS observations (
     confidence real
 );
 
+CREATE VIEW observations_with_details AS
+SELECT 
+    o.id,
+    o.site_id,
+    o.species_id,
+    o.timestamp,
+    o.method,
+    o.appearance_start,
+    o.appearance_end,
+    o.temperature,
+    o.narrative,
+    o.confidence,
+    s.native,
+    s.taxa,
+    s.scientific_name,
+    s.common_name,
+    s.indicator,
+    s.reportable,
+    si.block,
+    si.code AS site_code,
+    si.name AS site_name,
+    si.tenure,
+    si.forest
+FROM observations o
+JOIN species s ON o.species_id = s.id
+JOIN sites si ON o.site_id = si.id;
+
 COMMIT;

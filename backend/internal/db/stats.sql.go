@@ -32,14 +32,12 @@ func (q *Queries) CountDistinctSpeciesObserved(ctx context.Context, arg CountDis
 }
 
 const countSpeciesByNative = `-- name: CountSpeciesByNative :many
-SELECT s.native AS is_native, COUNT(DISTINCT o.species_id) AS species_count, COUNT(*) AS observation_count
-FROM observations o
-JOIN species s ON o.species_id = s.id
-JOIN sites si ON o.site_id = si.id
-WHERE ($1::timestamp IS NULL OR o."timestamp" >= $1::timestamp)
-  AND ($2::timestamp IS NULL OR o."timestamp" <= $2::timestamp)
-  AND ($3::int IS NULL OR si.block = $3::int)
-GROUP BY s.native
+SELECT native AS is_native, COUNT(DISTINCT species_id) AS species_count, COUNT(*) AS observation_count
+FROM observations_with_details
+WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
+  AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
+  AND ($3::int IS NULL OR block = $3::int)
+GROUP BY native
 `
 
 type CountSpeciesByNativeParams struct {
@@ -75,14 +73,12 @@ func (q *Queries) CountSpeciesByNative(ctx context.Context, arg CountSpeciesByNa
 }
 
 const listSpeciesCountByTaxa = `-- name: ListSpeciesCountByTaxa :many
-SELECT s.taxa, COUNT(DISTINCT o.species_id) AS count
-FROM observations o
-JOIN species s ON o.species_id = s.id
-JOIN sites si ON o.site_id = si.id
-WHERE ($1::timestamp IS NULL OR o."timestamp" >= $1::timestamp)
-  AND ($2::timestamp IS NULL OR o."timestamp" <= $2::timestamp)
-  AND ($3::int IS NULL OR si.block = $3::int)
-GROUP BY s.taxa
+SELECT taxa, COUNT(DISTINCT species_id) AS count
+FROM observations_with_details
+WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
+  AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
+  AND ($3::int IS NULL OR block = $3::int)
+GROUP BY taxa
 `
 
 type ListSpeciesCountByTaxaParams struct {
