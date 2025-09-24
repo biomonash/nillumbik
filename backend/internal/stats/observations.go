@@ -28,11 +28,10 @@ type ObservationOverviewRequest struct {
 }
 
 type ObservationOverviewResponse struct {
-	TotalSpeciesDetected  int64            `json:"total_species_detected"`
-	ActiveMonitoringSites int64            `json:"active_monitoring_sites"`
-	DetectionEvents       int64            `json:"detection_events"`
-	NativeSpeciesPercent  float64          `json:"native_species_percent"`
-	CountByCategory       map[string]int64 `json:"count_by_category"`
+	ObservationCount  int64             `json:"observation_count"`
+	TotalSpeciesCount int64             `json:"total_species_count"`
+	NativeCount       int64             `json:"native_count"`
+	CountByCategory   map[db.Taxa]int64 `json:"count_by_category"`
 }
 
 // ObservationOverview godoc
@@ -94,10 +93,10 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 		countByCategory[row.Taxa] = row.Count
 	}
 
-	resp := SpeciesOverviewResponse{
-		TotalCount:      totalCount,
-		NativeCount:     nativeCount,
-		CountByCategory: countByCategory,
+	resp := ObservationOverviewResponse{
+		TotalSpeciesCount: totalCount,
+		NativeCount:       nativeCount,
+		CountByCategory:   countByCategory,
 	}
 	c.JSON(http.StatusOK, resp)
 }
