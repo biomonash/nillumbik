@@ -122,7 +122,7 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 	var req ObservationTimeSeriesRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters"})
+		c.Error(utils.NewHttpError(http.StatusBadRequest, "Invalid query parameters", err))
 		return
 	}
 	ctx := c.Request.Context()
@@ -141,8 +141,7 @@ func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 
 	rows, err := u.q.ObservationTimeSeriesGroupByNative(ctx, params)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch time series",
-			"details": err.Error()})
+		c.Error(fmt.Errorf("Failed to fetch time series: %w", err))
 		return
 	}
 	series := map[string][]TimeSeriesPoint{

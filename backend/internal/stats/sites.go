@@ -1,6 +1,7 @@
 package stats
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/biomonash/nillumbik/internal/db"
@@ -53,7 +54,7 @@ type BlockResponse struct {
 func (u *Controller) ObservationBySites(c *gin.Context) {
 	var req ObservationBySitesRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters"})
+		c.Error(utils.NewHttpError(http.StatusBadRequest, "Invalid query parameters", err))
 		return
 	}
 	ctx := c.Request.Context()
@@ -71,8 +72,7 @@ func (u *Controller) ObservationBySites(c *gin.Context) {
 	}
 	rows, err := u.q.ObservationGroupBySites(ctx, params)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch observations by sites",
-			"details": err.Error()})
+		c.Error(fmt.Errorf("Failed to fetch observations by sites: %w", err))
 		return
 	}
 
@@ -111,7 +111,7 @@ func (u *Controller) ObservationBySites(c *gin.Context) {
 func (u *Controller) ObservationByBlocks(c *gin.Context) {
 	var req ObservationBySitesRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters"})
+		c.Error(utils.NewHttpError(http.StatusBadRequest, "Invalid query parameters", err))
 		return
 	}
 	ctx := c.Request.Context()
@@ -129,8 +129,7 @@ func (u *Controller) ObservationByBlocks(c *gin.Context) {
 	}
 	rows, err := u.q.ObservationGroupByBlocks(ctx, params)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch observations by sites",
-			"details": err.Error()})
+		c.Error(fmt.Errorf("Failed to fetch observations by blocks: %w", err))
 		return
 	}
 	convertBlock := func(row db.ObservationGroupByBlocksRow) BlockResponse {

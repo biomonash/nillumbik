@@ -1,11 +1,14 @@
 package observation
 
 import (
+	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/biomonash/nillumbik/internal/db"
 	"github.com/biomonash/nillumbik/internal/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 )
 
 type Controller struct {
@@ -53,7 +56,7 @@ func (u *Controller) ListObservations(c *gin.Context) {
 		Offset: params.Offset,
 	})
 	if err != nil {
-		c.Error(err)
+		c.Error(fmt.Errorf("failed to list observations: %w", err))
 		return
 	}
 
@@ -81,8 +84,12 @@ func (u *Controller) GetObservationByID(c *gin.Context) {
 		return
 	}
 	ob, err := u.q.GetObservation(c.Request.Context(), int64(id))
+	if errors.Is(pgx.ErrNoRows, err) {
+		c.Error(utils.NewHttpError(404, "observation not found", err))
+		return
+	}
 	if err != nil {
-		c.Error(utils.NewHttpError(404, "Observation not found", err))
+		c.Error(fmt.Errorf("failed to get observation by id: %w", err))
 		return
 	}
 
