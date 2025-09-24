@@ -302,6 +302,69 @@
                 }
             }
         },
+        "/stats/observations/blocks": {
+            "get": {
+                "description": "Observation stats group by blocks",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Observation stats group by blocks",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by site block",
+                        "name": "block",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by site code",
+                        "name": "site_code",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by taxa",
+                        "name": "taxa",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by species common_name",
+                        "name": "common_name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/stats.ObservationByBlocksResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/observations/sites": {
             "get": {
                 "description": "Observation stats group by sites",
@@ -620,6 +683,31 @@
                 },
                 "timestamp": {
                     "type": "string"
+                }
+            }
+        },
+        "stats.BlockResponse": {
+            "type": "object",
+            "properties": {
+                "block": {
+                    "type": "integer"
+                },
+                "observation_count": {
+                    "type": "integer"
+                },
+                "species_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "stats.ObservationByBlocksResponse": {
+            "type": "object",
+            "properties": {
+                "blocks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/stats.BlockResponse"
+                    }
                 }
             }
         },

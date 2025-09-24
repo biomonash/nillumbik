@@ -131,6 +131,22 @@ definitions:
       timestamp:
         type: string
     type: object
+  stats.BlockResponse:
+    properties:
+      block:
+        type: integer
+      observation_count:
+        type: integer
+      species_count:
+        type: integer
+    type: object
+  stats.ObservationByBlocksResponse:
+    properties:
+      blocks:
+        items:
+          $ref: '#/definitions/stats.BlockResponse'
+        type: array
+    type: object
   stats.ObservationBySitesResponse:
     properties:
       sites:
@@ -383,6 +399,48 @@ paths:
           schema:
             $ref: '#/definitions/stats.ObservationOverviewResponse'
       summary: Observation overview
+      tags:
+      - statistics
+  /stats/observations/blocks:
+    get:
+      consumes:
+      - application/json
+      description: Observation stats group by blocks
+      parameters:
+      - description: Search start from
+        format: date
+        in: query
+        name: from
+        type: string
+      - description: Search start from
+        format: date
+        in: query
+        name: to
+        type: string
+      - description: Filter by site block
+        in: query
+        name: block
+        type: integer
+      - description: Filter by site code
+        in: query
+        name: site_code
+        type: string
+      - description: Filter by taxa
+        in: query
+        name: taxa
+        type: string
+      - description: Filter by species common_name
+        in: query
+        name: common_name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/stats.ObservationByBlocksResponse'
+      summary: Observation stats group by blocks
       tags:
       - statistics
   /stats/observations/sites:

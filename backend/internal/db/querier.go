@@ -33,6 +33,7 @@ type Querier interface {
 	ListSites(ctx context.Context) ([]Site, error)
 	ListSpecies(ctx context.Context) ([]Species, error)
 	ListSpeciesCountByTaxa(ctx context.Context, arg ListSpeciesCountByTaxaParams) ([]ListSpeciesCountByTaxaRow, error)
+	ObservationGroupByBlocks(ctx context.Context, arg ObservationGroupByBlocksParams) ([]ObservationGroupByBlocksRow, error)
 	ObservationGroupBySites(ctx context.Context, arg ObservationGroupBySitesParams) ([]ObservationGroupBySitesRow, error)
 	ObservationTimeSeriesGroupByNative(ctx context.Context, arg ObservationTimeSeriesGroupByNativeParams) ([]ObservationTimeSeriesGroupByNativeRow, error)
 	SearchObservations(ctx context.Context, scientificName string) ([]SearchObservationsRow, error)

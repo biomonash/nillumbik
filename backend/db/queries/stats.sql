@@ -47,4 +47,17 @@ WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from'):
   AND (sqlc.narg('site_code')::text IS NULL OR site_code = sqlc.narg('site_code'))
   AND (sqlc.narg('taxa')::taxa IS NULL OR taxa = sqlc.narg('taxa')::taxa)
   AND (sqlc.narg('common_name')::text IS NULL OR LOWER(common_name) = LOWER(sqlc.narg('common_name')::text))
-GROUP BY site_code;
+GROUP BY site_code
+ORDER BY site_code;
+
+-- name: ObservationGroupByBlocks :many
+SELECT block, COUNT(DISTINCT species_id) AS species_count, COUNT(*) AS observation_count
+FROM observations_with_details
+WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from')::timestamp)
+  AND (sqlc.narg('to')::timestamp IS NULL OR "timestamp" <= sqlc.narg('to')::timestamp)
+  AND (sqlc.narg('block')::int IS NULL OR block = sqlc.narg('block')::int)
+  AND (sqlc.narg('site_code')::text IS NULL OR site_code = sqlc.narg('site_code'))
+  AND (sqlc.narg('taxa')::taxa IS NULL OR taxa = sqlc.narg('taxa')::taxa)
+  AND (sqlc.narg('common_name')::text IS NULL OR LOWER(common_name) = LOWER(sqlc.narg('common_name')::text))
+GROUP BY block
+ORDER BY block;

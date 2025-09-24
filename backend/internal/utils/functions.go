@@ -7,3 +7,11 @@ func MapSlice[K any, V any](conv func(K) V, inputs []K) []V {
 	}
 	return output
 }
+
+func Values[K comparable, V any](inputs map[K]V) []V {
+	result := make([]V, 0, len(inputs))
+	for _, v := range inputs {
+		result = append(result, v)
+	}
+	return result
+}

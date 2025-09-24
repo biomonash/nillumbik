@@ -138,6 +138,61 @@ func (q *Queries) ListSpeciesCountByTaxa(ctx context.Context, arg ListSpeciesCou
 	return items, nil
 }
 
+const observationGroupByBlocks = `-- name: ObservationGroupByBlocks :many
+SELECT block, COUNT(DISTINCT species_id) AS species_count, COUNT(*) AS observation_count
+FROM observations_with_details
+WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
+  AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
+  AND ($3::int IS NULL OR block = $3::int)
+  AND ($4::text IS NULL OR site_code = $4)
+  AND ($5::taxa IS NULL OR taxa = $5::taxa)
+  AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
+GROUP BY block
+ORDER BY block
+`
+
+type ObservationGroupByBlocksParams struct {
+	From       pgtype.Timestamp `json:"from"`
+	To         pgtype.Timestamp `json:"to"`
+	Block      *int32           `json:"block"`
+	SiteCode   *string          `json:"site_code"`
+	Taxa       NullTaxa         `json:"taxa"`
+	CommonName *string          `json:"common_name"`
+}
+
+type ObservationGroupByBlocksRow struct {
+	Block            int32 `json:"block"`
+	SpeciesCount     int64 `json:"species_count"`
+	ObservationCount int64 `json:"observation_count"`
+}
+
+func (q *Queries) ObservationGroupByBlocks(ctx context.Context, arg ObservationGroupByBlocksParams) ([]ObservationGroupByBlocksRow, error) {
+	rows, err := q.db.Query(ctx, observationGroupByBlocks,
+		arg.From,
+		arg.To,
+		arg.Block,
+		arg.SiteCode,
+		arg.Taxa,
+		arg.CommonName,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ObservationGroupByBlocksRow{}
+	for rows.Next() {
+		var i ObservationGroupByBlocksRow
+		if err := rows.Scan(&i.Block, &i.SpeciesCount, &i.ObservationCount); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const observationGroupBySites = `-- name: ObservationGroupBySites :many
 SELECT site_code, COUNT(DISTINCT species_id) AS species_count, COUNT(*) AS observation_count
 FROM observations_with_details
@@ -148,6 +203,7 @@ WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($5::taxa IS NULL OR taxa = $5::taxa)
   AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
 GROUP BY site_code
+ORDER BY site_code
 `
 
 type ObservationGroupBySitesParams struct {
