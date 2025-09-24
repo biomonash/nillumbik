@@ -58,7 +58,7 @@ type SiteResponse struct {
 //	@Param			taxa		query		string	False	"Filter by taxa"
 //	@Param			common_name	query		string	False	"Filter by species common_name"
 //	@Success		200			{object}	ObservationOverviewResponse
-//	@Error			400 														{object}	gin.H
+//	@Error			400 																				{object}	gin.H
 //	@Router			/stats/observations [get]
 func (u *Controller) ObservationOverview(c *gin.Context) {
 	var req ObservationOverviewRequest
@@ -137,7 +137,7 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 //	@Param			taxa		query		string	False	"Filter by taxa"
 //	@Param			common_name	query		string	False	"Filter by species common_name"
 //	@Success		200			{object}	ObservationTimeSeriesResponse
-//	@Error			400 					{object}	gin.H
+//	@Error			400 											{object}	gin.H
 //	@Router			/stats/observations/timeseries [get]
 func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 	var req ObservationTimeSeriesRequest
@@ -206,7 +206,7 @@ func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 //	@Param			taxa		query		string	False	"Filter by taxa"
 //	@Param			common_name	query		string	False	"Filter by species common_name"
 //	@Success		200			{object}	ObservationBySitesResponse
-//	@Error			400 					{object}	gin.H
+//	@Error			400 											{object}	gin.H
 //	@Router			/stats/observations/sites [get]
 func (u *Controller) ObservationBySites(c *gin.Context) {
 	var req ObservationBySitesRequest

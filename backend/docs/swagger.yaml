@@ -170,31 +170,6 @@ definitions:
       species_count:
         type: integer
     type: object
-  stats.SpeciesOverviewResponse:
-    properties:
-      from:
-        type: string
-      to:
-        type: string
-    type: object
-  stats.SpeciesStatsResponse:
-    properties:
-      active_monitoring_sites:
-        type: integer
-      detection_events:
-        type: integer
-      native_species_percent:
-        type: number
-      total_species_detected:
-        type: integer
-    type: object
-  stats.SpeciesTimeSeriesResponse:
-    properties:
-      series:
-        items:
-          $ref: '#/definitions/stats.TimeSeriesPoint'
-        type: array
-    type: object
   stats.TimeSeriesPoint:
     properties:
       observation_count:
@@ -492,51 +467,6 @@ paths:
           schema:
             $ref: '#/definitions/stats.ObservationTimeSeriesResponse'
       summary: Observation time series
-      tags:
-      - statistics
-  /stats/species:
-    get:
-      consumes:
-      - application/json
-      description: Species overview
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/stats.SpeciesOverviewResponse'
-      summary: Species overview
-      tags:
-      - statistics
-  /stats/species/stats:
-    get:
-      consumes:
-      - application/json
-      description: Species statistics
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/stats.SpeciesStatsResponse'
-      summary: Species statistics
-      tags:
-      - statistics
-  /stats/species/timeseries:
-    get:
-      consumes:
-      - application/json
-      description: Species time series
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/stats.SpeciesTimeSeriesResponse'
-      summary: Species time series
       tags:
       - statistics
 securityDefinitions:

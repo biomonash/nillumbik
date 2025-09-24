@@ -433,75 +433,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/stats/species": {
-            "get": {
-                "description": "Species overview",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "statistics"
-                ],
-                "summary": "Species overview",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/stats.SpeciesOverviewResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/stats/species/stats": {
-            "get": {
-                "description": "Species statistics",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "statistics"
-                ],
-                "summary": "Species statistics",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/stats.SpeciesStatsResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/stats/species/timeseries": {
-            "get": {
-                "description": "Species time series",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "statistics"
-                ],
-                "summary": "Species time series",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/stats.SpeciesTimeSeriesResponse"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -755,45 +686,6 @@ const docTemplate = `{
                 },
                 "species_count": {
                     "type": "integer"
-                }
-            }
-        },
-        "stats.SpeciesOverviewResponse": {
-            "type": "object",
-            "properties": {
-                "from": {
-                    "type": "string"
-                },
-                "to": {
-                    "type": "string"
-                }
-            }
-        },
-        "stats.SpeciesStatsResponse": {
-            "type": "object",
-            "properties": {
-                "active_monitoring_sites": {
-                    "type": "integer"
-                },
-                "detection_events": {
-                    "type": "integer"
-                },
-                "native_species_percent": {
-                    "type": "number"
-                },
-                "total_species_detected": {
-                    "type": "integer"
-                }
-            }
-        },
-        "stats.SpeciesTimeSeriesResponse": {
-            "type": "object",
-            "properties": {
-                "series": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/stats.TimeSeriesPoint"
-                    }
                 }
             }
         },
