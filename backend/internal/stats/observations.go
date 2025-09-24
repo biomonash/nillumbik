@@ -21,8 +21,9 @@ type ObservationTimeSeriesResponse struct {
 }
 
 type TimeSeriesPoint struct {
-	Timestamp string `json:"timestamp"`
-	Value     int64  `json:"value"`
+	Timestamp        string `json:"timestamp"`
+	SpeciesCount     int64  `json:"species_count"`
+	ObservationCount int64  `json:"observation_count"`
 }
 
 type ObservationOverviewRequest struct {
@@ -173,8 +174,9 @@ func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 			key = "non-native"
 		}
 		series[key] = append(series[key], TimeSeriesPoint{
-			Timestamp: row.Year.Format(time.RFC3339),
-			Value:     row.Count,
+			Timestamp:        row.Year.Format(time.RFC3339),
+			SpeciesCount:     row.SpeciesCount,
+			ObservationCount: row.ObservationCount,
 		})
 	}
 	resp := ObservationTimeSeriesResponse{Series: series}

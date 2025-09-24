@@ -27,7 +27,7 @@ WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from'):
 GROUP BY taxa;
 
 -- name: ObservationTimeSeriesGroupByNative :many
-SELECT native as is_native, date_trunc('year', "timestamp")::timestamp AS year, COUNT(*) AS count
+SELECT native as is_native, date_trunc('year', "timestamp")::timestamp AS year, COUNT(DISTINCT species_id) AS species_count, COUNT(*) AS observation_count
 FROM observations_with_details
 WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from')::timestamp)
   AND (sqlc.narg('to')::timestamp IS NULL OR "timestamp" <= sqlc.narg('to')::timestamp)

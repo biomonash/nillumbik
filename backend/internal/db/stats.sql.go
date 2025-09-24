@@ -139,7 +139,7 @@ func (q *Queries) ListSpeciesCountByTaxa(ctx context.Context, arg ListSpeciesCou
 }
 
 const observationTimeSeriesGroupByNative = `-- name: ObservationTimeSeriesGroupByNative :many
-SELECT native as is_native, date_trunc('year', "timestamp")::timestamp AS year, COUNT(*) AS count
+SELECT native as is_native, date_trunc('year', "timestamp")::timestamp AS year, COUNT(DISTINCT species_id) AS species_count, COUNT(*) AS observation_count
 FROM observations_with_details
 WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
@@ -161,9 +161,10 @@ type ObservationTimeSeriesGroupByNativeParams struct {
 }
 
 type ObservationTimeSeriesGroupByNativeRow struct {
-	IsNative bool      `json:"is_native"`
-	Year     time.Time `json:"year"`
-	Count    int64     `json:"count"`
+	IsNative         bool      `json:"is_native"`
+	Year             time.Time `json:"year"`
+	SpeciesCount     int64     `json:"species_count"`
+	ObservationCount int64     `json:"observation_count"`
 }
 
 func (q *Queries) ObservationTimeSeriesGroupByNative(ctx context.Context, arg ObservationTimeSeriesGroupByNativeParams) ([]ObservationTimeSeriesGroupByNativeRow, error) {
@@ -182,7 +183,12 @@ func (q *Queries) ObservationTimeSeriesGroupByNative(ctx context.Context, arg Ob
 	var items []ObservationTimeSeriesGroupByNativeRow
 	for rows.Next() {
 		var i ObservationTimeSeriesGroupByNativeRow
-		if err := rows.Scan(&i.IsNative, &i.Year, &i.Count); err != nil {
+		if err := rows.Scan(
+			&i.IsNative,
+			&i.Year,
+			&i.SpeciesCount,
+			&i.ObservationCount,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
