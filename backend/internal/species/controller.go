@@ -1,13 +1,14 @@
 package species
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/biomonash/nillumbik/internal/db"
 	"github.com/biomonash/nillumbik/internal/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 )
 
 type Controller struct {
@@ -32,7 +33,7 @@ func NewController(queries db.Querier) *Controller {
 func (u *Controller) ListSpecies(c *gin.Context) {
 	species, err := u.q.ListSpecies(c.Request.Context())
 	if err != nil {
-		c.AbortWithError(500, fmt.Errorf("failed to list species: %w", err))
+		c.Error(fmt.Errorf("failed to list species: %w", err))
 		return
 	}
 	c.JSON(200, species)
@@ -56,8 +57,12 @@ func (u *Controller) GetSpeciesByID(c *gin.Context) {
 		return
 	}
 	species, err := u.q.GetSpecies(c.Request.Context(), int64(id))
-	if err != nil {
+	if errors.Is(pgx.ErrNoRows, err) {
 		c.Error(utils.NewHttpError(404, "species not found", err))
+		return
+	}
+	if err != nil {
+		c.Error(fmt.Errorf("failed to get species by id: %w", err))
 		return
 	}
 
@@ -76,10 +81,14 @@ func (u *Controller) GetSpeciesByID(c *gin.Context) {
 //	@Router			/species/by-common-name/{name} [get]
 func (u *Controller) GetSpeciesByCommonName(c *gin.Context) {
 	name := c.Param("name")
-	cleanName := strings.ReplaceAll(name, "_", " ")
+	cleanName := CleanName(name)
 	species, err := u.q.GetSpeciesByCommonName(c.Request.Context(), cleanName)
-	if err != nil {
+	if errors.Is(pgx.ErrNoRows, err) {
 		c.Error(utils.NewHttpError(404, "species not found", err))
+		return
+	}
+	if err != nil {
+		c.Error(fmt.Errorf("failed to get species by common name: %w", err))
 		return
 	}
 

@@ -7,97 +7,7 @@ package db
 
 import (
 	"context"
-	"time"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
-
-const countActiveMonitoringSites = `-- name: CountActiveMonitoringSites :one
-SELECT COUNT(DISTINCT site_id) FROM observations
-`
-
-func (q *Queries) CountActiveMonitoringSites(ctx context.Context) (int64, error) {
-	row := q.db.QueryRow(ctx, countActiveMonitoringSites)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const countDetectionEvents = `-- name: CountDetectionEvents :one
-SELECT COUNT(*) FROM observations
-`
-
-func (q *Queries) CountDetectionEvents(ctx context.Context) (int64, error) {
-	row := q.db.QueryRow(ctx, countDetectionEvents)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const countDistinctNativeSpeciesObserved = `-- name: CountDistinctNativeSpeciesObserved :one
-SELECT COUNT(DISTINCT o.species_id)
-FROM observations o
-JOIN species s ON o.species_id = s.id
-WHERE s.native = TRUE
-`
-
-func (q *Queries) CountDistinctNativeSpeciesObserved(ctx context.Context) (int64, error) {
-	row := q.db.QueryRow(ctx, countDistinctNativeSpeciesObserved)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const countDistinctNativeSpeciesObservedInPeriod = `-- name: CountDistinctNativeSpeciesObservedInPeriod :one
-SELECT COUNT(DISTINCT o.species_id)
-FROM observations o
-JOIN species s ON o.species_id = s.id
-WHERE s.native = TRUE
-  AND ($1::timestamp IS NULL OR o."timestamp" >= $1::timestamp)
-  AND ($2::timestamp IS NULL OR o."timestamp" <= $2::timestamp)
-`
-
-type CountDistinctNativeSpeciesObservedInPeriodParams struct {
-	From pgtype.Timestamp `json:"from"`
-	To   pgtype.Timestamp `json:"to"`
-}
-
-func (q *Queries) CountDistinctNativeSpeciesObservedInPeriod(ctx context.Context, arg CountDistinctNativeSpeciesObservedInPeriodParams) (int64, error) {
-	row := q.db.QueryRow(ctx, countDistinctNativeSpeciesObservedInPeriod, arg.From, arg.To)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const countDistinctSpeciesObserved = `-- name: CountDistinctSpeciesObserved :one
-SELECT COUNT(DISTINCT species_id) FROM observations
-`
-
-func (q *Queries) CountDistinctSpeciesObserved(ctx context.Context) (int64, error) {
-	row := q.db.QueryRow(ctx, countDistinctSpeciesObserved)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const countDistinctSpeciesObservedInPeriod = `-- name: CountDistinctSpeciesObservedInPeriod :one
-SELECT COUNT(DISTINCT species_id)
-FROM observations
-WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
-  AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
-`
-
-type CountDistinctSpeciesObservedInPeriodParams struct {
-	From pgtype.Timestamp `json:"from"`
-	To   pgtype.Timestamp `json:"to"`
-}
-
-func (q *Queries) CountDistinctSpeciesObservedInPeriod(ctx context.Context, arg CountDistinctSpeciesObservedInPeriodParams) (int64, error) {
-	row := q.db.QueryRow(ctx, countDistinctSpeciesObservedInPeriod, arg.From, arg.To)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
 
 const countSpecies = `-- name: CountSpecies :one
 SELECT COUNT(*) FROM species
@@ -232,7 +142,7 @@ func (q *Queries) ListSpecies(ctx context.Context) ([]Species, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Species
+	items := []Species{}
 	for rows.Next() {
 		var i Species
 		if err := rows.Scan(
@@ -244,45 +154,6 @@ func (q *Queries) ListSpecies(ctx context.Context) ([]Species, error) {
 			&i.Indicator,
 			&i.Reportable,
 		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listSpeciesCountByTaxaInPeriod = `-- name: ListSpeciesCountByTaxaInPeriod :many
-SELECT s.taxa, COUNT(DISTINCT o.species_id) AS count
-FROM observations o
-JOIN species s ON o.species_id = s.id
-WHERE ($1::timestamp IS NULL OR o."timestamp" >= $1::timestamp)
-  AND ($2::timestamp IS NULL OR o."timestamp" <= $2::timestamp)
-GROUP BY s.taxa
-`
-
-type ListSpeciesCountByTaxaInPeriodParams struct {
-	From pgtype.Timestamp `json:"from"`
-	To   pgtype.Timestamp `json:"to"`
-}
-
-type ListSpeciesCountByTaxaInPeriodRow struct {
-	Taxa  Taxa  `json:"taxa"`
-	Count int64 `json:"count"`
-}
-
-func (q *Queries) ListSpeciesCountByTaxaInPeriod(ctx context.Context, arg ListSpeciesCountByTaxaInPeriodParams) ([]ListSpeciesCountByTaxaInPeriodRow, error) {
-	rows, err := q.db.Query(ctx, listSpeciesCountByTaxaInPeriod, arg.From, arg.To)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ListSpeciesCountByTaxaInPeriodRow
-	for rows.Next() {
-		var i ListSpeciesCountByTaxaInPeriodRow
-		if err := rows.Scan(&i.Taxa, &i.Count); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -306,7 +177,7 @@ func (q *Queries) SearchSpecies(ctx context.Context, scientificName string) ([]S
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Species
+	items := []Species{}
 	for rows.Next() {
 		var i Species
 		if err := rows.Scan(
@@ -318,45 +189,6 @@ func (q *Queries) SearchSpecies(ctx context.Context, scientificName string) ([]S
 			&i.Indicator,
 			&i.Reportable,
 		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const speciesObservationTimeSeries = `-- name: SpeciesObservationTimeSeries :many
-SELECT date_trunc('month', "timestamp")::timestamp AS month, COUNT(*) AS count
-FROM observations
-WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
-  AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
-GROUP BY month
-ORDER BY month
-`
-
-type SpeciesObservationTimeSeriesParams struct {
-	From pgtype.Timestamp `json:"from"`
-	To   pgtype.Timestamp `json:"to"`
-}
-
-type SpeciesObservationTimeSeriesRow struct {
-	Month time.Time `json:"month"`
-	Count int64     `json:"count"`
-}
-
-func (q *Queries) SpeciesObservationTimeSeries(ctx context.Context, arg SpeciesObservationTimeSeriesParams) ([]SpeciesObservationTimeSeriesRow, error) {
-	rows, err := q.db.Query(ctx, speciesObservationTimeSeries, arg.From, arg.To)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []SpeciesObservationTimeSeriesRow
-	for rows.Next() {
-		var i SpeciesObservationTimeSeriesRow
-		if err := rows.Scan(&i.Month, &i.Count); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
