@@ -139,7 +139,7 @@ func (q *Queries) ListSites(ctx context.Context) ([]Site, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Site
+	items := []Site{}
 	for rows.Next() {
 		var i Site
 		if err := rows.Scan(
@@ -173,7 +173,7 @@ func (q *Queries) SearchSites(ctx context.Context, code string) ([]Site, error) 
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Site
+	items := []Site{}
 	for rows.Next() {
 		var i Site
 		if err := rows.Scan(

@@ -32,7 +32,7 @@ func NewController(queries db.Querier) *Controller {
 func (u *Controller) ListSites(c *gin.Context) {
 	sites, err := u.q.ListSites(c.Request.Context())
 	if err != nil {
-		c.AbortWithError(500, fmt.Errorf("failed to list sites: %w", err))
+		c.Error(fmt.Errorf("failed to list sites: %w", err))
 		return
 	}
 	c.JSON(200, sites)
@@ -55,7 +55,7 @@ func (u *Controller) GetSiteByCode(c *gin.Context) {
 		c.Error(utils.NewHttpError(404, "Site code not found", err))
 		return
 	} else if err != nil {
-		c.AbortWithError(500, err)
+		c.Error(fmt.Errorf("failed to get site by code: %w", err))
 		return
 	}
 

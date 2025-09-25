@@ -11,28 +11,23 @@ import (
 )
 
 // --- Structs ---
-type ObservationTimeSeriesRequest struct {
-	TimePeriodRequest
-}
-
-type ObservationTimeSeriesResponse struct {
-	Series []TimeSeriesPoint `json:"series"`
-}
-type TimeSeriesPoint struct {
-	Timestamp string `json:"timestamp"`
-	Value     int64  `json:"value"`
-}
 
 type ObservationOverviewRequest struct {
-	TimePeriodRequest
+	ObservationStatsInput
 }
 
 type ObservationOverviewResponse struct {
-	TotalSpeciesDetected  int64            `json:"total_species_detected"`
-	ActiveMonitoringSites int64            `json:"active_monitoring_sites"`
-	DetectionEvents       int64            `json:"detection_events"`
-	NativeSpeciesPercent  float64          `json:"native_species_percent"`
-	CountByCategory       map[string]int64 `json:"count_by_category"`
+	ObservationStats
+	NativeCount int64             `json:"native_species_count"`
+	CountByTaxa map[db.Taxa]int64 `json:"count_by_taxa"`
+}
+
+type ObservationTimeSeriesRequest struct {
+	ObservationStatsInput
+}
+
+type ObservationTimeSeriesResponse struct {
+	Series map[string][]TimeSeriesPoint `json:"series"`
 }
 
 // ObservationOverview godoc
@@ -42,10 +37,14 @@ type ObservationOverviewResponse struct {
 //	@Tags			statistics
 //	@Accept			json
 //	@Produce		json
-//	@Param			from	query		string	False	"Search start from"	format(date)
-//	@Param			to		query		string	False	"Search start from"	format(date)
-//	@Success		200		{object}	ObservationOverviewResponse
-//	@Error			400 	{object}	gin.H
+//	@Param			from		query		string	False	"Search start from"	format(date)
+//	@Param			to			query		string	False	"Search start from"	format(date)
+//	@Param			block		query		integer	False	"Filter by site block"
+//	@Param			site_code	query		string	False	"Filter by site code"
+//	@Param			taxa		query		string	False	"Filter by taxa"
+//	@Param			common_name	query		string	False	"Filter by species common_name"
+//	@Success		200			{object}	ObservationOverviewResponse
+//	@Error			400 																							{object}	gin.H
 //	@Router			/stats/observations [get]
 func (u *Controller) ObservationOverview(c *gin.Context) {
 	var req ObservationOverviewRequest
@@ -55,50 +54,52 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 	}
 	ctx := c.Request.Context()
 
+	var resp ObservationOverviewResponse
+
 	// Use from/to for filtering
-	from := utils.ToPgTimestamp(req.From)
-	to := utils.ToPgTimestamp(req.To)
 
-	// Example: filter observations by date range
-	paramsDistinct := db.CountDistinctSpeciesObservedInPeriodParams{
-		From: from,
-		To:   to,
-	}
-	totalCount, err := u.q.CountDistinctSpeciesObservedInPeriod(ctx, paramsDistinct)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("Failed to count distinct species: %w", err))
-		return
+	from, to, taxa, commonName := parseObservationStatsInput(req.ObservationStatsInput)
+
+	paramsNative := db.CountSpeciesByNativeParams{
+		From:       from,
+		To:         to,
+		Block:      req.Block,
+		SiteCode:   req.SiteCode,
+		Taxa:       taxa,
+		CommonName: commonName,
 	}
 
-	paramsNative := db.CountDistinctNativeSpeciesObservedInPeriodParams{
-		From: from,
-		To:   to,
-	}
-	nativeCount, err := u.q.CountDistinctNativeSpeciesObservedInPeriod(ctx, paramsNative)
+	speciesGroups, err := u.q.CountSpeciesByNative(ctx, paramsNative)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("Failed to count native species: %w", err))
+		c.Error(fmt.Errorf("Failed to count native species: %w", err))
 		return
+	}
+	for _, group := range speciesGroups {
+		resp.ObservationCount += group.ObservationCount
+		resp.SpeciesCount += group.SpeciesCount
+		if group.IsNative {
+			resp.NativeCount = group.SpeciesCount
+		}
 	}
 
-	params := db.ListSpeciesCountByTaxaInPeriodParams{
-		From: from,
-		To:   to,
+	params := db.ListSpeciesCountByTaxaParams{
+		From:       from,
+		To:         to,
+		Block:      req.Block,
+		SiteCode:   req.SiteCode,
+		Taxa:       taxa,
+		CommonName: commonName,
 	}
-	countByCategoryRows, err := u.q.ListSpeciesCountByTaxaInPeriod(ctx, params)
+	countByCategoryRows, err := u.q.ListSpeciesCountByTaxa(ctx, params)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("Failed to count species by category: %w", err))
+		c.Error(fmt.Errorf("Failed to count species by category: %w", err))
 		return
 	}
-	countByCategory := map[db.Taxa]int64{}
+	resp.CountByTaxa = make(map[db.Taxa]int64)
 	for _, row := range countByCategoryRows {
-		countByCategory[row.Taxa] = row.Count
+		resp.CountByTaxa[row.Taxa] = row.Count
 	}
 
-	resp := SpeciesOverviewResponse{
-		TotalCount:      totalCount,
-		NativeCount:     nativeCount,
-		CountByCategory: countByCategory,
-	}
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -109,33 +110,55 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 //	@Tags			statistics
 //	@Accept			json
 //	@Produce		json
-//	@Success		200		{object}	ObservationTimeSeriesResponse
-//	@Error			400 	{object}	gin.H
+//	@Param			from		query		string	False	"Search start from"	format(date)
+//	@Param			to			query		string	False	"Search start from"	format(date)
+//	@Param			block		query		integer	False	"Filter by site block"
+//	@Param			site_code	query		string	False	"Filter by site code"
+//	@Param			taxa		query		string	False	"Filter by taxa"
+//	@Param			common_name	query		string	False	"Filter by species common_name"
+//	@Success		200			{object}	ObservationTimeSeriesResponse
+//	@Error			400 														{object}	gin.H
 //	@Router			/stats/observations/timeseries [get]
 func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 	var req ObservationTimeSeriesRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters"})
+		c.Error(utils.NewHttpError(http.StatusBadRequest, "Invalid query parameters", err))
 		return
 	}
 	ctx := c.Request.Context()
 
-	// Use req.From and req.To to filter your SQL query
-	params := db.ObservationTimeSeriesParams{
-		From: utils.ToPgTimestamp(req.From),
-		To:   utils.ToPgTimestamp(req.To),
+	// Parse common input parameters
+	from, to, taxa, commonName := parseObservationStatsInput(req.ObservationStatsInput)
+
+	params := db.ObservationTimeSeriesGroupByNativeParams{
+		From:       from,
+		To:         to,
+		Block:      req.Block,
+		SiteCode:   req.SiteCode,
+		Taxa:       taxa,
+		CommonName: commonName,
 	}
-	rows, err := u.q.ObservationTimeSeries(ctx, params)
+
+	rows, err := u.q.ObservationTimeSeriesGroupByNative(ctx, params)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch time series",
-			"details": err.Error()})
+		c.Error(fmt.Errorf("Failed to fetch time series: %w", err))
 		return
 	}
-	series := make([]TimeSeriesPoint, 0, len(rows))
+	series := map[string][]TimeSeriesPoint{
+		"native":     make([]TimeSeriesPoint, 0, len(rows)),
+		"non-native": make([]TimeSeriesPoint, 0, len(rows)),
+	}
 	for _, row := range rows {
-		series = append(series, TimeSeriesPoint{
-			Timestamp: row.Month.Format(time.RFC3339),
-			Value:     row.Count,
+		key := "native"
+		if !row.IsNative {
+			key = "non-native"
+		}
+		series[key] = append(series[key], TimeSeriesPoint{
+			Timestamp: row.Year.Format(time.RFC3339),
+			ObservationStats: ObservationStats{
+				SpeciesCount:     row.SpeciesCount,
+				ObservationCount: row.ObservationCount,
+			},
 		})
 	}
 	resp := ObservationTimeSeriesResponse{Series: series}

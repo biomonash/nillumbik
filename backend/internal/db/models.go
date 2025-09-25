@@ -261,6 +261,30 @@ type Observation struct {
 	Confidence      *float32          `json:"confidence"`
 }
 
+type ObservationsWithDetail struct {
+	ID              int64             `json:"id"`
+	SiteID          int64             `json:"site_id"`
+	SpeciesID       int64             `json:"species_id"`
+	Timestamp       time.Time         `json:"timestamp"`
+	Method          ObservationMethod `json:"method"`
+	AppearanceStart *int32            `json:"appearance_start"`
+	AppearanceEnd   *int32            `json:"appearance_end"`
+	Temperature     *int32            `json:"temperature"`
+	Narrative       *string           `json:"narrative"`
+	Confidence      *float32          `json:"confidence"`
+	Native          bool              `json:"native"`
+	Taxa            Taxa              `json:"taxa"`
+	ScientificName  string            `json:"scientific_name"`
+	CommonName      string            `json:"common_name"`
+	Indicator       bool              `json:"indicator"`
+	Reportable      bool              `json:"reportable"`
+	Block           int32             `json:"block"`
+	SiteCode        string            `json:"site_code"`
+	SiteName        *string           `json:"site_name"`
+	Tenure          TenureType        `json:"tenure"`
+	Forest          ForestType        `json:"forest"`
+}
+
 type Site struct {
 	ID       int64       `json:"id"`
 	Code     string      `json:"code"`

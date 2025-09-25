@@ -6,6 +6,7 @@ import (
 	"github.com/biomonash/nillumbik/internal/site"
 	"github.com/biomonash/nillumbik/internal/species"
 	"github.com/biomonash/nillumbik/internal/stats"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -41,6 +42,7 @@ func New(querier db.Querier) *Server {
 	r.Use(gin.Logger())
 	r.Use(panicRecovery())
 	r.Use(errorHandler())
+	r.Use(cors.Default()) // TODO: development only
 
 	api := r.Group("/api")
 

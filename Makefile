@@ -288,6 +288,7 @@ setup-dev: ## Setup development environment
 	go install github.com/air-verse/air@v1.62.0
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.29.0
 	go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.0
+	go install github.com/swaggo/swag/cmd/swag@v1.16.6
 	@$(MAKE) install
 
 .PHONY: check

@@ -4,7 +4,7 @@ The Nillumbik backend is a **Go-based REST API** built for the Nillumbik Shire p
 
 ## Quick start
 
-Make sure you follow the *Quick start* in [Project README](../README.md)
+Make sure you follow the _Quick start_ in [Project README](../README.md)
 
 Run backend server (auto restart by Air):
 
@@ -27,6 +27,7 @@ The backend uses modern Go technologies:
 ## Directory Structure
 
 ### Core Application (`/cmd`)
+
 - **`cmd/api/`**: Main API server entry point
 - **`cmd/importer/`**: Data import utilities
 
@@ -34,6 +35,7 @@ You should keep minimal code in this directory.
 It should be only used to create executive file and relative logic, like create HTTP server, shell arguments handling.
 
 ### Internal Modules (`/internal`)
+
 The backend follows a domain-driven design with these modules:
 
 - **`internal/config/`**: Configuration management
@@ -51,6 +53,7 @@ The backend follows a domain-driven design with these modules:
 - **`internal/utils/`**: Shared utilities
 
 ### Database (`/db`)
+
 - **`db/migrations/`**: SQL schema migrations
   - Use `make db-migrate-up` (or `-down`) to run the migrations
   - Use `make db-migrate-create` to create a new migration file
@@ -60,6 +63,7 @@ The backend follows a domain-driven design with these modules:
 **Every time updating `*.sql` should run `make sqlc-generate`.**
 
 ### Documentation (`/docs`)
+
 - Auto-generated Swagger documentation files
 - Written as doc comments in each controller function
 - Run `make gen-doc` each time you modify the comment
@@ -69,6 +73,7 @@ The backend follows a domain-driven design with these modules:
 The system manages three core entities with PostGIS spatial support:
 
 **Core Tables:**
+
 1. **Sites**: Monitoring locations with geospatial coordinates, tenure, and forest type
 2. **Species**: Catalog of wildlife with taxonomic classification and conservation status
 3. **Observations**: Wildlife sightings linked to sites and species with environmental data
@@ -81,6 +86,61 @@ The API follows RESTful principles with:
 - **Modular Routing**: Each domain registers its own routes
 - **Swagger Integration**: Automatic API documentation at `/swagger/*`
 - **Environment Configuration**: Development environment via `.env.dev`
+
+## Error Handling Strategy
+
+The backend implements a **centralized error handling strategy** with clear separation between user and server errors:
+
+### Error Types
+
+**User Errors (4xx)**: Client-side issues that can be resolved by the user
+
+- Invalid request parameters
+- Resource not found (404)
+- Validation failures
+- Bad request format
+
+**Server Errors (5xx)**: Unexpected server-side issues
+
+- Database connection failures
+- Internal processing errors
+- Unexpected system failures
+
+### Implementation Pattern
+
+All controllers follow a consistent error handling pattern:
+
+```go
+// User errors - use HttpError with appropriate status code
+if err := c.ShouldBindQuery(&req); err != nil {
+    c.Error(utils.NewHttpError(http.StatusBadRequest, "Invalid query parameters", err))
+    return
+}
+
+// Server errors - use fmt.Errorf with proper wrapping
+if err != nil {
+    c.Error(fmt.Errorf("failed to fetch data: %w", err))
+    return
+}
+```
+
+### Middleware Processing
+
+The `errorHandler()` middleware automatically:
+
+- Converts `HttpError` types to structured JSON responses with appropriate status codes
+- Converts generic errors to 500 Internal Server Error responses
+- Provides consistent error response format across all endpoints
+
+### Error Response Format
+
+```json
+{
+  "code": 400,
+  "message": "Invalid query parameters",
+  "detail": "validation error details"
+}
+```
 
 ## Development Features
 
@@ -99,7 +159,7 @@ The API follows RESTful principles with:
 
 ## Dev References
 
-* [Gin API](https://gin-gonic.com/en/docs/): Especially [Data binding](https://gin-gonic.com/en/docs/examples/bind-query-or-post/)
-* [Validator](https://pkg.go.dev/github.com/go-playground/validator/v10#section-readme): Write `binding:` struct tags for controllers
-* [SQLC](https://docs.sqlc.dev/en/stable/index.html): Especially [Configuration](https://docs.sqlc.dev/en/stable/reference/config.html) and [Data type](https://docs.sqlc.dev/en/stable/reference/datatypes.html)
-* [Swaggo declarative comments format](https://github.com/swaggo/swag?tab=readme-ov-file#declarative-comments-format)
+- [Gin API](https://gin-gonic.com/en/docs/): Especially [Data binding](https://gin-gonic.com/en/docs/examples/bind-query-or-post/)
+- [Validator](https://pkg.go.dev/github.com/go-playground/validator/v10#section-readme): Write `binding:` struct tags for controllers
+- [SQLC](https://docs.sqlc.dev/en/stable/index.html): Especially [Configuration](https://docs.sqlc.dev/en/stable/reference/config.html) and [Data type](https://docs.sqlc.dev/en/stable/reference/datatypes.html)
+- [Swaggo declarative comments format](https://github.com/swaggo/swag?tab=readme-ov-file#declarative-comments-format)
