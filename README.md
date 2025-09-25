@@ -6,6 +6,7 @@ A TypeScript + Go monorepo with development tooling and database integration.
 
 * Node.js: version TBD
 * Go: 1.24 or later
+* Make
 
 ## Quick Start
 
@@ -30,6 +31,14 @@ make dev
 ```
 
 Backend API documents: http://localhost:8000/swagger/index.html
+
+### Import Data
+
+Put the detections CSV file in `backend/data/nillumbik.csv` and run the following:
+
+```
+make run-import
+```
 
 ## Available Commands
 
