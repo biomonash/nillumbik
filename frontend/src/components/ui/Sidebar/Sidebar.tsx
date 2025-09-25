@@ -36,6 +36,8 @@ const mockdata = [
 	{ icon: <i className="fa-solid fa-chart-mixed"></i>, label: "Dashboard" },
 	{ icon: <i className="fa-solid fa-rectangle-vertical-history"></i>, label: "Gallery"},
 	{ icon: <i className="fa-solid fa-map-location-dot"></i>, label: "Map" },
+	{ icon: <i className="fa-solid fa-clock"></i>, label: "Timeline" },
+	{ icon: <i className="fa-solid fa-bookmark"></i>, label: "Saved"},
 	{ icon: <i className="fa-solid fa-gear"></i>, label: "Settings" },
 ];
 
@@ -67,13 +69,6 @@ const Sidebar: React.FC = (): JSX.Element => {
 				</Stack>
 			</div>
 
-			<Stack justify="center" gap={0}>
-				<NavbarLink
-					icon={<i className="fa-sharp fa-solid fa-repeat"></i>}
-					label="Change account"
-				/>
-				<NavbarLink icon={<i className="fa-solid fa-right-from-bracket"></i>} label="Logout" />
-			</Stack>
 		</nav>
 	);
 }

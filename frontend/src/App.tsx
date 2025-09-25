@@ -1,4 +1,4 @@
-
+import './styles/base/_global.scss';
 import useBrowserRouter from './hooks/useBrowserRouter';
 import { RouterProvider } from "react-router/dom";
 
