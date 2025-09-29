@@ -47,15 +47,15 @@ type CountSpeciesByNativeParams struct {
 	From       pgtype.Timestamp `json:"from"`
 	To         pgtype.Timestamp `json:"to"`
 	Block      *int32           `json:"block"`
-	SiteCode   *string          `json:"site_code"`
+	SiteCode   *string          `json:"siteCode"`
 	Taxa       NullTaxa         `json:"taxa"`
-	CommonName *string          `json:"common_name"`
+	CommonName *string          `json:"commonName"`
 }
 
 type CountSpeciesByNativeRow struct {
-	IsNative         bool  `json:"is_native"`
-	SpeciesCount     int64 `json:"species_count"`
-	ObservationCount int64 `json:"observation_count"`
+	IsNative         bool  `json:"isNative"`
+	SpeciesCount     int64 `json:"speciesCount"`
+	ObservationCount int64 `json:"observationCount"`
 }
 
 func (q *Queries) CountSpeciesByNative(ctx context.Context, arg CountSpeciesByNativeParams) ([]CountSpeciesByNativeRow, error) {
@@ -101,9 +101,9 @@ type ListSpeciesCountByTaxaParams struct {
 	From       pgtype.Timestamp `json:"from"`
 	To         pgtype.Timestamp `json:"to"`
 	Block      *int32           `json:"block"`
-	SiteCode   *string          `json:"site_code"`
+	SiteCode   *string          `json:"siteCode"`
 	Taxa       NullTaxa         `json:"taxa"`
-	CommonName *string          `json:"common_name"`
+	CommonName *string          `json:"commonName"`
 }
 
 type ListSpeciesCountByTaxaRow struct {
@@ -155,15 +155,15 @@ type ObservationGroupByBlocksParams struct {
 	From       pgtype.Timestamp `json:"from"`
 	To         pgtype.Timestamp `json:"to"`
 	Block      *int32           `json:"block"`
-	SiteCode   *string          `json:"site_code"`
+	SiteCode   *string          `json:"siteCode"`
 	Taxa       NullTaxa         `json:"taxa"`
-	CommonName *string          `json:"common_name"`
+	CommonName *string          `json:"commonName"`
 }
 
 type ObservationGroupByBlocksRow struct {
 	Block            int32 `json:"block"`
-	SpeciesCount     int64 `json:"species_count"`
-	ObservationCount int64 `json:"observation_count"`
+	SpeciesCount     int64 `json:"speciesCount"`
+	ObservationCount int64 `json:"observationCount"`
 }
 
 func (q *Queries) ObservationGroupByBlocks(ctx context.Context, arg ObservationGroupByBlocksParams) ([]ObservationGroupByBlocksRow, error) {
@@ -210,15 +210,15 @@ type ObservationGroupBySitesParams struct {
 	From       pgtype.Timestamp `json:"from"`
 	To         pgtype.Timestamp `json:"to"`
 	Block      *int32           `json:"block"`
-	SiteCode   *string          `json:"site_code"`
+	SiteCode   *string          `json:"siteCode"`
 	Taxa       NullTaxa         `json:"taxa"`
-	CommonName *string          `json:"common_name"`
+	CommonName *string          `json:"commonName"`
 }
 
 type ObservationGroupBySitesRow struct {
-	SiteCode         string `json:"site_code"`
-	SpeciesCount     int64  `json:"species_count"`
-	ObservationCount int64  `json:"observation_count"`
+	SiteCode         string `json:"siteCode"`
+	SpeciesCount     int64  `json:"speciesCount"`
+	ObservationCount int64  `json:"observationCount"`
 }
 
 func (q *Queries) ObservationGroupBySites(ctx context.Context, arg ObservationGroupBySitesParams) ([]ObservationGroupBySitesRow, error) {
@@ -265,16 +265,16 @@ type ObservationTimeSeriesGroupByNativeParams struct {
 	From       pgtype.Timestamp `json:"from"`
 	To         pgtype.Timestamp `json:"to"`
 	Block      *int32           `json:"block"`
-	SiteCode   *string          `json:"site_code"`
+	SiteCode   *string          `json:"siteCode"`
 	Taxa       NullTaxa         `json:"taxa"`
-	CommonName *string          `json:"common_name"`
+	CommonName *string          `json:"commonName"`
 }
 
 type ObservationTimeSeriesGroupByNativeRow struct {
-	IsNative         bool      `json:"is_native"`
+	IsNative         bool      `json:"isNative"`
 	Year             time.Time `json:"year"`
-	SpeciesCount     int64     `json:"species_count"`
-	ObservationCount int64     `json:"observation_count"`
+	SpeciesCount     int64     `json:"speciesCount"`
+	ObservationCount int64     `json:"observationCount"`
 }
 
 func (q *Queries) ObservationTimeSeriesGroupByNative(ctx context.Context, arg ObservationTimeSeriesGroupByNativeParams) ([]ObservationTimeSeriesGroupByNativeRow, error) {
