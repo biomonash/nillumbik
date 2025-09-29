@@ -18,8 +18,8 @@ type ObservationOverviewRequest struct {
 
 type ObservationOverviewResponse struct {
 	ObservationStats
-	NativeCount int64             `json:"native_species_count"`
-	CountByTaxa map[db.Taxa]int64 `json:"count_by_taxa"`
+	NativeCount int64             `json:"nativeSpeciesCount"`
+	CountByTaxa map[db.Taxa]int64 `json:"countByTaxa"`
 }
 
 type ObservationTimeSeriesRequest struct {
@@ -40,11 +40,11 @@ type ObservationTimeSeriesResponse struct {
 //	@Param			from		query		string	False	"Search start from"	format(date)
 //	@Param			to			query		string	False	"Search start from"	format(date)
 //	@Param			block		query		integer	False	"Filter by site block"
-//	@Param			site_code	query		string	False	"Filter by site code"
+//	@Param			siteCode	query		string	False	"Filter by site code"
 //	@Param			taxa		query		string	False	"Filter by taxa"
-//	@Param			common_name	query		string	False	"Filter by species common_name"
+//	@Param			commonName	query		string	False	"Filter by species common_name"
 //	@Success		200			{object}	ObservationOverviewResponse
-//	@Error			400 																							{object}	gin.H
+//	@Error			400 																													{object}	gin.H
 //	@Router			/stats/observations [get]
 func (u *Controller) ObservationOverview(c *gin.Context) {
 	var req ObservationOverviewRequest
@@ -113,11 +113,11 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 //	@Param			from		query		string	False	"Search start from"	format(date)
 //	@Param			to			query		string	False	"Search start from"	format(date)
 //	@Param			block		query		integer	False	"Filter by site block"
-//	@Param			site_code	query		string	False	"Filter by site code"
+//	@Param			siteCode	query		string	False	"Filter by site code"
 //	@Param			taxa		query		string	False	"Filter by taxa"
-//	@Param			common_name	query		string	False	"Filter by species common_name"
+//	@Param			commonName	query		string	False	"Filter by species common name"
 //	@Success		200			{object}	ObservationTimeSeriesResponse
-//	@Error			400 														{object}	gin.H
+//	@Error			400 																				{object}	gin.H
 //	@Router			/stats/observations/timeseries [get]
 func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 	var req ObservationTimeSeriesRequest

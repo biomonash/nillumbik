@@ -1,16 +1,16 @@
-import React, { type JSX } from 'react'
-import LineChart from './components/LineChart'
+import React, { type JSX } from "react";
+import LineChart from "./components/LineChart";
 
-import { dumbData } from './constants/dumbData'
+import { dumbData } from "./constants/dumbData";
 
 const Dashboard: React.FC = (): JSX.Element => {
-    return (
-        <section>
-            Dashboard Page
+  console.log(dumbData);
+  return (
+    <section>
+      Dashboard Page
+      <LineChart />
+    </section>
+  );
+};
 
-            <LineChart />
-        </section>
-    )
-}
-
-export default Dashboard
+export default Dashboard;
