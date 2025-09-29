@@ -9,9 +9,7 @@ export type ObservationStatsRequest = {
   commonName: string;
 };
 
-export type ObservationOverviewResponse = {
-  observationCount: number;
-  speciesCount: number;
+export type ObservationOverviewResponse = ObservationStats & {
   nativeSpeciesCount: number;
   countByTaxa: Record<string, string>;
 };
@@ -20,10 +18,21 @@ export type ObservationTimeseriesResponse = {
   series: Record<string, TimeseriesPoint[]>;
 };
 
-export type TimeseriesPoint = {
+export type TimeseriesPoint = ObservationStats & {
   timestamp: string;
+};
+
+export type ObservationStats = {
   observationCount: number;
   speciesCount: number;
+};
+
+export type ObservationBlocksResponse = {
+  blocks: BlockResponse[];
+};
+
+export type BlockResponse = ObservationStats & {
+  block: number;
 };
 
 export async function getObservationsOverview(
@@ -43,6 +52,18 @@ export async function getObservationsTimeseries(
 ): Promise<ObservationTimeseriesResponse> {
   const response = await fetcher.get<ObservationTimeseriesResponse>(
     "/stats/observations/timeseries",
+    {
+      params: req,
+    },
+  );
+  return response.data;
+}
+
+export async function getObservationsBlocks(
+  req: Partial<ObservationStatsRequest>,
+): Promise<ObservationBlocksResponse> {
+  const response = await fetcher.get<ObservationBlocksResponse>(
+    "/stats/observations/blocks",
     {
       params: req,
     },

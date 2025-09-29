@@ -10,6 +10,8 @@ import {
   type ObservationStatsRequest,
   type ObservationOverviewResponse,
   type ObservationTimeseriesResponse,
+  type ObservationBlocksResponse,
+  getObservationsBlocks,
 } from "../../../apis/stats.api";
 
 const ApiDisplay: React.FC = (): JSX.Element => {
@@ -19,13 +21,15 @@ const ApiDisplay: React.FC = (): JSX.Element => {
   );
   const [timeseries, setTimeseries] =
     useState<ObservationTimeseriesResponse | null>(null);
+  const [blocks, setBlocks] = useState<ObservationBlocksResponse | null>(null);
 
   useEffect(() => {
     getObservationsOverview(filter).then(setOverview);
     getObservationsTimeseries(filter).then(setTimeseries);
+    getObservationsBlocks(filter).then(setBlocks);
   }, [filter]);
 
-  if (overview === null || timeseries === null) {
+  if (overview === null || timeseries === null || blocks === null) {
     return <p>Loading</p>;
   }
 
@@ -51,10 +55,20 @@ const ApiDisplay: React.FC = (): JSX.Element => {
     </div>
   ));
 
+  const blockList = blocks?.blocks.map(
+    ({ block, observationCount, speciesCount }) => (
+      <li key={block}>
+        Block {block}: Observations: {observationCount}, species: {speciesCount}
+      </li>
+    ),
+  );
+
   return (
     <div>
+      <h1>API Debugger</h1>
       <p>This is API Debug section, should be removed later</p>
       <div>
+        <h2>Overview</h2>
         <p>Observation count: {overview.observationCount}</p>
         <p>Unique species count: {overview.speciesCount}</p>
         <p>Native species count: {overview.nativeSpeciesCount}</p>
@@ -67,6 +81,10 @@ const ApiDisplay: React.FC = (): JSX.Element => {
       <div>
         <h2>Timeseries</h2>
         {timeseriesList}
+      </div>
+      <div>
+        <h2>Blocks</h2>
+        <ul>{blockList}</ul>
       </div>
     </div>
   );
