@@ -13,7 +13,7 @@ import {
 } from "../../../apis/stats.api";
 
 const ApiDisplay: React.FC = (): JSX.Element => {
-  const [filter, setFilter] = useState<Partial<ObservationStatsRequest>>({});
+  const [filter] = useState<Partial<ObservationStatsRequest>>({});
   const [overview, setOverview] = useState<ObservationOverviewResponse | null>(
     null,
   );

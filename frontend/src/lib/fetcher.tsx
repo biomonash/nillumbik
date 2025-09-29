@@ -1,4 +1,4 @@
-import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
+import axios, { type AxiosResponse } from "axios";
 
 // Create Axios instance
 const fetcher = axios.create({
