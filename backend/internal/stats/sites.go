@@ -49,7 +49,7 @@ type BlockResponse struct {
 //	@Param			taxa		query		string	False	"Filter by taxa"
 //	@Param			commonName	query		string	False	"Filter by species common name"
 //	@Success		200			{object}	ObservationBySitesResponse
-//	@Error			400 																				{object}	gin.H
+//	@Error			400 																							{object}	gin.H
 //	@Router			/stats/observations/sites [get]
 func (u *Controller) ObservationBySites(c *gin.Context) {
 	var req ObservationBySitesRequest
@@ -106,7 +106,7 @@ func (u *Controller) ObservationBySites(c *gin.Context) {
 //	@Param			taxa		query		string	False	"Filter by taxa"
 //	@Param			commonName	query		string	False	"Filter by species common name"
 //	@Success		200			{object}	ObservationByBlocksResponse
-//	@Error			400 																				{object}	gin.H
+//	@Error			400 																							{object}	gin.H
 //	@Router			/stats/observations/blocks [get]
 func (u *Controller) ObservationByBlocks(c *gin.Context) {
 	var req ObservationBySitesRequest
