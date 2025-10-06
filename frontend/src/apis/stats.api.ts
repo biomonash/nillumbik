@@ -43,6 +43,16 @@ export type SiteResponse = ObservationStats & {
   siteCode: string;
 };
 
+export type DashboardStatsRequest = {
+  from: Date;
+  to: Date;
+};
+
+export type DashboardStatsResponse = ObservationStats & {
+  nativeSpeciesCount: number;
+  sitesCount: number;
+};
+
 export async function getObservationsOverview(
   req: Partial<ObservationStatsRequest>,
 ): Promise<ObservationOverviewResponse> {
@@ -84,6 +94,18 @@ export async function getObservationsSites(
 ): Promise<ObservationSitesResponse> {
   const response = await fetcher.get<ObservationSitesResponse>(
     "/stats/observations/sites",
+    {
+      params: req,
+    },
+  );
+  return response.data;
+}
+
+export async function getDashboardStats(
+  req: Partial<DashboardStatsRequest>,
+): Promise<DashboardStatsResponse> {
+  const response = await fetcher.get<DashboardStatsResponse>(
+    "/stats/dashboard",
     {
       params: req,
     },

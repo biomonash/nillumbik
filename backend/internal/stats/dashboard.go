@@ -15,8 +15,8 @@ type DashboardStatsRequest struct {
 
 type DashboardStatsResponse struct {
 	ObservationStats
-	NativeCount int64 `json:"nativeCount`
-	SitesCount  int64 `json:"sitesCount`
+	NativeCount int64 `json:"nativeSpeciesCount"`
+	SitesCount  int64 `json:"sitesCount"`
 }
 
 // DashboardStats godoc
