@@ -140,6 +140,17 @@ definitions:
       speciesCount:
         type: integer
     type: object
+  stats.DashboardStatsResponse:
+    properties:
+      nativeSpeciesCount:
+        type: integer
+      observationCount:
+        type: integer
+      sitesCount:
+        type: integer
+      speciesCount:
+        type: integer
+    type: object
   stats.ObservationByBlocksResponse:
     properties:
       blocks:
@@ -359,6 +370,32 @@ paths:
       summary: Get species detail by common name
       tags:
       - species
+  /stats/dashboard:
+    get:
+      consumes:
+      - application/json
+      description: Dashboard stats
+      parameters:
+      - description: Search start from
+        format: date
+        in: query
+        name: from
+        type: string
+      - description: Search start from
+        format: date
+        in: query
+        name: to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/stats.DashboardStatsResponse'
+      summary: Dashboard stats
+      tags:
+      - statistics
   /stats/observations:
     get:
       consumes:

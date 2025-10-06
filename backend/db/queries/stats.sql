@@ -61,3 +61,9 @@ WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from'):
   AND (sqlc.narg('common_name')::text IS NULL OR LOWER(common_name) = LOWER(sqlc.narg('common_name')::text))
 GROUP BY block
 ORDER BY block;
+
+-- name: CountActiveSites :one
+SELECT COUNT(DISTINCT site_id) as sites_count
+FROM observations_with_details
+WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from')::timestamp)
+  AND (sqlc.narg('to')::timestamp IS NULL OR "timestamp" <= sqlc.narg('to')::timestamp);
