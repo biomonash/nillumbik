@@ -245,6 +245,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/stats/dashboard": {
+            "get": {
+                "description": "Dashboard stats",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Dashboard stats",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/stats.DashboardStatsResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/observations": {
             "get": {
                 "description": "Observation overview",
@@ -699,6 +738,23 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "observationCount": {
+                    "type": "integer"
+                },
+                "speciesCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "stats.DashboardStatsResponse": {
+            "type": "object",
+            "properties": {
+                "nativeSpeciesCount": {
+                    "type": "integer"
+                },
+                "observationCount": {
+                    "type": "integer"
+                },
+                "sitesCount": {
                     "type": "integer"
                 },
                 "speciesCount": {
