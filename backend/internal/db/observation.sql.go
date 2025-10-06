@@ -38,12 +38,12 @@ RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appear
 `
 
 type CreateObservationParams struct {
-	SiteID          int64             `json:"site_id"`
-	SpeciesID       int64             `json:"species_id"`
+	SiteID          int64             `json:"siteId"`
+	SpeciesID       int64             `json:"speciesId"`
 	Timestamp       time.Time         `json:"timestamp"`
 	Method          ObservationMethod `json:"method"`
-	AppearanceStart *int32            `json:"appearance_start"`
-	AppearanceEnd   *int32            `json:"appearance_end"`
+	AppearanceStart *int32            `json:"appearanceStart"`
+	AppearanceEnd   *int32            `json:"appearanceEnd"`
 	Temperature     *int32            `json:"temperature"`
 	Narrative       *string           `json:"narrative"`
 	Confidence      *float32          `json:"confidence"`
@@ -78,12 +78,12 @@ func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationPa
 }
 
 type CreateObservationsParams struct {
-	SiteID          int64             `json:"site_id"`
-	SpeciesID       int64             `json:"species_id"`
+	SiteID          int64             `json:"siteId"`
+	SpeciesID       int64             `json:"speciesId"`
 	Timestamp       time.Time         `json:"timestamp"`
 	Method          ObservationMethod `json:"method"`
-	AppearanceStart *int32            `json:"appearance_start"`
-	AppearanceEnd   *int32            `json:"appearance_end"`
+	AppearanceStart *int32            `json:"appearanceStart"`
+	AppearanceEnd   *int32            `json:"appearanceEnd"`
 	Temperature     *int32            `json:"temperature"`
 	Narrative       *string           `json:"narrative"`
 	Confidence      *float32          `json:"confidence"`
@@ -178,19 +178,19 @@ ORDER BY o.timestamp DESC
 
 type SearchObservationsRow struct {
 	ID              int64             `json:"id"`
-	SiteID          int64             `json:"site_id"`
-	SpeciesID       int64             `json:"species_id"`
+	SiteID          int64             `json:"siteId"`
+	SpeciesID       int64             `json:"speciesId"`
 	Timestamp       time.Time         `json:"timestamp"`
 	Method          ObservationMethod `json:"method"`
-	AppearanceStart *int32            `json:"appearance_start"`
-	AppearanceEnd   *int32            `json:"appearance_end"`
+	AppearanceStart *int32            `json:"appearanceStart"`
+	AppearanceEnd   *int32            `json:"appearanceEnd"`
 	Temperature     *int32            `json:"temperature"`
 	Narrative       *string           `json:"narrative"`
 	Confidence      *float32          `json:"confidence"`
-	SiteCode        string            `json:"site_code"`
-	SiteName        *string           `json:"site_name"`
-	ScientificName  string            `json:"scientific_name"`
-	CommonName      string            `json:"common_name"`
+	SiteCode        string            `json:"siteCode"`
+	SiteName        *string           `json:"siteName"`
+	ScientificName  string            `json:"scientificName"`
+	CommonName      string            `json:"commonName"`
 	Taxa            Taxa              `json:"taxa"`
 }
 
@@ -247,12 +247,12 @@ RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appear
 
 type UpdateObservationParams struct {
 	ID              int64             `json:"id"`
-	SiteID          int64             `json:"site_id"`
-	SpeciesID       int64             `json:"species_id"`
+	SiteID          int64             `json:"siteId"`
+	SpeciesID       int64             `json:"speciesId"`
 	Timestamp       time.Time         `json:"timestamp"`
 	Method          ObservationMethod `json:"method"`
-	AppearanceStart *int32            `json:"appearance_start"`
-	AppearanceEnd   *int32            `json:"appearance_end"`
+	AppearanceStart *int32            `json:"appearanceStart"`
+	AppearanceEnd   *int32            `json:"appearanceEnd"`
 	Temperature     *int32            `json:"temperature"`
 	Narrative       *string           `json:"narrative"`
 	Confidence      *float32          `json:"confidence"`

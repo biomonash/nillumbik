@@ -27,8 +27,8 @@ RETURNING id, scientific_name, common_name, native, taxa, indicator, reportable
 `
 
 type CreateSpeciesParams struct {
-	ScientificName string `json:"scientific_name"`
-	CommonName     string `json:"common_name"`
+	ScientificName string `json:"scientificName"`
+	CommonName     string `json:"commonName"`
 	Native         bool   `json:"native"`
 	Taxa           Taxa   `json:"taxa"`
 	Indicator      bool   `json:"indicator"`
@@ -209,8 +209,8 @@ RETURNING id, scientific_name, common_name, native, taxa, indicator, reportable
 
 type UpdateSpeciesParams struct {
 	ID             int64  `json:"id"`
-	ScientificName string `json:"scientific_name"`
-	CommonName     string `json:"common_name"`
+	ScientificName string `json:"scientificName"`
+	CommonName     string `json:"commonName"`
 	Native         bool   `json:"native"`
 	Taxa           Taxa   `json:"taxa"`
 	Indicator      bool   `json:"indicator"`
