@@ -1,0 +1,533 @@
+basePath: /api/
+definitions:
+  db.ForestType:
+    enum:
+    - dry
+    - wet
+    type: string
+    x-enum-varnames:
+    - ForestTypeDry
+    - ForestTypeWet
+  db.Observation:
+    properties:
+      appearanceEnd:
+        type: integer
+      appearanceStart:
+        type: integer
+      confidence:
+        type: number
+      id:
+        type: integer
+      method:
+        $ref: '#/definitions/db.ObservationMethod'
+      narrative:
+        type: string
+      siteId:
+        type: integer
+      speciesId:
+        type: integer
+      temperature:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  db.ObservationMethod:
+    enum:
+    - audio
+    - camera
+    - observed
+    type: string
+    x-enum-varnames:
+    - ObservationMethodAudio
+    - ObservationMethodCamera
+    - ObservationMethodObserved
+  db.Site:
+    properties:
+      block:
+        type: integer
+      code:
+        type: string
+      forest:
+        $ref: '#/definitions/db.ForestType'
+      id:
+        type: integer
+      location: {}
+      name:
+        type: string
+      tenure:
+        $ref: '#/definitions/db.TenureType'
+    type: object
+  db.Species:
+    properties:
+      commonName:
+        type: string
+      id:
+        type: integer
+      indicator:
+        type: boolean
+      native:
+        type: boolean
+      reportable:
+        type: boolean
+      scientificName:
+        type: string
+      taxa:
+        $ref: '#/definitions/db.Taxa'
+    type: object
+  db.Taxa:
+    enum:
+    - bird
+    - mammal
+    - reptile
+    type: string
+    x-enum-varnames:
+    - TaxaBird
+    - TaxaMammal
+    - TaxaReptile
+  db.TenureType:
+    enum:
+    - public
+    - private
+    type: string
+    x-enum-varnames:
+    - TenureTypePublic
+    - TenureTypePrivate
+  observation.ListObservationsResponse:
+    properties:
+      count:
+        type: integer
+      observations:
+        items:
+          $ref: '#/definitions/db.Observation'
+        type: array
+    type: object
+  observation.Observation:
+    properties:
+      appearanceIime:
+        properties:
+          end:
+            type: integer
+          start:
+            type: integer
+        type: object
+      confidence:
+        type: number
+      id:
+        type: integer
+      indicator:
+        type: boolean
+      method:
+        $ref: '#/definitions/db.ObservationMethod'
+      narrative:
+        type: string
+      reportable:
+        type: boolean
+      siteId:
+        type: integer
+      speciesId:
+        type: integer
+      temperature:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  stats.BlockResponse:
+    properties:
+      block:
+        type: integer
+      observationCount:
+        type: integer
+      speciesCount:
+        type: integer
+    type: object
+  stats.ObservationByBlocksResponse:
+    properties:
+      blocks:
+        items:
+          $ref: '#/definitions/stats.BlockResponse'
+        type: array
+    type: object
+  stats.ObservationBySitesResponse:
+    properties:
+      sites:
+        items:
+          $ref: '#/definitions/stats.SiteResponse'
+        type: array
+    type: object
+  stats.ObservationOverviewResponse:
+    properties:
+      countByTaxa:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
+      nativeSpeciesCount:
+        type: integer
+      observationCount:
+        type: integer
+      speciesCount:
+        type: integer
+    type: object
+  stats.ObservationTimeSeriesResponse:
+    properties:
+      series:
+        additionalProperties:
+          items:
+            $ref: '#/definitions/stats.TimeSeriesPoint'
+          type: array
+        type: object
+    type: object
+  stats.SiteResponse:
+    properties:
+      observationCount:
+        type: integer
+      siteCode:
+        type: string
+      speciesCount:
+        type: integer
+    type: object
+  stats.TimeSeriesPoint:
+    properties:
+      observationCount:
+        type: integer
+      speciesCount:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is the backend API for Nillumbik Shire project.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Nillubim Shire API
+  version: "1.0"
+paths:
+  /observations:
+    get:
+      consumes:
+      - application/json
+      description: List observations
+      parameters:
+      - default: 100
+        description: Result limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - default: 0
+        description: Result offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/observation.ListObservationsResponse'
+      summary: List observations
+      tags:
+      - observation
+  /observations/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get the detail of an observation by ID
+      parameters:
+      - description: ID of the observation
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/observation.Observation'
+      summary: Get Observation Detail
+      tags:
+      - observation
+  /sites:
+    get:
+      consumes:
+      - application/json
+      description: List sites
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Site'
+            type: array
+      summary: List sites
+      tags:
+      - site
+  /sites/{code}:
+    get:
+      consumes:
+      - application/json
+      description: Get the detail of a site by ID
+      parameters:
+      - description: Code of the site
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Site'
+      summary: Get Site Detail
+      tags:
+      - site
+  /species:
+    get:
+      consumes:
+      - application/json
+      description: list all species
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Species'
+            type: array
+      summary: List species
+      tags:
+      - species
+  /species/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get species detail
+      parameters:
+      - description: id of the species
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Species'
+      summary: Get species detail
+      tags:
+      - species
+  /species/by-common-name/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Get species detail by common name. Case insensitive. Underscores
+        will be replaced with spaces.
+      parameters:
+      - description: name of the species. Case insensitive.
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Species'
+      summary: Get species detail by common name
+      tags:
+      - species
+  /stats/observations:
+    get:
+      consumes:
+      - application/json
+      description: Observation overview
+      parameters:
+      - description: Search start from
+        format: date
+        in: query
+        name: from
+        type: string
+      - description: Search start from
+        format: date
+        in: query
+        name: to
+        type: string
+      - description: Filter by site block
+        in: query
+        name: block
+        type: integer
+      - description: Filter by site code
+        in: query
+        name: siteCode
+        type: string
+      - description: Filter by taxa
+        in: query
+        name: taxa
+        type: string
+      - description: Filter by species common_name
+        in: query
+        name: commonName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/stats.ObservationOverviewResponse'
+      summary: Observation overview
+      tags:
+      - statistics
+  /stats/observations/blocks:
+    get:
+      consumes:
+      - application/json
+      description: Observation stats group by blocks
+      parameters:
+      - description: Search start from
+        format: date
+        in: query
+        name: from
+        type: string
+      - description: Search start from
+        format: date
+        in: query
+        name: to
+        type: string
+      - description: Filter by site block
+        in: query
+        name: block
+        type: integer
+      - description: Filter by site code
+        in: query
+        name: siteCode
+        type: string
+      - description: Filter by taxa
+        in: query
+        name: taxa
+        type: string
+      - description: Filter by species common name
+        in: query
+        name: commonName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/stats.ObservationByBlocksResponse'
+      summary: Observation stats group by blocks
+      tags:
+      - statistics
+  /stats/observations/sites:
+    get:
+      consumes:
+      - application/json
+      description: Observation stats group by sites
+      parameters:
+      - description: Search start from
+        format: date
+        in: query
+        name: from
+        type: string
+      - description: Search start from
+        format: date
+        in: query
+        name: to
+        type: string
+      - description: Filter by site block
+        in: query
+        name: block
+        type: integer
+      - description: Filter by site code
+        in: query
+        name: siteCode
+        type: string
+      - description: Filter by taxa
+        in: query
+        name: taxa
+        type: string
+      - description: Filter by species common name
+        in: query
+        name: commonName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/stats.ObservationBySitesResponse'
+      summary: Observation stats group by sites
+      tags:
+      - statistics
+  /stats/observations/timeseries:
+    get:
+      consumes:
+      - application/json
+      description: Observation time series
+      parameters:
+      - description: Search start from
+        format: date
+        in: query
+        name: from
+        type: string
+      - description: Search start from
+        format: date
+        in: query
+        name: to
+        type: string
+      - description: Filter by site block
+        in: query
+        name: block
+        type: integer
+      - description: Filter by site code
+        in: query
+        name: siteCode
+        type: string
+      - description: Filter by taxa
+        in: query
+        name: taxa
+        type: string
+      - description: Filter by species common name
+        in: query
+        name: commonName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/stats.ObservationTimeSeriesResponse'
+      summary: Observation time series
+      tags:
+      - statistics
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

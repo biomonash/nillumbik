@@ -11,6 +11,9 @@ WHERE id = $1 LIMIT 1;
 SELECT * FROM sites
 WHERE code = $1 LIMIT 1;
 
+-- name: GetSiteIDByCode :one
+SELECT id FROM sites WHERE code = $1;
+
 -- name: ListSites :many
 SELECT * FROM sites
 ORDER BY code;

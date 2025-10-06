@@ -117,6 +117,17 @@ func (q *Queries) GetSiteByCode(ctx context.Context, code string) (Site, error) 
 	return i, err
 }
 
+const getSiteIDByCode = `-- name: GetSiteIDByCode :one
+SELECT id FROM sites WHERE code = $1
+`
+
+func (q *Queries) GetSiteIDByCode(ctx context.Context, code string) (int64, error) {
+	row := q.db.QueryRow(ctx, getSiteIDByCode, code)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
 const listSites = `-- name: ListSites :many
 SELECT id, code, block, name, location, tenure, forest FROM sites
 ORDER BY code
@@ -128,7 +139,7 @@ func (q *Queries) ListSites(ctx context.Context) ([]Site, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Site
+	items := []Site{}
 	for rows.Next() {
 		var i Site
 		if err := rows.Scan(
@@ -162,7 +173,7 @@ func (q *Queries) SearchSites(ctx context.Context, code string) ([]Site, error) 
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Site
+	items := []Site{}
 	for rows.Next() {
 		var i Site
 		if err := rows.Scan(

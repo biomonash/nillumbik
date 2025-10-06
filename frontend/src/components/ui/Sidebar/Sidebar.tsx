@@ -1,34 +1,30 @@
-import React, { use, useState, type JSX } from "react";
-import { Center, Stack, Tooltip, UnstyledButton } from "@mantine/core";
+import React, { useState, type JSX } from "react";
+import { Stack, Tooltip, UnstyledButton } from "@mantine/core";
 // import { MantineLogo } from '@mantinex/mantine-logo';
 import classes from "./Sidebar.module.scss";
 import { useNavigate } from "react-router";
 
-import routes from "../../../constants/route";
+// import routes from "../../../constants/route";
 
 interface NavbarLinkProps {
-	icon: JSX.Element;
-	label: string;
-	active?: boolean;
-	onClick?: () => void;
+  icon: JSX.Element;
+  label: string;
+  active?: boolean;
+  onClick?: () => void;
 }
 
 function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
-	return (
-		<Tooltip
-			label={label}
-			position="right"
-			transitionProps={{ duration: 0 }}
-		>
-			<UnstyledButton
-				onClick={onClick}
-				className={classes.link}
-				data-active={active || undefined}
-			>
-				{Icon}
-			</UnstyledButton>
-		</Tooltip>
-	);
+  return (
+    <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
+      <UnstyledButton
+        onClick={onClick}
+        className={classes.link}
+        data-active={active || undefined}
+      >
+        {Icon}
+      </UnstyledButton>
+    </Tooltip>
+  );
 }
 
 const mockdata = [
@@ -42,32 +38,34 @@ const mockdata = [
 ];
 
 const Sidebar: React.FC = (): JSX.Element => {
-	const [active, setActive] = useState(1);
-	const navigate = useNavigate();
+  const [active, setActive] = useState(1);
+  const navigate = useNavigate();
 
-	const links = mockdata.map((link, index) => (
-		<NavbarLink
-			{...link}
-			key={link.label}
-			active={index === active}
-			onClick={() => {
-				setActive(index)
-				navigate(`${link.label.toLowerCase() != "home" ? link.label.toLowerCase() : ""}`)
-			}}
-		/>
-	));
+  const links = mockdata.map((link, index) => (
+    <NavbarLink
+      {...link}
+      key={link.label}
+      active={index === active}
+      onClick={() => {
+        setActive(index);
+        navigate(
+          `${link.label.toLowerCase() != "home" ? link.label.toLowerCase() : ""}`,
+        );
+      }}
+    />
+  ));
 
-	return (
-		<nav className={classes.navbar}>
-			{/* <Center>
+  return (
+    <nav className={classes.navbar}>
+      {/* <Center>
 				<img src="https://github.com/mantinedev.png" />
 			</Center> */}
 
-			<div className={classes.navbarMain}>
-				<Stack justify="center" gap={0}>
-					{links}
-				</Stack>
-			</div>
+      <div className={classes.navbarMain}>
+        <Stack justify="center" gap={0}>
+          {links}
+        </Stack>
+      </div>
 
 		</nav>
 	);

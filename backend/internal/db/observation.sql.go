@@ -7,8 +7,7 @@ package db
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
+	"time"
 )
 
 const countObservations = `-- name: CountObservations :one
@@ -22,47 +21,32 @@ func (q *Queries) CountObservations(ctx context.Context) (int64, error) {
 	return count, err
 }
 
-const countObservationsBySite = `-- name: CountObservationsBySite :one
-SELECT COUNT(*) FROM observations
-WHERE site_id = $1
-`
-
-func (q *Queries) CountObservationsBySite(ctx context.Context, siteID int64) (int64, error) {
-	row := q.db.QueryRow(ctx, countObservationsBySite, siteID)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const countObservationsBySpecies = `-- name: CountObservationsBySpecies :one
-SELECT COUNT(*) FROM observations
-WHERE species_id = $1
-`
-
-func (q *Queries) CountObservationsBySpecies(ctx context.Context, speciesID int64) (int64, error) {
-	row := q.db.QueryRow(ctx, countObservationsBySpecies, speciesID)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
 const createObservation = `-- name: CreateObservation :one
-INSERT INTO observations (site_id, species_id, timestamp, method, appearance_time, temperature, narrative, confidence, indicator, reportable)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-RETURNING id, site_id, species_id, timestamp, method, appearance_time, temperature, narrative, confidence, indicator, reportable
+INSERT INTO observations (
+  site_id,
+  species_id,
+  "timestamp",
+  method,
+  appearance_start,
+  appearance_end,
+  temperature,
+  narrative,
+  confidence
+)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
 `
 
 type CreateObservationParams struct {
-	SiteID         int64                     `json:"site_id"`
-	SpeciesID      int64                     `json:"species_id"`
-	Timestamp      pgtype.Timestamptz        `json:"timestamp"`
-	Method         ObservationMethod         `json:"method"`
-	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
-	Temperature    *int32                    `json:"temperature"`
-	Narrative      *string                   `json:"narrative"`
-	Confidence     *float32                  `json:"confidence"`
-	Indicator      bool                      `json:"indicator"`
-	Reportable     bool                      `json:"reportable"`
+	SiteID          int64             `json:"siteId"`
+	SpeciesID       int64             `json:"speciesId"`
+	Timestamp       time.Time         `json:"timestamp"`
+	Method          ObservationMethod `json:"method"`
+	AppearanceStart *int32            `json:"appearanceStart"`
+	AppearanceEnd   *int32            `json:"appearanceEnd"`
+	Temperature     *int32            `json:"temperature"`
+	Narrative       *string           `json:"narrative"`
+	Confidence      *float32          `json:"confidence"`
 }
 
 func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationParams) (Observation, error) {
@@ -71,12 +55,11 @@ func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationPa
 		arg.SpeciesID,
 		arg.Timestamp,
 		arg.Method,
-		arg.AppearanceTime,
+		arg.AppearanceStart,
+		arg.AppearanceEnd,
 		arg.Temperature,
 		arg.Narrative,
 		arg.Confidence,
-		arg.Indicator,
-		arg.Reportable,
 	)
 	var i Observation
 	err := row.Scan(
@@ -85,14 +68,25 @@ func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationPa
 		&i.SpeciesID,
 		&i.Timestamp,
 		&i.Method,
-		&i.AppearanceTime,
+		&i.AppearanceStart,
+		&i.AppearanceEnd,
 		&i.Temperature,
 		&i.Narrative,
 		&i.Confidence,
-		&i.Indicator,
-		&i.Reportable,
 	)
 	return i, err
+}
+
+type CreateObservationsParams struct {
+	SiteID          int64             `json:"siteId"`
+	SpeciesID       int64             `json:"speciesId"`
+	Timestamp       time.Time         `json:"timestamp"`
+	Method          ObservationMethod `json:"method"`
+	AppearanceStart *int32            `json:"appearanceStart"`
+	AppearanceEnd   *int32            `json:"appearanceEnd"`
+	Temperature     *int32            `json:"temperature"`
+	Narrative       *string           `json:"narrative"`
+	Confidence      *float32          `json:"confidence"`
 }
 
 const deleteObservation = `-- name: DeleteObservation :exec
@@ -106,97 +100,62 @@ func (q *Queries) DeleteObservation(ctx context.Context, id int64) error {
 }
 
 const getObservation = `-- name: GetObservation :one
-SELECT s.id, s.code, s.block, s.name, s.location, s.tenure, s.forest, sp.id, sp.scientific_name, sp.common_name, sp.native, sp.taxa, o.id, o.site_id, o.species_id, o.timestamp, o.method, o.appearance_time, o.temperature, o.narrative, o.confidence, o.indicator, o.reportable
-FROM observations o
-JOIN sites s ON o.site_id = s.id
-JOIN species sp ON o.species_id = sp.id
-WHERE o.id = $1 LIMIT 1
+SELECT id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
+FROM observations
+WHERE id = $1 LIMIT 1
 `
 
-type GetObservationRow struct {
-	Site        Site        `json:"site"`
-	Species     Species     `json:"species"`
-	Observation Observation `json:"observation"`
-}
-
-func (q *Queries) GetObservation(ctx context.Context, id int64) (GetObservationRow, error) {
+func (q *Queries) GetObservation(ctx context.Context, id int64) (Observation, error) {
 	row := q.db.QueryRow(ctx, getObservation, id)
-	var i GetObservationRow
+	var i Observation
 	err := row.Scan(
-		&i.Site.ID,
-		&i.Site.Code,
-		&i.Site.Block,
-		&i.Site.Name,
-		&i.Site.Location,
-		&i.Site.Tenure,
-		&i.Site.Forest,
-		&i.Species.ID,
-		&i.Species.ScientificName,
-		&i.Species.CommonName,
-		&i.Species.Native,
-		&i.Species.Taxa,
-		&i.Observation.ID,
-		&i.Observation.SiteID,
-		&i.Observation.SpeciesID,
-		&i.Observation.Timestamp,
-		&i.Observation.Method,
-		&i.Observation.AppearanceTime,
-		&i.Observation.Temperature,
-		&i.Observation.Narrative,
-		&i.Observation.Confidence,
-		&i.Observation.Indicator,
-		&i.Observation.Reportable,
+		&i.ID,
+		&i.SiteID,
+		&i.SpeciesID,
+		&i.Timestamp,
+		&i.Method,
+		&i.AppearanceStart,
+		&i.AppearanceEnd,
+		&i.Temperature,
+		&i.Narrative,
+		&i.Confidence,
 	)
 	return i, err
 }
 
 const listObservations = `-- name: ListObservations :many
-SELECT s.id, s.code, s.block, s.name, s.location, s.tenure, s.forest, sp.id, sp.scientific_name, sp.common_name, sp.native, sp.taxa, o.id, o.site_id, o.species_id, o.timestamp, o.method, o.appearance_time, o.temperature, o.narrative, o.confidence, o.indicator, o.reportable
-FROM observations o
-JOIN sites s ON o.site_id = s.id
-JOIN species sp ON o.species_id = sp.id
-ORDER BY o.timestamp DESC
+SELECT id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
+FROM observations
+ORDER BY timestamp
+LIMIT $1
+OFFSET $2
 `
 
-type ListObservationsRow struct {
-	Site        Site        `json:"site"`
-	Species     Species     `json:"species"`
-	Observation Observation `json:"observation"`
+type ListObservationsParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
 }
 
-func (q *Queries) ListObservations(ctx context.Context) ([]ListObservationsRow, error) {
-	rows, err := q.db.Query(ctx, listObservations)
+func (q *Queries) ListObservations(ctx context.Context, arg ListObservationsParams) ([]Observation, error) {
+	rows, err := q.db.Query(ctx, listObservations, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListObservationsRow
+	items := []Observation{}
 	for rows.Next() {
-		var i ListObservationsRow
+		var i Observation
 		if err := rows.Scan(
-			&i.Site.ID,
-			&i.Site.Code,
-			&i.Site.Block,
-			&i.Site.Name,
-			&i.Site.Location,
-			&i.Site.Tenure,
-			&i.Site.Forest,
-			&i.Species.ID,
-			&i.Species.ScientificName,
-			&i.Species.CommonName,
-			&i.Species.Native,
-			&i.Species.Taxa,
-			&i.Observation.ID,
-			&i.Observation.SiteID,
-			&i.Observation.SpeciesID,
-			&i.Observation.Timestamp,
-			&i.Observation.Method,
-			&i.Observation.AppearanceTime,
-			&i.Observation.Temperature,
-			&i.Observation.Narrative,
-			&i.Observation.Confidence,
-			&i.Observation.Indicator,
-			&i.Observation.Reportable,
+			&i.ID,
+			&i.SiteID,
+			&i.SpeciesID,
+			&i.Timestamp,
+			&i.Method,
+			&i.AppearanceStart,
+			&i.AppearanceEnd,
+			&i.Temperature,
+			&i.Narrative,
+			&i.Confidence,
 		); err != nil {
 			return nil, err
 		}
@@ -209,7 +168,7 @@ func (q *Queries) ListObservations(ctx context.Context) ([]ListObservationsRow, 
 }
 
 const searchObservations = `-- name: SearchObservations :many
-SELECT o.id, o.site_id, o.species_id, o.timestamp, o.method, o.appearance_time, o.temperature, o.narrative, o.confidence, o.indicator, o.reportable, s.code as site_code, s.name as site_name, sp.scientific_name, sp.common_name, sp.taxa
+SELECT o.id, o.site_id, o.species_id, o.timestamp, o.method, o.appearance_start, o.appearance_end, o.temperature, o.narrative, o.confidence, s.code as site_code, s.name as site_name, sp.scientific_name, sp.common_name, sp.taxa
 FROM observations o
 JOIN sites s ON o.site_id = s.id
 JOIN species sp ON o.species_id = sp.id
@@ -218,22 +177,21 @@ ORDER BY o.timestamp DESC
 `
 
 type SearchObservationsRow struct {
-	ID             int64                     `json:"id"`
-	SiteID         int64                     `json:"site_id"`
-	SpeciesID      int64                     `json:"species_id"`
-	Timestamp      pgtype.Timestamptz        `json:"timestamp"`
-	Method         ObservationMethod         `json:"method"`
-	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
-	Temperature    *int32                    `json:"temperature"`
-	Narrative      *string                   `json:"narrative"`
-	Confidence     *float32                  `json:"confidence"`
-	Indicator      bool                      `json:"indicator"`
-	Reportable     bool                      `json:"reportable"`
-	SiteCode       string                    `json:"site_code"`
-	SiteName       *string                   `json:"site_name"`
-	ScientificName string                    `json:"scientific_name"`
-	CommonName     string                    `json:"common_name"`
-	Taxa           Taxa                      `json:"taxa"`
+	ID              int64             `json:"id"`
+	SiteID          int64             `json:"siteId"`
+	SpeciesID       int64             `json:"speciesId"`
+	Timestamp       time.Time         `json:"timestamp"`
+	Method          ObservationMethod `json:"method"`
+	AppearanceStart *int32            `json:"appearanceStart"`
+	AppearanceEnd   *int32            `json:"appearanceEnd"`
+	Temperature     *int32            `json:"temperature"`
+	Narrative       *string           `json:"narrative"`
+	Confidence      *float32          `json:"confidence"`
+	SiteCode        string            `json:"siteCode"`
+	SiteName        *string           `json:"siteName"`
+	ScientificName  string            `json:"scientificName"`
+	CommonName      string            `json:"commonName"`
+	Taxa            Taxa              `json:"taxa"`
 }
 
 func (q *Queries) SearchObservations(ctx context.Context, scientificName string) ([]SearchObservationsRow, error) {
@@ -242,7 +200,7 @@ func (q *Queries) SearchObservations(ctx context.Context, scientificName string)
 		return nil, err
 	}
 	defer rows.Close()
-	var items []SearchObservationsRow
+	items := []SearchObservationsRow{}
 	for rows.Next() {
 		var i SearchObservationsRow
 		if err := rows.Scan(
@@ -251,12 +209,11 @@ func (q *Queries) SearchObservations(ctx context.Context, scientificName string)
 			&i.SpeciesID,
 			&i.Timestamp,
 			&i.Method,
-			&i.AppearanceTime,
+			&i.AppearanceStart,
+			&i.AppearanceEnd,
 			&i.Temperature,
 			&i.Narrative,
 			&i.Confidence,
-			&i.Indicator,
-			&i.Reportable,
 			&i.SiteCode,
 			&i.SiteName,
 			&i.ScientificName,
@@ -275,24 +232,30 @@ func (q *Queries) SearchObservations(ctx context.Context, scientificName string)
 
 const updateObservation = `-- name: UpdateObservation :one
 UPDATE observations
-SET site_id = $2, species_id = $3, timestamp = $4, method = $5, appearance_time = $6, 
-    temperature = $7, narrative = $8, confidence = $9, indicator = $10, reportable = $11
+SET site_id = $2,
+    species_id = $3,
+    "timestamp" = $4,
+    method = $5,
+    appearance_start = $6,
+    appearance_end = $7,
+    temperature = $8,
+    narrative = $9,
+    confidence = $10
 WHERE id = $1
-RETURNING id, site_id, species_id, timestamp, method, appearance_time, temperature, narrative, confidence, indicator, reportable
+RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
 `
 
 type UpdateObservationParams struct {
-	ID             int64                     `json:"id"`
-	SiteID         int64                     `json:"site_id"`
-	SpeciesID      int64                     `json:"species_id"`
-	Timestamp      pgtype.Timestamptz        `json:"timestamp"`
-	Method         ObservationMethod         `json:"method"`
-	AppearanceTime pgtype.Range[pgtype.Int4] `json:"appearance_time"`
-	Temperature    *int32                    `json:"temperature"`
-	Narrative      *string                   `json:"narrative"`
-	Confidence     *float32                  `json:"confidence"`
-	Indicator      bool                      `json:"indicator"`
-	Reportable     bool                      `json:"reportable"`
+	ID              int64             `json:"id"`
+	SiteID          int64             `json:"siteId"`
+	SpeciesID       int64             `json:"speciesId"`
+	Timestamp       time.Time         `json:"timestamp"`
+	Method          ObservationMethod `json:"method"`
+	AppearanceStart *int32            `json:"appearanceStart"`
+	AppearanceEnd   *int32            `json:"appearanceEnd"`
+	Temperature     *int32            `json:"temperature"`
+	Narrative       *string           `json:"narrative"`
+	Confidence      *float32          `json:"confidence"`
 }
 
 func (q *Queries) UpdateObservation(ctx context.Context, arg UpdateObservationParams) (Observation, error) {
@@ -302,12 +265,11 @@ func (q *Queries) UpdateObservation(ctx context.Context, arg UpdateObservationPa
 		arg.SpeciesID,
 		arg.Timestamp,
 		arg.Method,
-		arg.AppearanceTime,
+		arg.AppearanceStart,
+		arg.AppearanceEnd,
 		arg.Temperature,
 		arg.Narrative,
 		arg.Confidence,
-		arg.Indicator,
-		arg.Reportable,
 	)
 	var i Observation
 	err := row.Scan(
@@ -316,12 +278,11 @@ func (q *Queries) UpdateObservation(ctx context.Context, arg UpdateObservationPa
 		&i.SpeciesID,
 		&i.Timestamp,
 		&i.Method,
-		&i.AppearanceTime,
+		&i.AppearanceStart,
+		&i.AppearanceEnd,
 		&i.Temperature,
 		&i.Narrative,
 		&i.Confidence,
-		&i.Indicator,
-		&i.Reportable,
 	)
 	return i, err
 }

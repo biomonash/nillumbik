@@ -9,25 +9,33 @@ import (
 )
 
 type Querier interface {
+	CountDistinctSpeciesObserved(ctx context.Context, arg CountDistinctSpeciesObservedParams) (int64, error)
 	CountObservations(ctx context.Context) (int64, error)
-	CountObservationsBySite(ctx context.Context, siteID int64) (int64, error)
-	CountObservationsBySpecies(ctx context.Context, speciesID int64) (int64, error)
 	CountSites(ctx context.Context) (int64, error)
 	CountSpecies(ctx context.Context) (int64, error)
+	CountSpeciesByNative(ctx context.Context, arg CountSpeciesByNativeParams) ([]CountSpeciesByNativeRow, error)
 	CreateObservation(ctx context.Context, arg CreateObservationParams) (Observation, error)
+	CreateObservations(ctx context.Context, arg []CreateObservationsParams) (int64, error)
 	CreateSite(ctx context.Context, arg CreateSiteParams) (Site, error)
 	CreateSpecies(ctx context.Context, arg CreateSpeciesParams) (Species, error)
 	DeleteObservation(ctx context.Context, id int64) error
 	DeleteSite(ctx context.Context, id int64) error
 	DeleteSiteByCode(ctx context.Context, code string) error
 	DeleteSpecies(ctx context.Context, id int64) error
-	GetObservation(ctx context.Context, id int64) (GetObservationRow, error)
+	GetObservation(ctx context.Context, id int64) (Observation, error)
 	GetSite(ctx context.Context, id int64) (Site, error)
 	GetSiteByCode(ctx context.Context, code string) (Site, error)
+	GetSiteIDByCode(ctx context.Context, code string) (int64, error)
 	GetSpecies(ctx context.Context, id int64) (Species, error)
-	ListObservations(ctx context.Context) ([]ListObservationsRow, error)
+	GetSpeciesByCommonName(ctx context.Context, lower string) (Species, error)
+	GetSpeciesByScientificName(ctx context.Context, lower string) (Species, error)
+	ListObservations(ctx context.Context, arg ListObservationsParams) ([]Observation, error)
 	ListSites(ctx context.Context) ([]Site, error)
 	ListSpecies(ctx context.Context) ([]Species, error)
+	ListSpeciesCountByTaxa(ctx context.Context, arg ListSpeciesCountByTaxaParams) ([]ListSpeciesCountByTaxaRow, error)
+	ObservationGroupByBlocks(ctx context.Context, arg ObservationGroupByBlocksParams) ([]ObservationGroupByBlocksRow, error)
+	ObservationGroupBySites(ctx context.Context, arg ObservationGroupBySitesParams) ([]ObservationGroupBySitesRow, error)
+	ObservationTimeSeriesGroupByNative(ctx context.Context, arg ObservationTimeSeriesGroupByNativeParams) ([]ObservationTimeSeriesGroupByNativeRow, error)
 	SearchObservations(ctx context.Context, scientificName string) ([]SearchObservationsRow, error)
 	SearchSites(ctx context.Context, code string) ([]Site, error)
 	SearchSpecies(ctx context.Context, scientificName string) ([]Species, error)

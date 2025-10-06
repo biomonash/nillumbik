@@ -124,6 +124,11 @@ clean-backend: ## Clean Go build artifacts
 	@rm -f $(BINARY_NAME)
 	@rm -f $(BACKEND_DIR)/coverage.out $(BACKEND_DIR)/coverage.html
 
+.PHONY: gen-doc
+gen-doc:
+	@printf "$(GREEN)Generating Swagger API Documents...$(NC)\n"
+	@cd $(BACKEND_DIR) && swag fmt && swag init -g internal/server/server.go
+
 # =============================================================================
 # Database Commands
 # =============================================================================
@@ -283,6 +288,7 @@ setup-dev: ## Setup development environment
 	go install github.com/air-verse/air@v1.62.0
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.29.0
 	go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.0
+	go install github.com/swaggo/swag/cmd/swag@v1.16.6
 	@$(MAKE) install
 
 .PHONY: check

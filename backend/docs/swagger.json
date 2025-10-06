@@ -1,0 +1,798 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is the backend API for Nillumbik Shire project.",
+        "title": "Nillubim Shire API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8000",
+    "basePath": "/api/",
+    "paths": {
+        "/observations": {
+            "get": {
+                "description": "List observations",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "observation"
+                ],
+                "summary": "List observations",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 100,
+                        "description": "Result limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Result offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/observation.ListObservationsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/observations/{id}": {
+            "get": {
+                "description": "Get the detail of an observation by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "observation"
+                ],
+                "summary": "Get Observation Detail",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID of the observation",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/observation.Observation"
+                        }
+                    }
+                }
+            }
+        },
+        "/sites": {
+            "get": {
+                "description": "List sites",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "site"
+                ],
+                "summary": "List sites",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Site"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/sites/{code}": {
+            "get": {
+                "description": "Get the detail of a site by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "site"
+                ],
+                "summary": "Get Site Detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Code of the site",
+                        "name": "code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Site"
+                        }
+                    }
+                }
+            }
+        },
+        "/species": {
+            "get": {
+                "description": "list all species",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "species"
+                ],
+                "summary": "List species",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Species"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/species/by-common-name/{name}": {
+            "get": {
+                "description": "Get species detail by common name. Case insensitive. Underscores will be replaced with spaces.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "species"
+                ],
+                "summary": "Get species detail by common name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "name of the species. Case insensitive.",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Species"
+                        }
+                    }
+                }
+            }
+        },
+        "/species/{id}": {
+            "get": {
+                "description": "Get species detail",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "species"
+                ],
+                "summary": "Get species detail",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id of the species",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Species"
+                        }
+                    }
+                }
+            }
+        },
+        "/stats/observations": {
+            "get": {
+                "description": "Observation overview",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Observation overview",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by site block",
+                        "name": "block",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by site code",
+                        "name": "siteCode",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by taxa",
+                        "name": "taxa",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by species common_name",
+                        "name": "commonName",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/stats.ObservationOverviewResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/stats/observations/blocks": {
+            "get": {
+                "description": "Observation stats group by blocks",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Observation stats group by blocks",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by site block",
+                        "name": "block",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by site code",
+                        "name": "siteCode",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by taxa",
+                        "name": "taxa",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by species common name",
+                        "name": "commonName",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/stats.ObservationByBlocksResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/stats/observations/sites": {
+            "get": {
+                "description": "Observation stats group by sites",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Observation stats group by sites",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by site block",
+                        "name": "block",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by site code",
+                        "name": "siteCode",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by taxa",
+                        "name": "taxa",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by species common name",
+                        "name": "commonName",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/stats.ObservationBySitesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/stats/observations/timeseries": {
+            "get": {
+                "description": "Observation time series",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Observation time series",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Search start from",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by site block",
+                        "name": "block",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by site code",
+                        "name": "siteCode",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by taxa",
+                        "name": "taxa",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by species common name",
+                        "name": "commonName",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/stats.ObservationTimeSeriesResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "db.ForestType": {
+            "type": "string",
+            "enum": [
+                "dry",
+                "wet"
+            ],
+            "x-enum-varnames": [
+                "ForestTypeDry",
+                "ForestTypeWet"
+            ]
+        },
+        "db.Observation": {
+            "type": "object",
+            "properties": {
+                "appearanceEnd": {
+                    "type": "integer"
+                },
+                "appearanceStart": {
+                    "type": "integer"
+                },
+                "confidence": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "method": {
+                    "$ref": "#/definitions/db.ObservationMethod"
+                },
+                "narrative": {
+                    "type": "string"
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "speciesId": {
+                    "type": "integer"
+                },
+                "temperature": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.ObservationMethod": {
+            "type": "string",
+            "enum": [
+                "audio",
+                "camera",
+                "observed"
+            ],
+            "x-enum-varnames": [
+                "ObservationMethodAudio",
+                "ObservationMethodCamera",
+                "ObservationMethodObserved"
+            ]
+        },
+        "db.Site": {
+            "type": "object",
+            "properties": {
+                "block": {
+                    "type": "integer"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "forest": {
+                    "$ref": "#/definitions/db.ForestType"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "location": {},
+                "name": {
+                    "type": "string"
+                },
+                "tenure": {
+                    "$ref": "#/definitions/db.TenureType"
+                }
+            }
+        },
+        "db.Species": {
+            "type": "object",
+            "properties": {
+                "commonName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "indicator": {
+                    "type": "boolean"
+                },
+                "native": {
+                    "type": "boolean"
+                },
+                "reportable": {
+                    "type": "boolean"
+                },
+                "scientificName": {
+                    "type": "string"
+                },
+                "taxa": {
+                    "$ref": "#/definitions/db.Taxa"
+                }
+            }
+        },
+        "db.Taxa": {
+            "type": "string",
+            "enum": [
+                "bird",
+                "mammal",
+                "reptile"
+            ],
+            "x-enum-varnames": [
+                "TaxaBird",
+                "TaxaMammal",
+                "TaxaReptile"
+            ]
+        },
+        "db.TenureType": {
+            "type": "string",
+            "enum": [
+                "public",
+                "private"
+            ],
+            "x-enum-varnames": [
+                "TenureTypePublic",
+                "TenureTypePrivate"
+            ]
+        },
+        "observation.ListObservationsResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "observations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/db.Observation"
+                    }
+                }
+            }
+        },
+        "observation.Observation": {
+            "type": "object",
+            "properties": {
+                "appearanceIime": {
+                    "type": "object",
+                    "properties": {
+                        "end": {
+                            "type": "integer"
+                        },
+                        "start": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "confidence": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "indicator": {
+                    "type": "boolean"
+                },
+                "method": {
+                    "$ref": "#/definitions/db.ObservationMethod"
+                },
+                "narrative": {
+                    "type": "string"
+                },
+                "reportable": {
+                    "type": "boolean"
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "speciesId": {
+                    "type": "integer"
+                },
+                "temperature": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "stats.BlockResponse": {
+            "type": "object",
+            "properties": {
+                "block": {
+                    "type": "integer"
+                },
+                "observationCount": {
+                    "type": "integer"
+                },
+                "speciesCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "stats.ObservationByBlocksResponse": {
+            "type": "object",
+            "properties": {
+                "blocks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/stats.BlockResponse"
+                    }
+                }
+            }
+        },
+        "stats.ObservationBySitesResponse": {
+            "type": "object",
+            "properties": {
+                "sites": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/stats.SiteResponse"
+                    }
+                }
+            }
+        },
+        "stats.ObservationOverviewResponse": {
+            "type": "object",
+            "properties": {
+                "countByTaxa": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "nativeSpeciesCount": {
+                    "type": "integer"
+                },
+                "observationCount": {
+                    "type": "integer"
+                },
+                "speciesCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "stats.ObservationTimeSeriesResponse": {
+            "type": "object",
+            "properties": {
+                "series": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/stats.TimeSeriesPoint"
+                        }
+                    }
+                }
+            }
+        },
+        "stats.SiteResponse": {
+            "type": "object",
+            "properties": {
+                "observationCount": {
+                    "type": "integer"
+                },
+                "siteCode": {
+                    "type": "string"
+                },
+                "speciesCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "stats.TimeSeriesPoint": {
+            "type": "object",
+            "properties": {
+                "observationCount": {
+                    "type": "integer"
+                },
+                "speciesCount": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
+        }
+    },
+    "externalDocs": {
+        "description": "OpenAPI",
+        "url": "https://swagger.io/resources/open-api/"
+    }
+}

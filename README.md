@@ -6,6 +6,7 @@ A TypeScript + Go monorepo with development tooling and database integration.
 
 * Node.js: version TBD
 * Go: 1.24 or later
+* Make
 
 ## Quick Start
 
@@ -29,6 +30,16 @@ make db-seed
 make dev
 ```
 
+Backend API documents: http://localhost:8000/swagger/index.html
+
+### Import Data
+
+Put the detections CSV file in `backend/data/nillumbik.csv` and run the following:
+
+```
+make run-import
+```
+
 ## Available Commands
 
 ### Development
@@ -39,9 +50,10 @@ make dev
 
 ### Backend (Go)
 - `make run-backend` - Run Go backend
-- `make sqlc-generate` - Generate code from SQL (only required when schema changed)
-- `make test-backend-coverage` - Run tests with coverage
 - `make run-import` - Run CSV importer `cmd/importer/main.go`
+- `make sqlc-generate` - Generate code from SQL (only required when schema changed)
+- `make gen-doc` - Generate Swagger API documents from comments (See [swaggo document](https://github.com/swaggo/swag?tab=readme-ov-file#declarative-comments-format))
+- `make test-backend-coverage` - Run tests with coverage
 
 ### Frontend (TypeScript)
 - `make init-frontend` - Initialize new React+TypeScript frontend

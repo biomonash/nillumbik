@@ -5,14 +5,14 @@ import (
 	"log"
 	"os"
 
-	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 
-	"github.com/lancatlin/nillumbik/internal/db"
-	"github.com/lancatlin/nillumbik/internal/observation"
-	"github.com/lancatlin/nillumbik/internal/site"
-	"github.com/lancatlin/nillumbik/internal/species"
+	// swagger embed files
+	// gin-swagger middleware
+	_ "github.com/biomonash/nillumbik/docs"
+	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/server"
 )
 
 func init() {
@@ -26,22 +26,17 @@ func run() error {
 	ctx := context.Background()
 
 	dbUrl := os.Getenv("DB_URL")
-	conn, err := pgx.Connect(ctx, dbUrl)
+	conn, err := pgxpool.New(ctx, dbUrl)
 	if err != nil {
 		return err
 	}
-	defer conn.Close(ctx)
+	defer conn.Close()
 
 	querier := db.New(conn)
-	r := gin.Default()
-	site.Register(r, site.NewController(querier))
 
-	species.Register(r, species.NewController(querier))
+	s := server.New(querier)
 
-	observation.Register(r, observation.NewController(querier))
-
-	r.Run(":8000")
-	return nil
+	return s.Run(":8000")
 }
 
 func main() {
