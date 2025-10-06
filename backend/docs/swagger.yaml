@@ -10,9 +10,9 @@ definitions:
     - ForestTypeWet
   db.Observation:
     properties:
-      appearance_end:
+      appearanceEnd:
         type: integer
-      appearance_start:
+      appearanceStart:
         type: integer
       confidence:
         type: number
@@ -22,9 +22,9 @@ definitions:
         $ref: '#/definitions/db.ObservationMethod'
       narrative:
         type: string
-      site_id:
+      siteId:
         type: integer
-      species_id:
+      speciesId:
         type: integer
       temperature:
         type: integer
@@ -59,7 +59,7 @@ definitions:
     type: object
   db.Species:
     properties:
-      common_name:
+      commonName:
         type: string
       id:
         type: integer
@@ -69,7 +69,7 @@ definitions:
         type: boolean
       reportable:
         type: boolean
-      scientific_name:
+      scientificName:
         type: string
       taxa:
         $ref: '#/definitions/db.Taxa'
@@ -103,7 +103,7 @@ definitions:
     type: object
   observation.Observation:
     properties:
-      appearance_time:
+      appearanceIime:
         properties:
           end:
             type: integer
@@ -122,9 +122,9 @@ definitions:
         type: string
       reportable:
         type: boolean
-      site_id:
+      siteId:
         type: integer
-      species_id:
+      speciesId:
         type: integer
       temperature:
         type: integer
@@ -135,9 +135,9 @@ definitions:
     properties:
       block:
         type: integer
-      observation_count:
+      observationCount:
         type: integer
-      species_count:
+      speciesCount:
         type: integer
     type: object
   stats.ObservationByBlocksResponse:
@@ -156,16 +156,16 @@ definitions:
     type: object
   stats.ObservationOverviewResponse:
     properties:
-      count_by_taxa:
+      countByTaxa:
         additionalProperties:
           format: int64
           type: integer
         type: object
-      native_species_count:
+      nativeSpeciesCount:
         type: integer
-      observation_count:
+      observationCount:
         type: integer
-      species_count:
+      speciesCount:
         type: integer
     type: object
   stats.ObservationTimeSeriesResponse:
@@ -179,18 +179,18 @@ definitions:
     type: object
   stats.SiteResponse:
     properties:
-      observation_count:
+      observationCount:
         type: integer
-      site_code:
+      siteCode:
         type: string
-      species_count:
+      speciesCount:
         type: integer
     type: object
   stats.TimeSeriesPoint:
     properties:
-      observation_count:
+      observationCount:
         type: integer
-      species_count:
+      speciesCount:
         type: integer
       timestamp:
         type: string
@@ -381,7 +381,7 @@ paths:
         type: integer
       - description: Filter by site code
         in: query
-        name: site_code
+        name: siteCode
         type: string
       - description: Filter by taxa
         in: query
@@ -389,7 +389,7 @@ paths:
         type: string
       - description: Filter by species common_name
         in: query
-        name: common_name
+        name: commonName
         type: string
       produces:
       - application/json
@@ -423,15 +423,15 @@ paths:
         type: integer
       - description: Filter by site code
         in: query
-        name: site_code
+        name: siteCode
         type: string
       - description: Filter by taxa
         in: query
         name: taxa
         type: string
-      - description: Filter by species common_name
+      - description: Filter by species common name
         in: query
-        name: common_name
+        name: commonName
         type: string
       produces:
       - application/json
@@ -465,15 +465,15 @@ paths:
         type: integer
       - description: Filter by site code
         in: query
-        name: site_code
+        name: siteCode
         type: string
       - description: Filter by taxa
         in: query
         name: taxa
         type: string
-      - description: Filter by species common_name
+      - description: Filter by species common name
         in: query
-        name: common_name
+        name: commonName
         type: string
       produces:
       - application/json
@@ -507,15 +507,15 @@ paths:
         type: integer
       - description: Filter by site code
         in: query
-        name: site_code
+        name: siteCode
         type: string
       - description: Filter by taxa
         in: query
         name: taxa
         type: string
-      - description: Filter by species common_name
+      - description: Filter by species common name
         in: query
-        name: common_name
+        name: commonName
         type: string
       produces:
       - application/json

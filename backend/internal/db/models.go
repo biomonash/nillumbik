@@ -30,7 +30,7 @@ func (e *ForestType) Scan(src interface{}) error {
 }
 
 type NullForestType struct {
-	ForestType ForestType `json:"forest_type"`
+	ForestType ForestType `json:"forestType"`
 	Valid      bool       `json:"valid"` // Valid is true if ForestType is not NULL
 }
 
@@ -89,7 +89,7 @@ func (e *ObservationMethod) Scan(src interface{}) error {
 }
 
 type NullObservationMethod struct {
-	ObservationMethod ObservationMethod `json:"observation_method"`
+	ObservationMethod ObservationMethod `json:"observationMethod"`
 	Valid             bool              `json:"valid"` // Valid is true if ObservationMethod is not NULL
 }
 
@@ -210,7 +210,7 @@ func (e *TenureType) Scan(src interface{}) error {
 }
 
 type NullTenureType struct {
-	TenureType TenureType `json:"tenure_type"`
+	TenureType TenureType `json:"tenureType"`
 	Valid      bool       `json:"valid"` // Valid is true if TenureType is not NULL
 }
 
@@ -250,12 +250,12 @@ func AllTenureTypeValues() []TenureType {
 
 type Observation struct {
 	ID              int64             `json:"id"`
-	SiteID          int64             `json:"site_id"`
-	SpeciesID       int64             `json:"species_id"`
+	SiteID          int64             `json:"siteId"`
+	SpeciesID       int64             `json:"speciesId"`
 	Timestamp       time.Time         `json:"timestamp"`
 	Method          ObservationMethod `json:"method"`
-	AppearanceStart *int32            `json:"appearance_start"`
-	AppearanceEnd   *int32            `json:"appearance_end"`
+	AppearanceStart *int32            `json:"appearanceStart"`
+	AppearanceEnd   *int32            `json:"appearanceEnd"`
 	Temperature     *int32            `json:"temperature"`
 	Narrative       *string           `json:"narrative"`
 	Confidence      *float32          `json:"confidence"`
@@ -263,24 +263,24 @@ type Observation struct {
 
 type ObservationsWithDetail struct {
 	ID              int64             `json:"id"`
-	SiteID          int64             `json:"site_id"`
-	SpeciesID       int64             `json:"species_id"`
+	SiteID          int64             `json:"siteId"`
+	SpeciesID       int64             `json:"speciesId"`
 	Timestamp       time.Time         `json:"timestamp"`
 	Method          ObservationMethod `json:"method"`
-	AppearanceStart *int32            `json:"appearance_start"`
-	AppearanceEnd   *int32            `json:"appearance_end"`
+	AppearanceStart *int32            `json:"appearanceStart"`
+	AppearanceEnd   *int32            `json:"appearanceEnd"`
 	Temperature     *int32            `json:"temperature"`
 	Narrative       *string           `json:"narrative"`
 	Confidence      *float32          `json:"confidence"`
 	Native          bool              `json:"native"`
 	Taxa            Taxa              `json:"taxa"`
-	ScientificName  string            `json:"scientific_name"`
-	CommonName      string            `json:"common_name"`
+	ScientificName  string            `json:"scientificName"`
+	CommonName      string            `json:"commonName"`
 	Indicator       bool              `json:"indicator"`
 	Reportable      bool              `json:"reportable"`
 	Block           int32             `json:"block"`
-	SiteCode        string            `json:"site_code"`
-	SiteName        *string           `json:"site_name"`
+	SiteCode        string            `json:"siteCode"`
+	SiteName        *string           `json:"siteName"`
 	Tenure          TenureType        `json:"tenure"`
 	Forest          ForestType        `json:"forest"`
 }
@@ -297,8 +297,8 @@ type Site struct {
 
 type Species struct {
 	ID             int64  `json:"id"`
-	ScientificName string `json:"scientific_name"`
-	CommonName     string `json:"common_name"`
+	ScientificName string `json:"scientificName"`
+	CommonName     string `json:"commonName"`
 	Native         bool   `json:"native"`
 	Taxa           Taxa   `json:"taxa"`
 	Indicator      bool   `json:"indicator"`

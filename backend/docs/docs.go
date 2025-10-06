@@ -282,7 +282,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Filter by site code",
-                        "name": "site_code",
+                        "name": "siteCode",
                         "in": "query"
                     },
                     {
@@ -294,7 +294,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Filter by species common_name",
-                        "name": "common_name",
+                        "name": "commonName",
                         "in": "query"
                     }
                 ],
@@ -345,7 +345,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Filter by site code",
-                        "name": "site_code",
+                        "name": "siteCode",
                         "in": "query"
                     },
                     {
@@ -356,8 +356,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Filter by species common_name",
-                        "name": "common_name",
+                        "description": "Filter by species common name",
+                        "name": "commonName",
                         "in": "query"
                     }
                 ],
@@ -408,7 +408,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Filter by site code",
-                        "name": "site_code",
+                        "name": "siteCode",
                         "in": "query"
                     },
                     {
@@ -419,8 +419,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Filter by species common_name",
-                        "name": "common_name",
+                        "description": "Filter by species common name",
+                        "name": "commonName",
                         "in": "query"
                     }
                 ],
@@ -471,7 +471,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Filter by site code",
-                        "name": "site_code",
+                        "name": "siteCode",
                         "in": "query"
                     },
                     {
@@ -482,8 +482,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Filter by species common_name",
-                        "name": "common_name",
+                        "description": "Filter by species common name",
+                        "name": "commonName",
                         "in": "query"
                     }
                 ],
@@ -513,10 +513,10 @@ const docTemplate = `{
         "db.Observation": {
             "type": "object",
             "properties": {
-                "appearance_end": {
+                "appearanceEnd": {
                     "type": "integer"
                 },
-                "appearance_start": {
+                "appearanceStart": {
                     "type": "integer"
                 },
                 "confidence": {
@@ -531,10 +531,10 @@ const docTemplate = `{
                 "narrative": {
                     "type": "string"
                 },
-                "site_id": {
+                "siteId": {
                     "type": "integer"
                 },
-                "species_id": {
+                "speciesId": {
                     "type": "integer"
                 },
                 "temperature": {
@@ -585,7 +585,7 @@ const docTemplate = `{
         "db.Species": {
             "type": "object",
             "properties": {
-                "common_name": {
+                "commonName": {
                     "type": "string"
                 },
                 "id": {
@@ -600,7 +600,7 @@ const docTemplate = `{
                 "reportable": {
                     "type": "boolean"
                 },
-                "scientific_name": {
+                "scientificName": {
                     "type": "string"
                 },
                 "taxa": {
@@ -649,7 +649,7 @@ const docTemplate = `{
         "observation.Observation": {
             "type": "object",
             "properties": {
-                "appearance_time": {
+                "appearanceIime": {
                     "type": "object",
                     "properties": {
                         "end": {
@@ -678,10 +678,10 @@ const docTemplate = `{
                 "reportable": {
                     "type": "boolean"
                 },
-                "site_id": {
+                "siteId": {
                     "type": "integer"
                 },
-                "species_id": {
+                "speciesId": {
                     "type": "integer"
                 },
                 "temperature": {
@@ -698,10 +698,10 @@ const docTemplate = `{
                 "block": {
                     "type": "integer"
                 },
-                "observation_count": {
+                "observationCount": {
                     "type": "integer"
                 },
-                "species_count": {
+                "speciesCount": {
                     "type": "integer"
                 }
             }
@@ -731,20 +731,20 @@ const docTemplate = `{
         "stats.ObservationOverviewResponse": {
             "type": "object",
             "properties": {
-                "count_by_taxa": {
+                "countByTaxa": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "integer",
                         "format": "int64"
                     }
                 },
-                "native_species_count": {
+                "nativeSpeciesCount": {
                     "type": "integer"
                 },
-                "observation_count": {
+                "observationCount": {
                     "type": "integer"
                 },
-                "species_count": {
+                "speciesCount": {
                     "type": "integer"
                 }
             }
@@ -766,13 +766,13 @@ const docTemplate = `{
         "stats.SiteResponse": {
             "type": "object",
             "properties": {
-                "observation_count": {
+                "observationCount": {
                     "type": "integer"
                 },
-                "site_code": {
+                "siteCode": {
                     "type": "string"
                 },
-                "species_count": {
+                "speciesCount": {
                     "type": "integer"
                 }
             }
@@ -780,10 +780,10 @@ const docTemplate = `{
         "stats.TimeSeriesPoint": {
             "type": "object",
             "properties": {
-                "observation_count": {
+                "observationCount": {
                     "type": "integer"
                 },
-                "species_count": {
+                "speciesCount": {
                     "type": "integer"
                 },
                 "timestamp": {

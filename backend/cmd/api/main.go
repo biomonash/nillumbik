@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 
 	// swagger embed files
@@ -26,11 +26,11 @@ func run() error {
 	ctx := context.Background()
 
 	dbUrl := os.Getenv("DB_URL")
-	conn, err := pgx.Connect(ctx, dbUrl)
+	conn, err := pgxpool.New(ctx, dbUrl)
 	if err != nil {
 		return err
 	}
-	defer conn.Close(ctx)
+	defer conn.Close()
 
 	querier := db.New(conn)
 
