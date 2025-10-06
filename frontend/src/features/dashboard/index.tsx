@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StatsCard } from "./components/StatsCard";
 import {
   Card,
@@ -10,8 +10,21 @@ import {
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Badge";
 import styles from "./Dashboard.module.scss";
+import {
+  getDashboardStats,
+  type DashboardStatsResponse,
+} from "../../apis/stats.api";
+import { toPercent } from "../../lib/utils";
 
 const Dashboard: React.FC = () => {
+  const [stats, setStats] = useState<DashboardStatsResponse | null>(null);
+
+  useEffect(() => {
+    getDashboardStats({
+      from: new Date("2025-01-01"),
+    }).then(setStats);
+  }, []);
+
   // Icon placeholder
   const IconPlaceholder = ({ label }: { label: string }) => (
     <span className={styles.iconPlaceholder} title={label} aria-label={label}>
@@ -72,40 +85,44 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Key Statistics */}
-      <div className={styles.statsGrid}>
-        <StatsCard
-          title="Total Species Detected"
-          value="185"
-          subtitle="Across all monitored areas"
-          icon={<span className="statsCardIcon">🔔</span>}
-          trend={{ value: 12, label: "vs last month" }}
-          color="forest"
-        />
-        <StatsCard
-          title="Active Monitoring Sites"
-          value="24"
-          subtitle="Continuous data collection"
-          icon={<span className="statsCardIcon">🌁</span>}
-          trend={{ value: 12, label: "vs last month" }}
-          color="primary"
-        />
-        <StatsCard
-          title="Detection Events"
-          value="160,247"
-          subtitle="Total recorded observations"
-          icon={<span className="statsCardIcon">🔍</span>}
-          trend={{ value: 8, label: "vs last month" }}
-          color="accent"
-        />
-        <StatsCard
-          title="Native Species"
-          value="92%"
-          subtitle="Of all detected species"
-          icon={<span className="statsCardIcon">🦜</span>}
-          trend={{ value: 12, label: "vs last month" }}
-          color="secondary"
-        />
-      </div>
+      {stats !== null ? (
+        <div className={styles.statsGrid}>
+          <StatsCard
+            title="Total Species Detected"
+            value={stats.speciesCount}
+            subtitle="Across all monitored areas"
+            icon={<span className="statsCardIcon">🔔</span>}
+            trend={{ value: 12, label: "vs last month" }}
+            color="forest"
+          />
+          <StatsCard
+            title="Active Monitoring Sites"
+            value={stats.sitesCount}
+            subtitle="Continuous data collection"
+            icon={<span className="statsCardIcon">🌁</span>}
+            trend={{ value: 12, label: "vs last month" }}
+            color="primary"
+          />
+          <StatsCard
+            title="Detection Events"
+            value={stats.observationCount}
+            subtitle="Total recorded observations"
+            icon={<span className="statsCardIcon">🔍</span>}
+            trend={{ value: 8, label: "vs last month" }}
+            color="accent"
+          />
+          <StatsCard
+            title="Native Species"
+            value={toPercent(stats.nativeSpeciesCount / stats.speciesCount)}
+            subtitle="Of all detected species"
+            icon={<span className="statsCardIcon">🦜</span>}
+            trend={{ value: 12, label: "vs last month" }}
+            color="secondary"
+          />
+        </div>
+      ) : (
+        <p>Loading</p>
+      )}
 
       {/* Data Visualizations */}
       <div className={styles.dataVisualizationGrid}>
@@ -117,65 +134,69 @@ const Dashboard: React.FC = () => {
 
       {/* Recent Activity & Map */}
       <div className={styles.recentActivityGrid}>
-  {/* Left: Map Placeholder */}
-  <div className={styles.mapPlaceholder}>
-    <Card>
-      <CardHeader>
-        <CardTitle>Interactive Map</CardTitle>
-        <CardDescription>Placeholder for the map</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className={styles.mapFrame}>
-          Map Placeholder
+        {/* Left: Map Placeholder */}
+        <div className={styles.mapPlaceholder}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Interactive Map</CardTitle>
+              <CardDescription>Placeholder for the map</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className={styles.mapFrame}>Map Placeholder</div>
+            </CardContent>
+          </Card>
         </div>
-      </CardContent>
-    </Card>
-  </div>
 
-  {/* Right: Recent Detection Highlights */}
-  <div className={styles.detectionHighlights}>
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent Detection Highlights</CardTitle>
-        <CardDescription>
-          Notable species observations from the past 48 hours
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className={styles.detectionList}>
-          {detectionItems.map((item, index) => (
-            <div key={index} className={styles.detectionItem}>
-              <div className={styles.detectionInfo}>
-                <div
-                  className={`${styles.statusDot} ${
-                    item.status === "rare"
-                      ? styles.statusRare
-                      : item.status === "native"
-                      ? styles.statusNative
-                      : styles.statusInvasive
-                  }`}
-                />
-                <div>
-                  <p className={styles.speciesName}>{item.species}</p>
-                  <p className={styles.speciesLocation}>{item.location}</p>
-                </div>
+        {/* Right: Recent Detection Highlights */}
+        <div className={styles.detectionHighlights}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Detection Highlights</CardTitle>
+              <CardDescription>
+                Notable species observations from the past 48 hours
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className={styles.detectionList}>
+                {detectionItems.map((item, index) => (
+                  <div key={index} className={styles.detectionItem}>
+                    <div className={styles.detectionInfo}>
+                      <div
+                        className={`${styles.statusDot} ${
+                          item.status === "rare"
+                            ? styles.statusRare
+                            : item.status === "native"
+                              ? styles.statusNative
+                              : styles.statusInvasive
+                        }`}
+                      />
+                      <div>
+                        <p className={styles.speciesName}>{item.species}</p>
+                        <p className={styles.speciesLocation}>
+                          {item.location}
+                        </p>
+                      </div>
+                    </div>
+                    <div className={styles.detectionTime}>
+                      <Badge
+                        variant={
+                          item.status === "invasive"
+                            ? "destructive"
+                            : "secondary"
+                        }
+                        className={styles.detectionBadge}
+                      >
+                        {item.status}
+                      </Badge>
+                      <p className={styles.timeText}>{item.time}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className={styles.detectionTime}>
-                <Badge
-                  variant={item.status === "invasive" ? "destructive" : "secondary"}
-                  className={styles.detectionBadge}
-                >
-                  {item.status}
-                </Badge>
-                <p className={styles.timeText}>{item.time}</p>
-              </div>
-            </div>
-          ))}
+            </CardContent>
+          </Card>
         </div>
-      </CardContent>
-    </Card>
-  </div>
-</div>
+      </div>
 
       {/* Quick Actions */}
       <Card>
@@ -196,10 +217,10 @@ const Dashboard: React.FC = () => {
                   {label === "Map"
                     ? "View Map"
                     : label === "Tree"
-                    ? "Species Report"
-                    : label === "Trnd"
-                    ? "Analytics"
-                    : "Data Export"}
+                      ? "Species Report"
+                      : label === "Trnd"
+                        ? "Analytics"
+                        : "Data Export"}
                 </span>
               </Button>
             ))}
