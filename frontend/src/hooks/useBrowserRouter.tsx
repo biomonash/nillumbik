@@ -15,6 +15,8 @@ const Instruction = lazy(() => import("../pages/Instruction"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
 const Gallery = lazy(() => import("../pages/Gallery"));
 const Map = lazy(() => import("../pages/Map"));
+const Timeline = lazy(() => import("../pages/Timeline.tsx"));
+const Settings = lazy(() => import("../pages/Settings"));
 const Admin = lazy(() => import("../pages/Admin"));
 const Error = lazy(() => import("../pages/Error"));
 
@@ -54,6 +56,14 @@ const useBrowserRouter = () => {
           path: routes.MAP,
           Component: Map,
         },
+        {
+          path: routes.TIMELINE,
+          Component: Timeline,
+        },
+        {
+          path: routes.SETTINGS,
+          Component: Settings,
+        },
       ],
     },
     {
@@ -71,7 +81,6 @@ const useBrowserRouter = () => {
       Component: Error,
     },
   ]);
-
   return router;
 };
 

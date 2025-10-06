@@ -1,0 +1,51 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px; 
+  border: 1px solid transparent;
+  padding: 0.125rem 0.625rem; 
+  font-size: 0.75rem; 
+  font-weight: 600; 
+  transition: background-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--mantine-ring-color), 0 0 0 4px var(--mantine-ring-offset-color);
+  }
+
+  &.default {
+    background-color: var(--mantine-primary-color);
+    color: var(--mantine-primary-foreground);
+    border-color: transparent;
+
+    &:hover {
+      background-color: rgba(var(--mantine-primary-rgb), 0.8);
+    }
+  }
+
+  &.secondary {
+    background-color: var(--mantine-secondary-color);
+    color: var(--mantine-secondary-foreground);
+    border-color: transparent;
+
+    &:hover {
+      background-color: rgba(var(--mantine-secondary-rgb), 0.8);
+    }
+  }
+
+  &.destructive {
+    background-color: var(--mantine-destructive-color);
+    color: var(--mantine-destructive-foreground);
+    border-color: transparent;
+
+    &:hover {
+      background-color: rgba(var(--mantine-destructive-rgb), 0.8);
+    }
+  }
+
+  &.outline {
+    background-color: transparent;
+    color: var(--mantine-color-foreground);
+    border-color: currentColor;
+  }
+}
