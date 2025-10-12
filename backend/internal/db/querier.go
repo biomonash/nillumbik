@@ -9,6 +9,7 @@ import (
 )
 
 type Querier interface {
+	CountActiveSites(ctx context.Context, arg CountActiveSitesParams) (int64, error)
 	CountDistinctSpeciesObserved(ctx context.Context, arg CountDistinctSpeciesObservedParams) (int64, error)
 	CountObservations(ctx context.Context) (int64, error)
 	CountSites(ctx context.Context) (int64, error)

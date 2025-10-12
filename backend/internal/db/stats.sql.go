@@ -12,6 +12,25 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countActiveSites = `-- name: CountActiveSites :one
+SELECT COUNT(DISTINCT site_id) as sites_count
+FROM observations_with_details
+WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
+  AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
+`
+
+type CountActiveSitesParams struct {
+	From pgtype.Timestamp `json:"from"`
+	To   pgtype.Timestamp `json:"to"`
+}
+
+func (q *Queries) CountActiveSites(ctx context.Context, arg CountActiveSitesParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countActiveSites, arg.From, arg.To)
+	var sites_count int64
+	err := row.Scan(&sites_count)
+	return sites_count, err
+}
+
 const countDistinctSpeciesObserved = `-- name: CountDistinctSpeciesObserved :one
 SELECT COUNT(DISTINCT species_id)
 FROM observations
