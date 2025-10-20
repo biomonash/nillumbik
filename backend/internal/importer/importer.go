@@ -6,7 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+
+	// "log"
 	"os"
+	// "path/filepath"
 	"strings"
 
 	"github.com/biomonash/nillumbik/internal/db"
@@ -23,6 +26,16 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 	defer file.Close()
 
 	cache := NewCache(q)
+
+	// // Initialize file parser for handling file paths in CSV
+	// baseDir := filepath.Dir(filename)
+	// fileParser := NewFileParser(baseDir)
+
+	// // Directory for placeholder files (temporary solution)
+	// placeholderDir := filepath.Join(baseDir, "imported_files")
+	// if err := os.MkdirAll(placeholderDir, 0755); err != nil {
+	// 	log.Printf("Warning: failed to create placeholder directory: %v", err)
+	// }
 
 	reader := csv.NewReader(file)
 	reader.TrimLeadingSpace = true
@@ -91,6 +104,50 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 		if err != nil {
 			return fmt.Errorf("Row %d: failed to parse observation: %w", i, err)
 		}
+
+		// // --- Parse file paths from CSV ---
+		// // Column 7: Photo, Column 11: Audio, Column 12: Files
+		// fileColumnIndices := []int{7, 11, 12}
+
+		// if len(fileColumnIndices) > 0 {
+		// 	fileInfos, err := ParseCSVFileColumns(row, fileParser, fileColumnIndices)
+		// 	if err != nil {
+		// 		log.Printf("Warning: Row %d failed to parse file columns: %v", i, err)
+		// 	} else {
+		// 		// Process each file
+		// 		for _, fileInfo := range fileInfos {
+		// 			if fileInfo == nil {
+		// 				continue
+		// 			}
+
+		// 			// Log file information
+		// 			log.Printf("Row %d: Found file %s (original: %s, relative: %s, exists: %v, OneDrive: %v)",
+		// 				i,
+		// 				fileInfo.FileName,
+		// 				fileInfo.OriginalPath,
+		// 				fileInfo.RelativePath,
+		// 				fileInfo.Exists,
+		// 				fileInfo.IsOneDrive,
+		// 			)
+
+		// 			// Create placeholder if file doesn't exist locally
+		// 			if !fileInfo.Exists {
+		// 				if err := fileParser.CreatePlaceholderFile(fileInfo, placeholderDir); err != nil {
+		// 					log.Printf("Warning: Row %d failed to create placeholder for %s: %v",
+		// 						i, fileInfo.FileName, err)
+		// 				} else {
+		// 					log.Printf("Row %d: Created placeholder for %s at %s",
+		// 						i, fileInfo.FileName, filepath.Join(placeholderDir, fileInfo.RelativePath))
+		// 				}
+		// 			}
+
+		// 			// TODO: Store fileInfo.RelativePath in your database if needed
+		// 			// For example, you might want to add file paths to the observations table
+		// 			// or create a separate files table linked to observations
+		// 		}
+		// 	}
+		// }
+
 		batch = append(batch, params)
 
 		if len(batch) == BATCH_SIZE {
