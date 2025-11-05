@@ -5,7 +5,7 @@ COPY frontend/package.json frontend/package-lock.json ./
 RUN yarn install --frozen-lockfile
 
 COPY frontend ./
-RUN yarn build
+RUN VITE_API_BASE_URL=/api yarn build
 
 FROM golang:1.24-alpine AS build-backend
 
