@@ -13,7 +13,7 @@ FRONTEND_DIR=frontend
 DOCKER_DIR=docker
 GO_MAIN=cmd/api/main.go
 GO_IMPORTER=cmd/importer/main.go
-DOCKER_COMPOSE_FILE=docker/docker-compose.yml
+DOCKER_COMPOSE_FILE=docker/compose.yml
 # POSTGRESQL_URL=postgres://biom:supersecretpassword@localhost:5432/nillumbik?sslmode=disable
 
 # Colors for output

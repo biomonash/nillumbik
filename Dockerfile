@@ -18,6 +18,11 @@ COPY --from=build-frontend /build/dist assets/dist
 RUN go build -o nillumbik cmd/api/main.go
 
 FROM scratch AS prod
+
 WORKDIR /app
 COPY --from=build-backend /build/nillumbik /app/nillumbik
+
+# Switch to a non-root user
+USER 65532:65532
+
 ENTRYPOINT [ "/app/nillumbik" ]
