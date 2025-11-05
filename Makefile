@@ -40,7 +40,7 @@ dev: ## Start development servers for both backend and frontend
 	@$(MAKE) -j 2 dev-backend dev-frontend
 
 .PHONY: build
-build: build-backend build-frontend ## Build both backend and frontend
+build: build-frontend build-backend ## Build both backend and frontend
 
 .PHONY: clean
 clean: clean-backend clean-frontend ## Clean all build artifacts
@@ -198,7 +198,7 @@ install-frontend: ## Install Node.js dependencies
 build-frontend: ## Build the TypeScript frontend
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Building TypeScript frontend...$(NC)\n"; \
-		cd $(FRONTEND_DIR) && yarn build; \
+		cd $(FRONTEND_DIR) && yarn build --outDir ../backend/assets/dist; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend build.$(NC)\n"; \
 	fi
