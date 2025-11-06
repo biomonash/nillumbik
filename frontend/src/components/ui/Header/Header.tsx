@@ -1,5 +1,5 @@
-import { useState, type JSX } from "react";
-import { Burger, Container, Group, Collapse, Paper } from "@mantine/core";
+import { type JSX } from "react";
+import { Burger, Container, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 // import { MantineLogo } from "@mantinex/mantine-logo";
@@ -45,14 +45,14 @@ const Header: React.FC = (): JSX.Element => {
         />
         <Group gap={5} visibleFrom="xs">
           {items}
-		  <span className={classes.iconWrapper}>
-			<i className="fa-solid fa-gear"></i>
-		</span>
+          <span className={classes.iconWrapper}>
+            <i className="fa-solid fa-gear"></i>
+          </span>
         </Group>
 
         <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
       </Container>
-	  {/*
+      {/*
 	  Burger menu only when needed
       <Collapse in={opened}>
         <Paper shadow="sm" p="sm">
