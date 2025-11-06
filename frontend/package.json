@@ -19,14 +19,17 @@
     "@reduxjs/toolkit": "^2.9.0",
     "@types/axios": "^0.14.4",
     "axios": "^1.11.0",
+    "leaflet": "^1.9.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-leaflet": "^5.0.0-rc.2",
     "react-redux": "^9.2.0",
     "react-router": "^7.8.2",
     "redux": "^5.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@types/leaflet": "^1.9.21",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
