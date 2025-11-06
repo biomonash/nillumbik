@@ -15,6 +15,9 @@ import {
   type DashboardStatsResponse,
 } from "../../apis/stats.api";
 import { toPercent } from "../../lib/utils";
+import { BarChart } from "./components/charts/BarChart";
+import { LineChart } from "./components/charts/LineChart";
+import { PieChart } from "./components/charts/PieChart";
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStatsResponse | null>(null);
@@ -126,11 +129,38 @@ const Dashboard: React.FC = () => {
 
       {/* Data Visualizations */}
       <div className={styles.dataVisualizationGrid}>
-        <DataVisualizationPlaceholder />
-        <DataVisualizationPlaceholder />
-        <DataVisualizationPlaceholder />
-        <DataVisualizationPlaceholder />
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Species by Year</CardTitle>
+          <CardDescription>Distribution across years</CardDescription>
+        </CardHeader>
+        <CardContent><BarChart /></CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Native vs Invasive Trends</CardTitle>
+          <CardDescription>Annual variation</CardDescription>
+        </CardHeader>
+        <CardContent><LineChart /></CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Species Composition</CardTitle>
+          <CardDescription>Native, Invasive, Rare</CardDescription>
+        </CardHeader>
+        <CardContent><PieChart /></CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Coming Soon</CardTitle>
+          <CardDescription>Habitat or Location breakdown</CardDescription>
+        </CardHeader>
+        <CardContent><DataVisualizationPlaceholder /></CardContent>
+      </Card>
+    </div>
 
       {/* Recent Activity & Map */}
       <div className={styles.recentActivityGrid}>
