@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/biomonash/nillumbik/assets"
 	"github.com/biomonash/nillumbik/internal/db"
 	"github.com/biomonash/nillumbik/internal/observation"
 	"github.com/biomonash/nillumbik/internal/site"
@@ -43,6 +44,8 @@ func New(querier db.Querier) *Server {
 	r.Use(panicRecovery())
 	r.Use(errorHandler())
 	r.Use(cors.Default()) // TODO: development only
+
+	r.NoRoute(assets.Serve)
 
 	api := r.Group("/api")
 

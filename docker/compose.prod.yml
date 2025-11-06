@@ -1,0 +1,25 @@
+services:
+  nillumbik:
+    build: ..
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    environment:
+      DB_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable
+
+  db:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer:5.3.0
+    ports:
+      - 8080:8080
