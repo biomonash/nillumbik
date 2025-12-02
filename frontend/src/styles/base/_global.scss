@@ -1,10 +1,15 @@
 body {
     background-color: var(--background) !important;
-    color: var(--text) !important;
+    color: var(--text-color) !important;
 }
 
 
 :root{
     --background: #1F2421;
     --text-color: #ffffff;
+    --accent: #216869;  // sidebar color
+    --accent2: #49A078;
+
+
+    --radius: 8px;
 }

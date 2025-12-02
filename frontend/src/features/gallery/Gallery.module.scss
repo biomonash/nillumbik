@@ -1,0 +1,204 @@
+.galleryContainer {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: hsl(var(--foreground));
+}
+
+// Search Bar
+.searchRow {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+    margin-bottom: 1rem;
+}
+
+.clearSearchButton {
+    padding: 0.625rem 1.25rem;
+    background: hsl(var(--muted));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    height: fit-content;
+
+    &:hover {
+        background: var(--accent);
+    }
+}
+
+// Filters 
+.filtersRow {
+    justify-content: space-between;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+
+     > * {
+    flex: 1 1 1 200px; 
+  }
+
+}
+
+// Action Buttons 
+.actionsRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.clearFiltersButton {
+    padding: 0.625rem 1.5rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #35a5a7;
+        font-weight: 620;
+    }
+}
+
+.clearAllButton {
+    padding: 0.625rem 1.5rem;
+    background: var(--accent2);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #58c190;
+    }
+}
+
+// Results Header
+.resultsHeader {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    padding: 1.25rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+
+    h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: hsl(var(--foreground));
+    }
+}
+
+.activeFilters {
+    margin: 0;
+    font-size: 0.875rem;
+    color: hsl(var(--muted-foreground));
+
+    strong {
+        color: hsl(var(--foreground));
+    }
+}
+
+// Results Grid
+.resultsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.resultCard {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: hsl(var(--foreground));
+    }
+}
+
+.scientificName {
+    font-style: italic;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.875rem;
+    margin: 0 0 1rem 0;
+}
+
+.cardDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+
+    p {
+        margin: 0;
+        color: hsl(var(--muted-foreground));
+
+        strong {
+            color: hsl(var(--foreground));
+        }
+    }
+}
+
+.badgeNative {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    background: #d1fae5;
+    color: #065f46;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badgeNonNative {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+// No Results
+.noResults {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+
+    p {
+        font-size: 1.125rem;
+        color: hsl(var(--muted-foreground));
+        margin-bottom: 1rem;
+    }
+}
