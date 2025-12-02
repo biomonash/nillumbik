@@ -1,0 +1,196 @@
+.wrapper {
+    position: relative;
+    
+    display: flex;
+    min-width: max-content;
+    justify-content: center;
+    align-self: center;
+
+    /* default colors */
+    --select-bg: var(--text-color);
+    --select-text:var(--background);
+    --select-accent: rgba(0, 0, 0, 0.08);
+    --select-primary: rgba(0, 0, 0, 0.25);
+    --select-border: rgba(0,0,0,0.2);  
+    --select-hover: rgba(255, 255, 255, 0.612); 
+}
+select {
+    position: relative;
+    
+
+
+    &.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    &.error .trigger {
+        border-color: var(--destructive, #ff4d4f);
+
+        &:focus {
+        box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.1);
+        }
+    }
+}
+
+.trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(0.625rem, 2vw, 0.75rem) clamp(0.875rem, 2vw, 1rem);
+    border-radius: var(--radius, 8px);
+    font-size: clamp(0.875rem, 2vw, 1rem);
+    line-height: 1.5;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+
+    background-color: var(--select-bg);
+    color: var(--select-text);
+    border: 1px solid var(--select-border);
+
+    &:hover:not(:disabled) {
+        border-color: var(--select-border);
+        background-color: var(--select-hover);
+    }
+
+    &:focus {
+        outline: none;
+        border-color: var(--ring, #fff);
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+
+    &.active {
+        border-color: var(--ring, #fff);
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
+    }
+
+    &.hasValue .value {
+        color: var(--select-text);
+    }
+}
+
+.value {
+    flex: 1;
+    color: var(--select-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.arrow {
+    margin-left: 0.5rem;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+    color: var(--select-text);
+    font-size: 0.625rem;
+
+    &.arrowUp {
+        transform: rotate(180deg);
+    } 
+}
+
+.menu {
+    position: absolute; //to overlay
+    width: 100%;
+    min-width: 100%; 
+    width: max-content;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background-color: var(--select-bg);
+    border: 1px solid var(--select-border);
+    border-radius: var(--radius, 8px);
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+                0 4px 6px -4px rgb(0 0 0 / 0.1);
+    animation: slideDown 0.15s ease;
+
+    @media (max-width: 640px) {
+        max-height: 200px;
+    }
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--select-muted);
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.item {
+    padding: clamp(0.5rem, 2vw, 0.625rem) clamp(0.75rem, 2vw, 1rem);
+    font-size: clamp(0.875rem, 2vw, 1rem);
+    cursor: pointer;
+    border-radius: calc(var(--radius, 8px) - 2px);
+    transition: background-color 0.15s ease;
+    color: var(--select-text);
+    user-select: none;
+
+    &:hover:not(.disabled) {
+        background-color: var(--select-accent);
+        color: var(--select-text);
+        font-weight: 500;
+    }
+
+    &.selected {
+        background-color: var(--select-primary);
+        color: var(--select-text);
+
+        &:hover {
+        background-color: var(--select-hover);
+        }
+    }
+
+    &.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.helperText {
+  display: block;
+  margin-top: 0.375rem;
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
+  color: var(--select-text);
+
+  &.errorText {
+    color: var(--destructive, #ff4d4f);
+  }
+}
+
+.select {
+    position: relative;
+    display: flex;
+    min-width: max-content;
+    justify-content: center;
+    align-self: center;
+}
