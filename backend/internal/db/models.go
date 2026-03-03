@@ -286,13 +286,13 @@ type ObservationsWithDetail struct {
 }
 
 type Site struct {
-	ID       int64       `json:"id"`
-	Code     string      `json:"code"`
-	Block    int32       `json:"block"`
-	Name     *string     `json:"name"`
-	Location interface{} `json:"location"`
-	Tenure   TenureType  `json:"tenure"`
-	Forest   ForestType  `json:"forest"`
+	ID       int64      `json:"id"`
+	Code     string     `json:"code"`
+	Block    int32      `json:"block"`
+	Name     *string    `json:"name"`
+	Location *string    `json:"location"`
+	Tenure   TenureType `json:"tenure"`
+	Forest   ForestType `json:"forest"`
 }
 
 type Species struct {
