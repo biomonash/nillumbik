@@ -1,7 +1,5 @@
 BEGIN;
 
-CREATE EXTENSION IF NOT EXISTS postgis;
-
 CREATE TYPE tenure_type AS ENUM ('public', 'private');
 CREATE TYPE forest_type AS ENUM ('dry', 'wet');
 CREATE TYPE taxa AS ENUM ('bird', 'mammal', 'reptile');
@@ -12,7 +10,7 @@ CREATE TABLE IF NOT EXISTS sites (
     code TEXT UNIQUE NOT NULL,
     block integer NOT NULL,
     name TEXT,
-    location geometry(POINT, 4326),
+    location TEXT,
     tenure tenure_type NOT NULL,
     forest forest_type NOT NULL
 );
@@ -41,7 +39,7 @@ CREATE TABLE IF NOT EXISTS observations (
 );
 
 CREATE VIEW observations_with_details AS
-SELECT 
+SELECT
     o.id,
     o.site_id,
     o.species_id,
