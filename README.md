@@ -4,9 +4,10 @@ A TypeScript + Go monorepo with development tooling and database integration.
 
 ## Requirements
 
-* Node.js: version TBD
+* Node.js: version 24
 * Go: 1.24 or later
 * Make
+* Docker
 
 ## Quick Start
 

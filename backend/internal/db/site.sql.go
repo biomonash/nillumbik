@@ -27,12 +27,12 @@ RETURNING id, code, block, name, location, tenure, forest
 `
 
 type CreateSiteParams struct {
-	Code     string      `json:"code"`
-	Block    int32       `json:"block"`
-	Name     *string     `json:"name"`
-	Location interface{} `json:"location"`
-	Tenure   TenureType  `json:"tenure"`
-	Forest   ForestType  `json:"forest"`
+	Code     string     `json:"code"`
+	Block    int32      `json:"block"`
+	Name     *string    `json:"name"`
+	Location *string    `json:"location"`
+	Tenure   TenureType `json:"tenure"`
+	Forest   ForestType `json:"forest"`
 }
 
 func (q *Queries) CreateSite(ctx context.Context, arg CreateSiteParams) (Site, error) {
@@ -203,13 +203,13 @@ RETURNING id, code, block, name, location, tenure, forest
 `
 
 type UpdateSiteParams struct {
-	ID       int64       `json:"id"`
-	Code     string      `json:"code"`
-	Block    int32       `json:"block"`
-	Name     *string     `json:"name"`
-	Location interface{} `json:"location"`
-	Tenure   TenureType  `json:"tenure"`
-	Forest   ForestType  `json:"forest"`
+	ID       int64      `json:"id"`
+	Code     string     `json:"code"`
+	Block    int32      `json:"block"`
+	Name     *string    `json:"name"`
+	Location *string    `json:"location"`
+	Tenure   TenureType `json:"tenure"`
+	Forest   ForestType `json:"forest"`
 }
 
 func (q *Queries) UpdateSite(ctx context.Context, arg UpdateSiteParams) (Site, error) {
@@ -243,12 +243,12 @@ RETURNING id, code, block, name, location, tenure, forest
 `
 
 type UpdateSiteByCodeParams struct {
-	Code     string      `json:"code"`
-	Block    int32       `json:"block"`
-	Name     *string     `json:"name"`
-	Location interface{} `json:"location"`
-	Tenure   TenureType  `json:"tenure"`
-	Forest   ForestType  `json:"forest"`
+	Code     string     `json:"code"`
+	Block    int32      `json:"block"`
+	Name     *string    `json:"name"`
+	Location *string    `json:"location"`
+	Tenure   TenureType `json:"tenure"`
+	Forest   ForestType `json:"forest"`
 }
 
 func (q *Queries) UpdateSiteByCode(ctx context.Context, arg UpdateSiteByCodeParams) (Site, error) {

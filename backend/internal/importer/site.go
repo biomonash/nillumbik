@@ -21,22 +21,6 @@ func parseSite(i int, row []string) (site db.CreateSiteParams, err error) {
 	forest := strings.ToLower(strings.TrimSpace(row[16]))
 	tenure := strings.ToLower(strings.TrimSpace(row[19]))
 
-	latStr, lonStr := strings.TrimSpace(row[2]), strings.TrimSpace(row[3])
-
-	// location for CreateSiteParams is interface{} in generated code.
-	// Provide WKT string when coords present, otherwise nil to insert NULL.
-	var location interface{}
-	if latStr != "" && lonStr != "" && latStr != "####" && lonStr != "####" {
-		lat, lon, err := parseCoords(latStr, lonStr)
-		if err != nil {
-			return site, fmt.Errorf("row %d: invalid coords %q,%q: %w", i+1, latStr, lonStr, err)
-		}
-		// WKT: POINT(lon lat)
-		location = fmt.Sprintf("POINT(%f %f)", lon, lat)
-	} else {
-		location = nil
-	}
-
 	tenureEnum := db.TenureType(tenure)
 	if !tenureEnum.Valid() {
 		err = fmt.Errorf("unknown tenure type: %s", tenure)
@@ -61,6 +45,6 @@ func parseSite(i int, row []string) (site db.CreateSiteParams, err error) {
 		Name:     &siteCode,
 		Tenure:   tenureEnum,
 		Forest:   forestEnum,
-		Location: location,
+		Location: nil, // We won't have the location data
 	}, nil
 }
