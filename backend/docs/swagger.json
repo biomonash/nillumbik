@@ -555,6 +555,9 @@
                 "confidence": {
                     "type": "number"
                 },
+                "file": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -606,7 +609,9 @@
                 "id": {
                     "type": "integer"
                 },
-                "location": {},
+                "location": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
