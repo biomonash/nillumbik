@@ -29,7 +29,7 @@ type DashboardStatsResponse struct {
 //	@Param			from	query		string	False	"Search start from"	format(date)
 //	@Param			to		query		string	False	"Search start from"	format(date)
 //	@Success		200		{object}	DashboardStatsResponse
-//	@Error			400 																															{object}	gin.H
+//	@Error			400 																																	{object}	gin.H
 //	@Router			/stats/dashboard [get]
 func (u *Controller) DashboardStats(c *gin.Context) {
 	var req DashboardStatsRequest
