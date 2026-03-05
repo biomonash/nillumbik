@@ -259,6 +259,7 @@ type Observation struct {
 	Temperature     *int32            `json:"temperature"`
 	Narrative       *string           `json:"narrative"`
 	Confidence      *float32          `json:"confidence"`
+	File            *string           `json:"file"`
 }
 
 type ObservationsWithDetail struct {
@@ -272,6 +273,7 @@ type ObservationsWithDetail struct {
 	Temperature     *int32            `json:"temperature"`
 	Narrative       *string           `json:"narrative"`
 	Confidence      *float32          `json:"confidence"`
+	File            *string           `json:"file"`
 	Native          bool              `json:"native"`
 	Taxa            Taxa              `json:"taxa"`
 	ScientificName  string            `json:"scientificName"`
