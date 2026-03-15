@@ -1,10 +1,12 @@
 body {
     background-color: var(--background) !important;
-    color: var(--text) !important;
+    color: var(--text-color) !important;
 }
 
 
 :root{
     --background: #1F2421;
     --text-color: #ffffff;
+    --foreground: #ffffff;
+    --muted-foreground: #e4e4e4;
 }
