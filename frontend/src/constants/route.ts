@@ -5,7 +5,7 @@ export default {
     DASHBOARD: '/dashboard',
     GALLERY: '/gallery',
     MAP: '/map',
-    TIMELINE: '/timeline',
+    GRAPH: '/graph',
     ADMIN: '/admin',
     SETTINGS: '/settings',
     UNAUTHORIZED: '/401',

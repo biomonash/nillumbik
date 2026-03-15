@@ -28,14 +28,16 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
 }
 
 const mockdata = [
-	{ icon: <i className="fa-solid fa-house"></i>, label: "Home"},
-	{ icon: <i className="fa-solid fa-chart-mixed"></i>, label: "Dashboard" },
-	{ icon: <i className="fa-solid fa-rectangle-vertical-history"></i>, label: "Gallery"},
-	{ icon: <i className="fa-solid fa-map-location-dot"></i>, label: "Map" },
-	{ icon: <i className="fa-solid fa-clock"></i>, label: "Timeline" },
-	{ icon: <i className="fa-solid fa-bookmark"></i>, label: "Saved"},
-	{ icon: <i className="fa-solid fa-gear"></i>, label: "Settings" },
+  { icon: <i className="fa-solid fa-house"></i>, label: "Home" },
+  { icon: <i className="fa-regular fa-window-maximize"></i>, label: "Dashboard" },
+  { icon: <i className="fa-solid fa-map-location-dot"></i>, label: "Map" },
+  { icon: <i className="fa-solid fa-chart-simple"></i>, label: "Graph" },
+  { icon: <i className="fa-solid fa-gear"></i>, label: "Settings" }
 ];
+
+//   { icon: <i className="fa-solid fa-history"></i>, label: "Gallery" },
+//   { icon: <i className="fa-solid fa-clock"></i>, label: "Timeline" },
+//   { icon: <i className="fa-solid fa-bookmark"></i>, label: "Saved" },
 
 const Sidebar: React.FC = (): JSX.Element => {
   const [active, setActive] = useState(1);
