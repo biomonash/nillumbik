@@ -257,8 +257,11 @@ const Dashboard: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
     </div>
+    
   );
+  
 };
 
 export default Dashboard;
