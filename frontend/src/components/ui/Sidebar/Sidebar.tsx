@@ -1,10 +1,5 @@
-import React, { useState, type JSX } from "react";
-import { Stack, Tooltip, UnstyledButton } from "@mantine/core";
-// import { MantineLogo } from '@mantinex/mantine-logo';
-import classes from "./Sidebar.module.scss";
-import { useNavigate } from "react-router";
-
-// import routes from "../../../constants/route";
+import React, { type JSX } from "react";
+import { useNavigate, useLocation } from "react-router";
 
 interface NavbarLinkProps {
   icon: JSX.Element;
@@ -15,62 +10,58 @@ interface NavbarLinkProps {
 
 function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
   return (
-    <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
-      <UnstyledButton
+    <div className="relative group">
+      <button
         onClick={onClick}
-        className={classes.link}
-        data-active={active || undefined}
+        className={`w-[50px] h-[50px] rounded-lg flex items-center justify-center my-2.5 mx-auto transition-all text-white ${
+          active
+            ? "bg-white/20 border-l-4 border-white"
+            : "bg-transparent border-l-4 border-transparent hover:bg-white/10"
+        }`}
+        aria-label={label}
       >
         {Icon}
-      </UnstyledButton>
-    </Tooltip>
+      </button>
+      {/* Tooltip */}
+      <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+        {label}
+      </div>
+    </div>
   );
 }
 
 const mockdata = [
-  { icon: <i className="fa-solid fa-house"></i>, label: "Home" },
-  { icon: <i className="fa-regular fa-window-maximize"></i>, label: "Dashboard" },
-  { icon: <i className="fa-solid fa-map-location-dot"></i>, label: "Map" },
-  { icon: <i className="fa-solid fa-chart-simple"></i>, label: "Graph" },
-  { icon: <i className="fa-solid fa-gear"></i>, label: "Settings" }
+  { icon: <i className="fa-solid fa-house"></i>, label: "Home", path: "/" },
+  { icon: <i className="fa-regular fa-window-maximize"></i>, label: "Dashboard", path: "/dashboard" },
+  { icon: <i className="fa-solid fa-map-location-dot"></i>, label: "Map", path: "/map" },
+  { icon: <i className="fa-solid fa-chart-simple"></i>, label: "Graph", path: "/graph" },
+  { icon: <i className="fa-solid fa-gear"></i>, label: "Settings", path: "/settings" }
 ];
 
-//   { icon: <i className="fa-solid fa-history"></i>, label: "Gallery" },
-//   { icon: <i className="fa-solid fa-clock"></i>, label: "Timeline" },
-//   { icon: <i className="fa-solid fa-bookmark"></i>, label: "Saved" },
-
 const Sidebar: React.FC = (): JSX.Element => {
-  const [active, setActive] = useState(1);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const links = mockdata.map((link, index) => (
+  const links = mockdata.map((link) => (
     <NavbarLink
       {...link}
       key={link.label}
-      active={index === active}
+      active={location.pathname === link.path}
       onClick={() => {
-        setActive(index);
-        navigate(
-          `${link.label.toLowerCase() != "home" ? link.label.toLowerCase() : ""}`,
-        );
+        navigate(link.path);
       }}
     />
   ));
 
   return (
-    <nav className={classes.navbar}>
-      {/* <Center>
-				<img src="https://github.com/mantinedev.png" />
-			</Center> */}
-
-      <div className={classes.navbarMain}>
-        <Stack justify="center" gap={0}>
+    <nav className="w-20 min-h-screen p-4 flex flex-col bg-sidebar fixed top-0 left-0">
+      <div className="flex-1 mt-[50px]">
+        <div className="flex flex-col items-center">
           {links}
-        </Stack>
+        </div>
       </div>
-
-		</nav>
-	);
+    </nav>
+  );
 }
 
 export default Sidebar;
