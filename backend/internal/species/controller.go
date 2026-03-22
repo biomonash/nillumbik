@@ -3,15 +3,21 @@ package species
 import (
 	"errors"
 	"fmt"
+	"log"
+	"net/http"
 	"strconv"
 
-	"time"
-
 	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/models"
 	"github.com/biomonash/nillumbik/internal/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
 )
+
+type ObservedSpeciesRequest struct {
+	SiteCode *string `form:"siteCode"`
+	models.TimePeriodRequest
+}
 
 // ObservedSpecies represents species with observation count
 type ObservedSpecies struct {
@@ -117,43 +123,27 @@ func (u *Controller) GetSpeciesByCommonName(c *gin.Context) {
 //	@Description	List species observed within a date range, optionally filtered by site
 //	@Tags			species
 //	@Param			siteCode	query	string	false	"Site code"
-//	@Param			from		query	string	true	"Start timestamp (RFC3339 format)"
-//	@Param			to			query	string	true	"End timestamp (RFC3339 format)"
+//	@Param			from		query	string	false	"Start timestamp (RFC3339 format)"
+//	@Param			to			query	string	false	"End timestamp (RFC3339 format)"
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{object}	ObservedSpeciesResponse
 //	@Router			/species/observed [get]
 func (u *Controller) GetObservedSpecies(c *gin.Context) {
 
-	//Get query parameters
-	siteCode := c.Query("siteCode")
-	fromStr := c.Query("from")
-	toStr := c.Query("to")
-
-	//Validate required parameters
-	if fromStr == "" || toStr == "" {
-		c.Error(utils.NewHttpError(400, "from and to are required query parameters", nil))
+	var req ObservedSpeciesRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.Error(utils.NewHttpError(http.StatusBadRequest, "failed to parse input", err))
 		return
 	}
 
-	//Parse timestamps (RFC3339 format expected)
-	fromTime, err := time.Parse("2006-01-02", fromStr)
-	if err != nil {
-		c.Error(utils.NewHttpError(400, "invalid from timestamp format", err))
-		return
-	}
-
-	toTime, err := time.Parse("2006-01-02", toStr)
-	if err != nil {
-		c.Error(utils.NewHttpError(400, "invalid to timestamp format", err))
-		return
-	}
+	log.Println(req)
 
 	//Call DB query
 	rows, err := u.q.ListObservedSpecies(c.Request.Context(), db.ListObservedSpeciesParams{
-		FromTime: fromTime,
-		ToTime:   toTime,
-		SiteCode: siteCode, // empty string means no filtering
+		From:     req.From.ToPGTime(),
+		To:       req.To.ToPGTime(),
+		SiteCode: req.SiteCode, // empty string means no filtering
 	})
 	if err != nil {
 		c.Error(fmt.Errorf("failed to list observed species: %w", err))

@@ -405,12 +405,10 @@ paths:
       - description: Start timestamp (RFC3339 format)
         in: query
         name: from
-        required: true
         type: string
       - description: End timestamp (RFC3339 format)
         in: query
         name: to
-        required: true
         type: string
       produces:
       - application/json
