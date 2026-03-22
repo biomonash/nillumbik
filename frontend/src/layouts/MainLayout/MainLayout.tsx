@@ -10,7 +10,7 @@ const MainLayout: React.FC = (): JSX.Element => {
             <Header />
                 <main className="min-h-screen flex flex-col">
                     <Sidebar />
-                    <div className="ml-20 min-h-screen bg-[var(--background)]">
+                    <div className="min-h-screen bg-[var(--background)] ml-[var(--sidebar-width)] pt-[var(--header-height)] flex-1">
                         <Outlet />
                     </div>
                 </main>
