@@ -1,18 +1,12 @@
 package stats
 
 import (
-	"time"
-
 	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/models"
 )
 
-type TimePeriodRequest struct {
-	From *time.Time `form:"from"`
-	To   *time.Time `form:"to"`
-}
-
 type ObservationStatsInput struct {
-	TimePeriodRequest
+	models.TimePeriodRequest
 	Block      *int32   `form:"block"`
 	SiteCode   *string  `form:"siteCode"`
 	Taxa       *db.Taxa `form:"taxa"`

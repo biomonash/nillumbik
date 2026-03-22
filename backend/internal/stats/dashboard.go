@@ -5,12 +5,13 @@ import (
 	"net/http"
 
 	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/models"
 	"github.com/biomonash/nillumbik/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type DashboardStatsRequest struct {
-	TimePeriodRequest
+	models.TimePeriodRequest
 }
 
 type DashboardStatsResponse struct {
@@ -26,10 +27,10 @@ type DashboardStatsResponse struct {
 //	@Tags			statistics
 //	@Accept			json
 //	@Produce		json
-//	@Param			from	query		string	False	"Search start from"	format(date)
-//	@Param			to		query		string	False	"Search start from"	format(date)
+//	@Param			from	query		string	False	"Search start from"	format(date-time)
+//	@Param			to		query		string	False	"Search end to"		format(date-time)
 //	@Success		200		{object}	DashboardStatsResponse
-//	@Error			400 																																	{object}	gin.H
+//	@Error			400 																																			{object}	gin.H
 //	@Router			/stats/dashboard [get]
 func (u *Controller) DashboardStats(c *gin.Context) {
 	var req DashboardStatsRequest
@@ -43,12 +44,9 @@ func (u *Controller) DashboardStats(c *gin.Context) {
 
 	// Use from/to for filtering
 
-	from := utils.ToPgTimestamp(req.From)
-	to := utils.ToPgTimestamp(req.To)
-
 	paramsNative := db.CountSpeciesByNativeParams{
-		From: from,
-		To:   to,
+		From: req.From.ToPGTime(),
+		To:   req.To.ToPGTime(),
 	}
 
 	speciesGroups, err := u.q.CountSpeciesByNative(ctx, paramsNative)
@@ -64,7 +62,7 @@ func (u *Controller) DashboardStats(c *gin.Context) {
 		}
 	}
 
-	resp.SitesCount, err = u.q.CountActiveSites(ctx, db.CountActiveSitesParams{From: from, To: to})
+	resp.SitesCount, err = u.q.CountActiveSites(ctx, db.CountActiveSitesParams{From: req.From.ToPGTime(), To: req.From.ToPGTime()})
 	if err != nil {
 		c.Error(fmt.Errorf("Failed to count active sites: %w", err))
 		return

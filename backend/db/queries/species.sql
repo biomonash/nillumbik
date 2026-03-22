@@ -56,10 +56,12 @@ SELECT
 FROM observations o
 JOIN species sp ON o.species_id = sp.id
 JOIN sites s ON o.site_id = s.id
-WHERE o.timestamp BETWEEN sqlc.arg(from_time) AND sqlc.arg(to_time)
+WHERE
+  (sqlc.narg('from')::timestamp IS NULL OR o.timestamp >= sqlc.narg('from')::timestamp)
+  AND (sqlc.narg('to')::timestamp IS NULL OR o.timestamp <= sqlc.narg('to')::timestamp)
   AND (
-      sqlc.arg(site_code) = ''
-      OR s.code = sqlc.arg(site_code)
+      sqlc.narg('site_code')::text IS NULL
+      OR s.code = sqlc.narg('site_code')::text
     )
 GROUP BY sp.id, sp.scientific_name, sp.common_name
 ORDER BY observation_count DESC;

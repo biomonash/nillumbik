@@ -237,15 +237,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Start timestamp (RFC3339 format)",
                         "name": "from",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
                     },
                     {
                         "type": "string",
                         "description": "End timestamp (RFC3339 format)",
                         "name": "to",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
                     }
                 ],
                 "responses": {
