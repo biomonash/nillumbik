@@ -35,7 +35,8 @@ CREATE TABLE IF NOT EXISTS observations (
     appearance_end integer,
     temperature integer,
     narrative text,
-    confidence real
+    confidence real,
+    file TEXT
 );
 
 CREATE VIEW observations_with_details AS
@@ -50,6 +51,7 @@ SELECT
     o.temperature,
     o.narrative,
     o.confidence,
+    o.file,
     s.native,
     s.taxa,
     s.scientific_name,
