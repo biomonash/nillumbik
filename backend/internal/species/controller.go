@@ -3,13 +3,35 @@ package species
 import (
 	"errors"
 	"fmt"
+	"log"
+	"net/http"
 	"strconv"
 
 	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/nillumbik/internal/models"
 	"github.com/biomonash/nillumbik/internal/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
 )
+
+type ObservedSpeciesRequest struct {
+	SiteCode *string `form:"siteCode"`
+	models.TimePeriodRequest
+}
+
+// ObservedSpecies represents species with observation count
+type ObservedSpecies struct {
+	ID               int64  `json:"id"`
+	ScientificName   string `json:"scientific_name"`
+	CommonName       string `json:"common_name"`
+	ObservationCount int64  `json:"observation_count"`
+}
+
+// ObservedSpeciesResponse wraps the result with total count
+type ObservedSpeciesResponse struct {
+	Total   int               `json:"total"`
+	Species []ObservedSpecies `json:"species"`
+}
 
 type Controller struct {
 	q db.Querier
@@ -93,4 +115,55 @@ func (u *Controller) GetSpeciesByCommonName(c *gin.Context) {
 	}
 
 	c.JSON(200, species)
+}
+
+// GetObservedSpecies godoc
+//
+//	@Summary		List observed species
+//	@Description	List species observed within a date range, optionally filtered by site
+//	@Tags			species
+//	@Param			siteCode	query	string	false	"Site code"
+//	@Param			from		query	string	false	"Start timestamp (RFC3339 format)"
+//	@Param			to			query	string	false	"End timestamp (RFC3339 format)"
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	ObservedSpeciesResponse
+//	@Router			/species/observed [get]
+func (u *Controller) GetObservedSpecies(c *gin.Context) {
+
+	var req ObservedSpeciesRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.Error(utils.NewHttpError(http.StatusBadRequest, "failed to parse input", err))
+		return
+	}
+
+	log.Println(req)
+
+	//Call DB query
+	rows, err := u.q.ListObservedSpecies(c.Request.Context(), db.ListObservedSpeciesParams{
+		From:     req.From.ToPGTime(),
+		To:       req.To.ToPGTime(),
+		SiteCode: req.SiteCode, // empty string means no filtering
+	})
+	if err != nil {
+		c.Error(fmt.Errorf("failed to list observed species: %w", err))
+		return
+	}
+
+	//Transform result
+	result := make([]ObservedSpecies, 0, len(rows))
+	for _, r := range rows {
+		result = append(result, ObservedSpecies{
+			ID:               r.ID,
+			ScientificName:   r.ScientificName,
+			CommonName:       r.CommonName,
+			ObservationCount: r.ObservationCount,
+		})
+	}
+
+	// Return response
+	c.JSON(200, ObservedSpeciesResponse{
+		Total:   len(result),
+		Species: result,
+	})
 }

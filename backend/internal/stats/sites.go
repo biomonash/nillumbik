@@ -42,14 +42,14 @@ type BlockResponse struct {
 //	@Tags			statistics
 //	@Accept			json
 //	@Produce		json
-//	@Param			from		query		string	False	"Search start from"	format(date)
-//	@Param			to			query		string	False	"Search start from"	format(date)
+//	@Param			from		query		string	False	"Search start from"	format(date-time)
+//	@Param			to			query		string	False	"Search end to"		format(date-time)
 //	@Param			block		query		integer	False	"Filter by site block"
 //	@Param			siteCode	query		string	False	"Filter by site code"
 //	@Param			taxa		query		string	False	"Filter by taxa"
 //	@Param			commonName	query		string	False	"Filter by species common name"
 //	@Success		200			{object}	ObservationBySitesResponse
-//	@Error			400 																										{object}	gin.H
+//	@Error			400 																													{object}	gin.H
 //	@Router			/stats/observations/sites [get]
 func (u *Controller) ObservationBySites(c *gin.Context) {
 	var req ObservationBySitesRequest
@@ -99,14 +99,14 @@ func (u *Controller) ObservationBySites(c *gin.Context) {
 //	@Tags			statistics
 //	@Accept			json
 //	@Produce		json
-//	@Param			from		query		string	False	"Search start from"	format(date)
-//	@Param			to			query		string	False	"Search start from"	format(date)
+//	@Param			from		query		string	False	"Search start from"	format(date-time)
+//	@Param			to			query		string	False	"Search end to"		format(date-time)
 //	@Param			block		query		integer	False	"Filter by site block"
 //	@Param			siteCode	query		string	False	"Filter by site code"
 //	@Param			taxa		query		string	False	"Filter by taxa"
 //	@Param			commonName	query		string	False	"Filter by species common name"
 //	@Success		200			{object}	ObservationByBlocksResponse
-//	@Error			400 																										{object}	gin.H
+//	@Error			400 																													{object}	gin.H
 //	@Router			/stats/observations/blocks [get]
 func (u *Controller) ObservationByBlocks(c *gin.Context) {
 	var req ObservationBySitesRequest
