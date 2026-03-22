@@ -31,10 +31,11 @@ INSERT INTO observations (
   appearance_end,
   temperature,
   narrative,
-  confidence
+  confidence,
+  file
 )
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence, file
 `
 
 type CreateObservationParams struct {
@@ -47,6 +48,7 @@ type CreateObservationParams struct {
 	Temperature     *int32            `json:"temperature"`
 	Narrative       *string           `json:"narrative"`
 	Confidence      *float32          `json:"confidence"`
+	File            *string           `json:"file"`
 }
 
 func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationParams) (Observation, error) {
@@ -60,6 +62,7 @@ func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationPa
 		arg.Temperature,
 		arg.Narrative,
 		arg.Confidence,
+		arg.File,
 	)
 	var i Observation
 	err := row.Scan(
@@ -73,6 +76,7 @@ func (q *Queries) CreateObservation(ctx context.Context, arg CreateObservationPa
 		&i.Temperature,
 		&i.Narrative,
 		&i.Confidence,
+		&i.File,
 	)
 	return i, err
 }
@@ -87,6 +91,7 @@ type CreateObservationsParams struct {
 	Temperature     *int32            `json:"temperature"`
 	Narrative       *string           `json:"narrative"`
 	Confidence      *float32          `json:"confidence"`
+	File            *string           `json:"file"`
 }
 
 const deleteObservation = `-- name: DeleteObservation :exec
@@ -100,7 +105,7 @@ func (q *Queries) DeleteObservation(ctx context.Context, id int64) error {
 }
 
 const getObservation = `-- name: GetObservation :one
-SELECT id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
+SELECT id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence, file
 FROM observations
 WHERE id = $1 LIMIT 1
 `
@@ -119,12 +124,13 @@ func (q *Queries) GetObservation(ctx context.Context, id int64) (Observation, er
 		&i.Temperature,
 		&i.Narrative,
 		&i.Confidence,
+		&i.File,
 	)
 	return i, err
 }
 
 const listObservations = `-- name: ListObservations :many
-SELECT id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
+SELECT id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence, file
 FROM observations
 ORDER BY timestamp
 LIMIT $1
@@ -156,6 +162,7 @@ func (q *Queries) ListObservations(ctx context.Context, arg ListObservationsPara
 			&i.Temperature,
 			&i.Narrative,
 			&i.Confidence,
+			&i.File,
 		); err != nil {
 			return nil, err
 		}
@@ -168,7 +175,7 @@ func (q *Queries) ListObservations(ctx context.Context, arg ListObservationsPara
 }
 
 const searchObservations = `-- name: SearchObservations :many
-SELECT o.id, o.site_id, o.species_id, o.timestamp, o.method, o.appearance_start, o.appearance_end, o.temperature, o.narrative, o.confidence, s.code as site_code, s.name as site_name, sp.scientific_name, sp.common_name, sp.taxa
+SELECT o.id, o.site_id, o.species_id, o.timestamp, o.method, o.appearance_start, o.appearance_end, o.temperature, o.narrative, o.confidence, o.file, s.code as site_code, s.name as site_name, sp.scientific_name, sp.common_name, sp.taxa
 FROM observations o
 JOIN sites s ON o.site_id = s.id
 JOIN species sp ON o.species_id = sp.id
@@ -187,6 +194,7 @@ type SearchObservationsRow struct {
 	Temperature     *int32            `json:"temperature"`
 	Narrative       *string           `json:"narrative"`
 	Confidence      *float32          `json:"confidence"`
+	File            *string           `json:"file"`
 	SiteCode        string            `json:"siteCode"`
 	SiteName        *string           `json:"siteName"`
 	ScientificName  string            `json:"scientificName"`
@@ -214,6 +222,7 @@ func (q *Queries) SearchObservations(ctx context.Context, scientificName string)
 			&i.Temperature,
 			&i.Narrative,
 			&i.Confidence,
+			&i.File,
 			&i.SiteCode,
 			&i.SiteName,
 			&i.ScientificName,
@@ -240,9 +249,10 @@ SET site_id = $2,
     appearance_end = $7,
     temperature = $8,
     narrative = $9,
-    confidence = $10
+    confidence = $10,
+    file = $11
 WHERE id = $1
-RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
+RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence, file
 `
 
 type UpdateObservationParams struct {
@@ -256,6 +266,7 @@ type UpdateObservationParams struct {
 	Temperature     *int32            `json:"temperature"`
 	Narrative       *string           `json:"narrative"`
 	Confidence      *float32          `json:"confidence"`
+	File            *string           `json:"file"`
 }
 
 func (q *Queries) UpdateObservation(ctx context.Context, arg UpdateObservationParams) (Observation, error) {
@@ -270,6 +281,7 @@ func (q *Queries) UpdateObservation(ctx context.Context, arg UpdateObservationPa
 		arg.Temperature,
 		arg.Narrative,
 		arg.Confidence,
+		arg.File,
 	)
 	var i Observation
 	err := row.Scan(
@@ -283,6 +295,7 @@ func (q *Queries) UpdateObservation(ctx context.Context, arg UpdateObservationPa
 		&i.Temperature,
 		&i.Narrative,
 		&i.Confidence,
+		&i.File,
 	)
 	return i, err
 }

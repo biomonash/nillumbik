@@ -604,6 +604,9 @@ const docTemplate = `{
                 "confidence": {
                     "type": "number"
                 },
+                "file": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
