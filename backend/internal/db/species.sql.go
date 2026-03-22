@@ -7,6 +7,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const countSpecies = `-- name: CountSpecies :one
@@ -128,6 +130,67 @@ func (q *Queries) GetSpeciesByScientificName(ctx context.Context, lower string) 
 		&i.Reportable,
 	)
 	return i, err
+}
+
+const listObservedSpecies = `-- name: ListObservedSpecies :many
+SELECT
+    sp.id,
+    sp.scientific_name,
+    sp.common_name,
+    COUNT(o.id) AS observation_count
+FROM observations o
+JOIN species sp ON o.species_id = sp.id
+JOIN sites s ON o.site_id = s.id
+WHERE
+  ($1::timestamp IS NULL OR o.timestamp >= $1::timestamp)
+  AND ($2::timestamp IS NULL OR o.timestamp <= $2::timestamp)
+  AND (
+      $3::text IS NULL
+      OR s.code = $3::text
+    )
+GROUP BY sp.id, sp.scientific_name, sp.common_name
+ORDER BY observation_count DESC
+`
+
+type ListObservedSpeciesParams struct {
+	From     pgtype.Timestamp `json:"from"`
+	To       pgtype.Timestamp `json:"to"`
+	SiteCode *string          `json:"siteCode"`
+}
+
+type ListObservedSpeciesRow struct {
+	ID               int64  `json:"id"`
+	ScientificName   string `json:"scientificName"`
+	CommonName       string `json:"commonName"`
+	ObservationCount int64  `json:"observationCount"`
+}
+
+// ListObservedSpecies returns species observed within a time range.
+// If site_code is NULL, results include all sites.
+// Returns species details along with observation count.
+func (q *Queries) ListObservedSpecies(ctx context.Context, arg ListObservedSpeciesParams) ([]ListObservedSpeciesRow, error) {
+	rows, err := q.db.Query(ctx, listObservedSpecies, arg.From, arg.To, arg.SiteCode)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListObservedSpeciesRow{}
+	for rows.Next() {
+		var i ListObservedSpeciesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ScientificName,
+			&i.CommonName,
+			&i.ObservationCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listSpecies = `-- name: ListSpecies :many

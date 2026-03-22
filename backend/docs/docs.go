@@ -213,6 +213,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/species/observed": {
+            "get": {
+                "description": "List species observed within a date range, optionally filtered by site",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "species"
+                ],
+                "summary": "List observed species",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Site code",
+                        "name": "siteCode",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start timestamp (RFC3339 format)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End timestamp (RFC3339 format)",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/species.ObservedSpeciesResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/species/{id}": {
             "get": {
                 "description": "Get species detail",
@@ -733,6 +776,37 @@ const docTemplate = `{
                 },
                 "timestamp": {
                     "type": "string"
+                }
+            }
+        },
+        "species.ObservedSpecies": {
+            "type": "object",
+            "properties": {
+                "common_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "observation_count": {
+                    "type": "integer"
+                },
+                "scientific_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "species.ObservedSpeciesResponse": {
+            "type": "object",
+            "properties": {
+                "species": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/species.ObservedSpecies"
+                    }
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },

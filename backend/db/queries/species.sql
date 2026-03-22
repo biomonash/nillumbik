@@ -42,3 +42,26 @@ SELECT id, scientific_name, common_name, native, taxa, indicator, reportable
 FROM species
 WHERE scientific_name ILIKE $1 OR common_name ILIKE $1
 ORDER BY scientific_name;
+
+
+-- name: ListObservedSpecies :many
+-- ListObservedSpecies returns species observed within a time range.
+-- If site_code is NULL, results include all sites.
+-- Returns species details along with observation count.
+SELECT
+    sp.id,
+    sp.scientific_name,
+    sp.common_name,
+    COUNT(o.id) AS observation_count
+FROM observations o
+JOIN species sp ON o.species_id = sp.id
+JOIN sites s ON o.site_id = s.id
+WHERE
+  (sqlc.narg('from')::timestamp IS NULL OR o.timestamp >= sqlc.narg('from')::timestamp)
+  AND (sqlc.narg('to')::timestamp IS NULL OR o.timestamp <= sqlc.narg('to')::timestamp)
+  AND (
+      sqlc.narg('site_code')::text IS NULL
+      OR s.code = sqlc.narg('site_code')::text
+    )
+GROUP BY sp.id, sp.scientific_name, sp.common_name
+ORDER BY observation_count DESC;

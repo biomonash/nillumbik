@@ -134,6 +134,26 @@ definitions:
       timestamp:
         type: string
     type: object
+  species.ObservedSpecies:
+    properties:
+      common_name:
+        type: string
+      id:
+        type: integer
+      observation_count:
+        type: integer
+      scientific_name:
+        type: string
+    type: object
+  species.ObservedSpeciesResponse:
+    properties:
+      species:
+        items:
+          $ref: '#/definitions/species.ObservedSpecies'
+        type: array
+      total:
+        type: integer
+    type: object
   stats.BlockResponse:
     properties:
       block:
@@ -371,6 +391,35 @@ paths:
           schema:
             $ref: '#/definitions/db.Species'
       summary: Get species detail by common name
+      tags:
+      - species
+  /species/observed:
+    get:
+      consumes:
+      - application/json
+      description: List species observed within a date range, optionally filtered
+        by site
+      parameters:
+      - description: Site code
+        in: query
+        name: siteCode
+        type: string
+      - description: Start timestamp (RFC3339 format)
+        in: query
+        name: from
+        type: string
+      - description: End timestamp (RFC3339 format)
+        in: query
+        name: to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/species.ObservedSpeciesResponse'
+      summary: List observed species
       tags:
       - species
   /stats/dashboard:
