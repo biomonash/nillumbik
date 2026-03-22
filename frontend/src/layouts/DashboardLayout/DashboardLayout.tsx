@@ -7,7 +7,7 @@ const DashboardLayout: React.FC = () => {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex-1 ml-20 flex flex-col min-h-screen bg-[#2d2d2d]">
+      <div className="flex-1 ml-[var(--sidebar-width)] pt-[var(--header-height)] flex flex-col min-h-screen bg-[var(--background)]">
         <Header />
         <main className="flex-1 p-6">
           <Outlet />
