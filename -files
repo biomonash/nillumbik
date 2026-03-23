@@ -1,0 +1,35 @@
+[33mcommit 9c68f2981346e14c60ba4fe501d2814517c3010f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeat/update-routes[m[33m, [m[1;31morigin/feat/update-routes[m[33m)[m
+Author: Minseyy <yanyennhui2005@gmail.com>
+Date:   Mon Mar 23 11:05:44 2026 +1100
+
+    Removed scss in readme
+
+[1mdiff --git a/frontend/README.md b/frontend/README.md[m
+[1mindex d2638cb..e0ecc6b 100644[m
+[1m--- a/frontend/README.md[m
+[1m+++ b/frontend/README.md[m
+[36m@@ -11,7 +11,6 @@[m [mA modern React + TypeScript application powered by Vite, Mantine UI, and modular[m
+ - **Vite**: Fast build and dev server[m
+ - **React Router**: Routing for SPA[m
+ - **Mantine UI**: React CSS component library[m
+[31m-- **SCSS Modules**: Scoped component styling[m
+ - **Nivo**: React - charts component library[m
+ - **axios**: Integration with API[m
+ - **Font Awesome**: decorations with pro icons[m
+[36m@@ -38,7 +37,7 @@[m [msrc/[m
+   layouts/            # Layout components[m
+   lib/                # External third-party libraries[m
+   pages/              # Route-level components (Home, Dashboard, Gallery, etc.)[m
+[31m-  styles/             # Styling files (Global SCSS, variables, mixins, functions, etc.)[m
+[32m+[m[32m  styles/             # Styling files (Global CSS, variables, mixins, functions, etc.)[m
+   App.tsx             # Main App component[m
+   main.tsx            # Entry point[m
+   vite-env.d.ts       # Vite environment types[m
+[36m@@ -84,7 +83,6 @@[m [myarn build[m
+ - [Mantine](https://mantine.dev/core/package/)[m
+ - [Mantine UI](https://ui.mantine.dev/)[m
+ - [Nivo](https://nivo.rocks/components/)[m
+[31m-- [SCSS Template](https://github.com/technoph1le/sass-template/tree/main/sass)[m
+ - [Axios](https://axios-http.com/docs/api_intro)[m
+ - [Font Awesome](https://fontawesome.com/icons)[m
+ - [@fontsource](https://fontsource.org/fonts/lato)[m

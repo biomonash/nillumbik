@@ -8,10 +8,11 @@ INSERT INTO observations (
   appearance_end,
   temperature,
   narrative,
-  confidence
+  confidence,
+  file
 )
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence;
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence, file;
 
 -- name: CreateObservations :copyfrom
 INSERT INTO observations (
@@ -23,17 +24,18 @@ INSERT INTO observations (
   appearance_end,
   temperature,
   narrative,
-  confidence
+  confidence,
+  file
 )
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
 
 -- name: GetObservation :one
-SELECT id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
+SELECT id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence, file
 FROM observations
 WHERE id = $1 LIMIT 1;
 
 -- name: ListObservations :many
-SELECT id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence
+SELECT id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence, file
 FROM observations
 ORDER BY timestamp
 LIMIT $1
@@ -50,9 +52,10 @@ SET site_id = $2,
     appearance_end = $7,
     temperature = $8,
     narrative = $9,
-    confidence = $10
+    confidence = $10,
+    file = $11
 WHERE id = $1
-RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence;
+RETURNING id, site_id, species_id, "timestamp", method, appearance_start, appearance_end, temperature, narrative, confidence, file;
 
 -- name: DeleteObservation :exec
 DELETE FROM observations

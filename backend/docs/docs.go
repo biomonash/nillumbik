@@ -561,6 +561,9 @@ const docTemplate = `{
                 "confidence": {
                     "type": "number"
                 },
+                "file": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -612,7 +615,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "location": {},
+                "location": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
