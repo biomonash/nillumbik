@@ -8,6 +8,7 @@ A modern React + TypeScript application powered by Vite, Mantine UI, and modular
 
 - **React**: UI library
 - **TypeScript**: Type safety for frontend
+- **TailwindCSS**: Styling framework
 - **Vite**: Fast build and dev server
 - **React Router**: Routing for SPA
 - **Mantine UI**: React CSS component library
@@ -79,6 +80,7 @@ yarn build
 - [React](https://react.dev/)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vitejs.dev/)
+- [TailwindCSS](https://tailwindcss.com/)
 - [React Router](https://reactrouter.com/start/data/installation)
 - [Mantine](https://mantine.dev/core/package/)
 - [Mantine UI](https://ui.mantine.dev/)
