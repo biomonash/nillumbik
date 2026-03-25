@@ -1,8 +1,8 @@
 import type { JSX } from "react";
-import Timeline from "../features/timeline";
+import Graph from "../features/graph";
 
 const page: React.FC = (): JSX.Element => {
-    return <Timeline />;
+    return <Graph />;
 }
 
 export default page;

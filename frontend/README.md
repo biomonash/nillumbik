@@ -8,10 +8,10 @@ A modern React + TypeScript application powered by Vite, Mantine UI, and modular
 
 - **React**: UI library
 - **TypeScript**: Type safety for frontend
+- **TailwindCSS**: Styling framework
 - **Vite**: Fast build and dev server
 - **React Router**: Routing for SPA
 - **Mantine UI**: React CSS component library
-- **SCSS Modules**: Scoped component styling
 - **Nivo**: React - charts component library
 - **axios**: Integration with API
 - **Font Awesome**: decorations with pro icons
@@ -38,7 +38,7 @@ src/
   layouts/            # Layout components
   lib/                # External third-party libraries
   pages/              # Route-level components (Home, Dashboard, Gallery, etc.)
-  styles/             # Styling files (Global SCSS, variables, mixins, functions, etc.)
+  styles/             # Styling files (Global CSS, variables, mixins, functions, etc.)
   App.tsx             # Main App component
   main.tsx            # Entry point
   vite-env.d.ts       # Vite environment types
@@ -80,11 +80,11 @@ yarn build
 - [React](https://react.dev/)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vitejs.dev/)
+- [TailwindCSS](https://tailwindcss.com/)
 - [React Router](https://reactrouter.com/start/data/installation)
 - [Mantine](https://mantine.dev/core/package/)
 - [Mantine UI](https://ui.mantine.dev/)
 - [Nivo](https://nivo.rocks/components/)
-- [SCSS Template](https://github.com/technoph1le/sass-template/tree/main/sass)
 - [Axios](https://axios-http.com/docs/api_intro)
 - [Font Awesome](https://fontawesome.com/icons)
 - [@fontsource](https://fontsource.org/fonts/lato)

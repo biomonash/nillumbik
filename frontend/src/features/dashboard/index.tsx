@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { StatsCard } from "./components/StatsCard";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "../../components/ui/Card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Badge";
-import styles from "./Dashboard.module.scss";
-import {
-  getDashboardStats,
-  type DashboardStatsResponse,
-} from "../../apis/stats.api";
+import { getDashboardStats, type DashboardStatsResponse } from "../../apis/stats.api";
 import { toPercent } from "../../lib/utils";
 import { BarChart } from "./components/charts/BarChart";
 import { LineChart } from "./components/charts/LineChart";
@@ -23,78 +13,52 @@ const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStatsResponse | null>(null);
 
   useEffect(() => {
-    getDashboardStats({
-      from: new Date("2025-01-01"),
-    }).then(setStats);
+    getDashboardStats({ from: new Date("2025-01-01") }).then(setStats);
   }, []);
 
-  // Icon placeholder
   const IconPlaceholder = ({ label }: { label: string }) => (
-    <span className={styles.iconPlaceholder} title={label} aria-label={label}>
+    <span
+      title={label}
+      aria-label={label}
+      className="inline-flex items-center justify-center w-5 h-5 bg-white/20 rounded-full text-[10px] mr-1.5"
+    >
       {label[0]}
     </span>
   );
 
-  // Data visualization placeholder
   const DataVisualizationPlaceholder = () => (
-    <div className={styles.dataVisualizationPlaceholder}>
+    <div className="h-[200px] rounded-lg bg-white/5 flex items-center justify-center text-muted-foreground text-sm w-full">
       Data Visualization Coming Soon
     </div>
   );
 
-  const detectionItems = [
-    {
-      species: "Powerful Owl",
-      location: "Eltham Lower Park",
-      time: "2 hours ago",
-      status: "rare",
-    },
-    {
-      species: "Echidna",
-      location: "Diamond Creek Trail",
-      time: "4 hours ago",
-      status: "native",
-    },
-    {
-      species: "Sugar Glider",
-      location: "Kangaroo Ground",
-      time: "6 hours ago",
-      status: "native",
-    },
-    {
-      species: "European Starling",
-      location: "Hurstbridge",
-      time: "8 hours ago",
-      status: "invasive",
-    },
-  ];
-
   return (
-    <div className={styles.dashboardContainer}>
-      {/* Welcome Section */}
-      <div className={styles.welcomeSection}>
+    <div className="flex flex-col w-full px-8 py-6 gap-8 box-border">
+
+      {/* Title */}
+      <div className="flex flex-wrap justify-between items-center gap-4">
         <div>
-          <h1 className={styles.title}>Ecological Monitoring Dashboard</h1>
-          <p className={styles.subtitle}>
+          <h1 className="text-4xl font-bold text-foreground m-0">
+            Ecological Monitoring Dashboard
+          </h1>
+          <p className="mt-1 text-[var(--muted-foreground)]">
             Real-time environmental data from across Nillumbik Shire
           </p>
         </div>
-        <div>
-          <Badge variant="secondary" className={styles.liveBadge}>
-            <IconPlaceholder label="Live" />
-            Live Monitoring
-          </Badge>
-        </div>
+        <Badge variant="secondary" className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-sidebar text-white">
+          <IconPlaceholder label="Live" />
+          Live Monitoring
+        </Badge>
       </div>
 
       {/* Key Statistics */}
       {stats !== null ? (
-        <div className={styles.statsGrid}>
+        <div className="grid gap-4 w-full" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
           <StatsCard
             title="Total Species Detected"
             value={stats.speciesCount}
             subtitle="Across all monitored areas"
-            icon={<span className="statsCardIcon">🔔</span>}
+            icon={<span>🔔</span>}
             trend={{ value: 12, label: "vs last month" }}
             color="forest"
           />
@@ -102,7 +66,7 @@ const Dashboard: React.FC = () => {
             title="Active Monitoring Sites"
             value={stats.sitesCount}
             subtitle="Continuous data collection"
-            icon={<span className="statsCardIcon">🌁</span>}
+            icon={<span>🌁</span>}
             trend={{ value: 12, label: "vs last month" }}
             color="primary"
           />
@@ -110,7 +74,7 @@ const Dashboard: React.FC = () => {
             title="Detection Events"
             value={stats.observationCount}
             subtitle="Total recorded observations"
-            icon={<span className="statsCardIcon">🔍</span>}
+            icon={<span>🔍</span>}
             trend={{ value: 8, label: "vs last month" }}
             color="accent"
           />
@@ -118,145 +82,92 @@ const Dashboard: React.FC = () => {
             title="Native Species"
             value={toPercent(stats.nativeSpeciesCount / stats.speciesCount)}
             subtitle="Of all detected species"
-            icon={<span className="statsCardIcon">🦜</span>}
+            icon={<span>🦜</span>}
             trend={{ value: 12, label: "vs last month" }}
             color="secondary"
           />
         </div>
       ) : (
-        <p>Loading</p>
+        <p className="text-[var(--muted-foreground)]">Loading</p>
       )}
 
       {/* Data Visualizations */}
-      <div className={styles.dataVisualizationGrid}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Species by Year</CardTitle>
-          <CardDescription>Distribution across years</CardDescription>
-        </CardHeader>
-        <CardContent><BarChart /></CardContent>
-      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+        <Card>
+          <CardHeader>
+            <CardTitle>Species by Year</CardTitle>
+            <CardDescription>Distribution across years</CardDescription>
+          </CardHeader>
+          <CardContent><BarChart /></CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Native vs Invasive Trends</CardTitle>
-          <CardDescription>Annual variation</CardDescription>
-        </CardHeader>
-        <CardContent><LineChart /></CardContent>
-      </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Native vs Invasive Trends</CardTitle>
+            <CardDescription>Annual variation</CardDescription>
+          </CardHeader>
+          <CardContent><LineChart /></CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Species Composition</CardTitle>
-          <CardDescription>Native, Invasive, Rare</CardDescription>
-        </CardHeader>
-        <CardContent><PieChart /></CardContent>
-      </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Species Composition</CardTitle>
+            <CardDescription>Native, Invasive, Rare</CardDescription>
+          </CardHeader>
+          <CardContent><PieChart /></CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Coming Soon</CardTitle>
-          <CardDescription>Habitat or Location breakdown</CardDescription>
-        </CardHeader>
-        <CardContent><DataVisualizationPlaceholder /></CardContent>
-      </Card>
-    </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Coming Soon</CardTitle>
+            <CardDescription>Habitat or Location breakdown</CardDescription>
+          </CardHeader>
+          <CardContent><DataVisualizationPlaceholder /></CardContent>
+        </Card>
+      </div>
 
-      {/* Recent Activity & Map */}
-      <div className={styles.recentActivityGrid}>
-        {/* Left: Map Placeholder */}
-        <div className={styles.mapPlaceholder}>
-          <Card>
-            <CardHeader>
-              <CardTitle>Interactive Map</CardTitle>
-              <CardDescription>Placeholder for the map</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className={styles.mapFrame}>Map Placeholder</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Right: Recent Detection Highlights */}
-        <div className={styles.detectionHighlights}>
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Detection Highlights</CardTitle>
-              <CardDescription>
-                Notable species observations from the past 48 hours
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className={styles.detectionList}>
-                {detectionItems.map((item, index) => (
-                  <div key={index} className={styles.detectionItem}>
-                    <div className={styles.detectionInfo}>
-                      <div
-                        className={`${styles.statusDot} ${
-                          item.status === "rare"
-                            ? styles.statusRare
-                            : item.status === "native"
-                              ? styles.statusNative
-                              : styles.statusInvasive
-                        }`}
-                      />
-                      <div>
-                        <p className={styles.speciesName}>{item.species}</p>
-                        <p className={styles.speciesLocation}>
-                          {item.location}
-                        </p>
-                      </div>
-                    </div>
-                    <div className={styles.detectionTime}>
-                      <Badge
-                        variant={
-                          item.status === "invasive"
-                            ? "destructive"
-                            : "secondary"
-                        }
-                        className={styles.detectionBadge}
-                      >
-                        {item.status}
-                      </Badge>
-                      <p className={styles.timeText}>{item.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      {/* Map */}
+      <div className="w-full">
+        <Card>
+          <CardHeader>
+            <CardTitle>Interactive Map</CardTitle>
+            <CardDescription>Placeholder for the map</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="w-full h-[300px] border-2 border-dashed border-white/20 rounded-lg flex items-center justify-center text-[var(--muted-foreground)] bg-white/5">
+              Map Placeholder
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Quick Actions */}
-      <Card>
+      <Card className="!bg-transparent !border-transparent !shadow-none"> {/** Override the transparent background*/}
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
           <CardDescription>Common tasks and report generation</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className={styles.quickActionsGrid}>
-            {["Map", "Tree", "Trnd", "Data"].map((label) => (
+          <div className="grid gap-3 w-full grid-cols-1 sm:grid-cols-4">
+            {[
+              { key: "Map", label: "View Map" },
+              { key: "Tree", label: "Species Report" },
+              { key: "Trnd", label: "Analytics" },
+              { key: "Data", label: "Data Export" },
+            ].map(({ key, label }) => (
               <Button
-                key={label}
+                key={key}
                 variant="outline"
-                className={styles.quickActionButton}
+                className="flex flex-col items-center gap-1 py-3"
               >
-                <IconPlaceholder label={label} />
-                <span className={styles.quickActionText}>
-                  {label === "Map"
-                    ? "View Map"
-                    : label === "Tree"
-                      ? "Species Report"
-                      : label === "Trnd"
-                        ? "Analytics"
-                        : "Data Export"}
-                </span>
+                <IconPlaceholder label={key} />
+                <span className="text-xs">{label}</span>
               </Button>
             ))}
           </div>
         </CardContent>
       </Card>
+
     </div>
   );
 };
