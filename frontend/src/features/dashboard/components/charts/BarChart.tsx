@@ -1,47 +1,94 @@
-import { ResponsiveBar } from '@nivo/bar'
+import { useEffect, useState } from 'react';
+import { ResponsiveBar } from '@nivo/bar';
+import { getObservationsTimeseries } from '../../../../apis/stats.api';
 
-const dummyData = [
-  { year: '2021', birds: 120, mammals: 40, amphibians: 12 },
-  { year: '2022', birds: 180, mammals: 60, amphibians: 25 },
-  { year: '2023', birds: 200, mammals: 70, amphibians: 30 },
-]
+const chartTheme = {
+  axis: {
+    ticks: { text: { fill: '#ffffff', fontSize: 11 } },
+    legend: { text: { fill: '#ffffff', fontSize: 12 } },
+  },
+  legends: { text: { fill: '#ffffff' } },
+  grid: { line: { stroke: 'rgba(255,255,255,0.1)' } },
+  tooltip: { container: { background: '#1a1a1a', color: '#ffffff' } }
+};
 
-export const BarChart = () => (
-  <div className="h-[300px]">
-    <ResponsiveBar
-      data={dummyData}
-      keys={['birds', 'mammals', 'amphibians']}
-      indexBy="year"
-      margin={{ top: 50, right: 50, bottom: 50, left: 60 }}
-      padding={0.3}
-      colors={{ scheme: 'nivo' }}
-      axisBottom={{ legend: 'Year', legendPosition: 'middle', legendOffset: 32 }}
-      axisLeft={{ legend: 'Count', legendPosition: 'middle', legendOffset: -40 }}
-      labelSkipWidth={12}
-      labelSkipHeight={12}
-      labelTextColor="var(--background)"
-      theme={{
-        axis: {
-          ticks:  { text: { fill: '#ffffff', fontSize: 11 } },
-          legend: { text: { fill: '#ffffff', fontSize: 12 } },
-        },
-        legends: { text: { fill: '#ffffff' } },
-        grid:    { line: { stroke: 'rgba(255,255,255,0.1)' } },
-      }}
-      tooltip={({ id, value, indexValue, color }) => (
-        <div className="bg-background text-white px-3 py-2 rounded-lg text-xs border border-white/15 shadow-lg">
-          <p className="mb-1 text-[var(--muted-foreground)]">
-            Year: <strong className="text-white">{indexValue}</strong>
-          </p>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm" style={{ background: color }} />
-            <span className="text-[var(--muted-foreground)]">
-              {String(id).charAt(0).toUpperCase() + String(id).slice(1)}:
-            </span>
-            <strong>{value} species</strong>
-          </div>
+export const BarChart = () => {
+  const [data, setData] = useState<any[]>([]);
+
+  useEffect(() => {
+    getObservationsTimeseries({}).then((res) => {
+      if (res && res.series) {
+        const yearMap: Record<string, any> = {};
+        
+        Object.entries(res.series).forEach(([type, points]) => {
+          // Normalizing keys to match 'Native' and 'Invasive'
+          const normalizedType = type.toLowerCase().includes('native') || type === 'true' 
+            ? 'Native' 
+            : 'Invasive';
+
+          points.forEach((p: any) => {
+            // FIX: Use p.timestamp (matching your API definition)
+            const rawDate = p.timestamp || p.year; 
+            const yearDate = rawDate ? new Date(rawDate) : new Date();
+            const yearStr = yearDate.getFullYear().toString();
+            
+            if (!yearMap[yearStr]) {
+              yearMap[yearStr] = { year: yearStr, Native: 0, Invasive: 0 };
+            }
+            
+            // Sum the counts (in case there are multiple entries per year)
+            yearMap[yearStr][normalizedType] += p.speciesCount;
+          });
+        });
+
+        const finalData = Object.values(yearMap).sort((a: any, b: any) => 
+          a.year.localeCompare(b.year)
+        );
+
+        console.log("BarChart: Verified Data Structure");
+        console.table(finalData); // Check your F12 console to see the table!
+        setData(finalData);
+      }
+    }).catch(err => console.error("BarChart API Error:", err));
+  }, []);
+
+  return (
+    <div className="h-[300px]">
+      {data.length > 0 ? (
+        <ResponsiveBar
+          data={data}
+          keys={['Native', 'Invasive']}
+          indexBy="year"
+          margin={{ top: 50, right: 50, bottom: 50, left: 100 }}
+          padding={0.3}
+          valueScale={{ type: 'linear' }}
+          colors={{ scheme: 'nivo' }}
+          theme={chartTheme}
+          enableLabel={true}
+          labelSkipHeight={12}
+          labelTextColor="#000000"
+          axisBottom={{ 
+            legend: 'Year', 
+            legendPosition: 'middle', 
+            legendOffset: 40 
+          }}
+          axisLeft={{ 
+            legend: 'Total Species', 
+            legendPosition: 'middle', 
+            legendOffset: -75 
+          }}
+          tooltip={({ id, value, indexValue, color }) => (
+            <div className="bg-[#1a1a1a] text-white px-3 py-2 rounded-lg text-xs border border-white/20 shadow-2xl flex items-center gap-2">
+              <div className="w-3 h-3 rounded-sm" style={{ background: color }} />
+              <span><strong>{id}</strong> ({indexValue}): <strong>{value} Species</strong></span>
+            </div>
+          )}
+        />
+      ) : (
+        <div className="flex items-center justify-center h-full text-white">
+          Loading Year Data...
         </div>
       )}
-    />
-  </div>
-)
+    </div>
+  );
+};
