@@ -1,13 +1,17 @@
-import React, { type JSX } from "react";
-import ApiDisplay from "./components/ApiDisplay";
+import MapView from "./components/MapView";
 
-const Map: React.FC = (): JSX.Element => {
+export default function MapPage() {
   return (
-    <section>
-      Map Page
-      <ApiDisplay />
-    </section>
-  );
-};
+    <div style={{ position: "relative" }}>
+      
+      {/* Background Map */}
+      <MapView />
 
-export default Map;
+      {/* Overlay UI (later) */}
+      <div style={{ position: "relative", zIndex: 10 }}>
+        <h1>Map Page</h1>
+      </div>
+
+    </div>
+  );
+}
