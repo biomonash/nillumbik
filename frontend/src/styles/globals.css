@@ -44,6 +44,7 @@
 :root {
   --foreground: #ffffff;
   --muted-foreground: #e4e4e4;
+  --muted-foreground2: #F5F5F5;
   --header-bg: #eaeaea;
   --header-height: 56px;
   --sidebar-width: 80px;
