@@ -1,12 +1,12 @@
 import MapView from "./components/MapView";
-import MapStats from "../../components/ui/MapStats";
-import InfoStats from "../../components/ui/InfoStats";
+import MapCharts from "./components/MapCharts";
+import SpeciesList from "./components/SpeciesList";
 
 export default function MapPage() {
   return (
     <div style={{ position: "relative" }}>
-      <InfoStats/>
-      <MapStats/>
+      <SpeciesList />
+      <MapCharts />
       {/* Background Map */}
       <MapView />
 
