@@ -1,6 +1,6 @@
-import Select from "../Select";
 import React, { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../Card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../../../components/ui/Card";
+import Select from "../../../components/ui/Select";
 
 
 interface Species {
@@ -13,7 +13,7 @@ interface Species {
   reportable: boolean;
 }
 
-const MapStats: React.FC = () => {
+const MapCharts: React.FC = () => {
   const [selectedZone, setSelectedZone] = useState("");
   const [selectedTaxa, setSelectedTaxa] = useState("");
   const [selectedSpecies, setSelectedSpecies] = useState("");
@@ -176,13 +176,13 @@ const MapStats: React.FC = () => {
         </table>
       </div>
 
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-              
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+
+      </div>
     </div>
 
 
   );
 };
 
-export default MapStats;
+export default MapCharts;

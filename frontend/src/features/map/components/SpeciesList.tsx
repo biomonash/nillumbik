@@ -1,6 +1,6 @@
 import React from "react";
 
-const InfoStats: React.FC = () => {
+const SpeciesList: React.FC = () => {
     const [isOpen, setIsOpen] = React.useState(true);
 
     return (
@@ -27,4 +27,4 @@ const InfoStats: React.FC = () => {
     );
 };
 
-export default InfoStats 
+export default SpeciesList; 
