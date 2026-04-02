@@ -21,6 +21,7 @@ export interface SelectProps {
   borderColor?: string;
   accentColor?: string;
   hoverColor?: string;
+  label?: string,
 }
 
 const Select = forwardRef<HTMLDivElement, SelectProps>(
@@ -39,6 +40,7 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
       borderColor,
       accentColor,
       hoverColor,
+      label,
       ...props
     },
     ref
@@ -76,18 +78,31 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
       <div
         ref={ref}
         className={cn(
-          "relative flex min-w-max justify-center self-center",
+          "relative flex flex-col min-w-max", // <- add flex-col here
           className
         )}
         style={{
-          "--select-bg":     background  ?? "var(--color-text)",
-          "--select-text":   textColor   ?? "var(--background)",
+          "--select-bg": background ?? "var(--color-text)",
+          "--select-text": textColor ?? "var(--background)",
           "--select-border": borderColor ?? "rgba(0,0,0,0.2)",
           "--select-accent": accentColor ?? "rgba(0,0,0,0.08)",
-          "--select-hover":  hoverColor  ?? "rgba(255,255,255,0.6)",
+          "--select-hover": hoverColor ?? "rgba(255,255,255,0.6)",
         } as React.CSSProperties}
         {...props}
       >
+
+        {/* Label */}
+        {label && (
+          <label
+            className={cn(
+              "mb-1 text-sm font-medium text-[var(--select-text)]",
+              error && "text-red-500"
+            )}
+          >
+            {label}
+          </label>
+        )}
+
         <div
           ref={wrapperRef}
           className={cn(

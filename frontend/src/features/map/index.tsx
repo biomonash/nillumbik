@@ -1,9 +1,12 @@
 import MapView from "./components/MapView";
+import MapCharts from "./components/MapCharts";
+import SpeciesList from "./components/SpeciesList";
 
 export default function MapPage() {
   return (
     <div style={{ position: "relative" }}>
-      
+      <SpeciesList />
+      <MapCharts />
       {/* Background Map */}
       <MapView />
 
@@ -11,7 +14,6 @@ export default function MapPage() {
       <div style={{ position: "relative", zIndex: 10 }}>
         <h1>Map Page</h1>
       </div>
-
     </div>
   );
 }
