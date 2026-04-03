@@ -21,17 +21,24 @@ export function useUserLocation() {
     const locate = () => {
         //Check if browser supports geolocation
         if (!navigator.geolocation) {
-            setState(prev => ({ ...prev, error: "Geolocation is not supported by your browser" }));
+            setState((prev: LocationState) => ({
+                ...prev, 
+                error: "Geolocation is not supported by your browser" 
+            }));
             return;
         }
 
         //Set loading to true while waiting for browser
-        setState(prev => ({ ...prev, loading: true, error: null}));
+        setState((prev: LocationState) => ({
+            ...prev,
+            loading: true,
+            error: null
+        }));
 
         navigator.geolocation.getCurrentPosition(
             //After browser has given coordinates
             (position) => {
-                console.log("Got coordinates: " position.coords.latitude, position.coords.longitude);
+                console.log("Got coordinates: ", position.coords.latitude, position.coords.longitude);
                 setState({
                     coords: {
                         latitude: position.coords.latitude,
