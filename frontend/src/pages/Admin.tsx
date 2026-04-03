@@ -1,8 +1,8 @@
-import type { JSX } from "react";
-import Admin from "../features/admin";
+import type { JSX } from 'react'
+import Admin from '../features/admin'
 
 const page: React.FC = (): JSX.Element => {
-    return <Admin />;
+  return <Admin />
 }
 
-export default page;
+export default page

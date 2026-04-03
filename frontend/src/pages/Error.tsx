@@ -1,8 +1,8 @@
-import React, { type JSX } from "react";
-import Error from "../features/error";
+import React, { type JSX } from 'react'
+import Error from '../features/error'
 
 const page: React.FC = (): JSX.Element => {
-	return <Error />;
-};
+  return <Error />
+}
 
-export default page;
+export default page
