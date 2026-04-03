@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
+
+      - name: Install dependencies
+        run: cd frontend && yarn install --frozen-lockfile
+
+      - name: Lint
+        run: cd frontend && yarn lint
+
+      # Requires a "format" script in frontend/package.json, e.g.:
+      #   "format": "prettier --check ."
+      - name: Format check
+        run: cd frontend && yarn format
+
+      - name: Build
+        run: cd frontend && yarn build
+        env:
+          VITE_API_BASE_URL: /api
+
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - name: Vet
+        run: cd backend && go vet ./...
+
+      - name: Build
+        run: cd backend && go build ./cmd/api/main.go

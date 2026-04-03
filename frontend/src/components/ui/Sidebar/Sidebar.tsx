@@ -1,11 +1,11 @@
-import React, { type JSX } from "react";
-import { useNavigate, useLocation } from "react-router";
+import React, { type JSX } from 'react'
+import { useNavigate, useLocation } from 'react-router'
 
 interface NavbarLinkProps {
-  icon: JSX.Element;
-  label: string;
-  active?: boolean;
-  onClick?: () => void;
+  icon: JSX.Element
+  label: string
+  active?: boolean
+  onClick?: () => void
 }
 
 function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
@@ -15,8 +15,8 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
         onClick={onClick}
         className={`w-[50px] h-[50px] rounded-lg flex items-center justify-center my-2.5 mx-auto transition-all text-white ${
           active
-            ? "bg-white/20 border-l-4 border-white"
-            : "bg-transparent border-l-4 border-transparent hover:bg-white/10"
+            ? 'bg-white/20 border-l-4 border-white'
+            : 'bg-transparent border-l-4 border-transparent hover:bg-white/10'
         }`}
         aria-label={label}
       >
@@ -27,20 +27,36 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
         {label}
       </div>
     </div>
-  );
+  )
 }
 
 const mockdata = [
-  { icon: <i className="fa-solid fa-house"></i>, label: "Home", path: "/" },
-  { icon: <i className="fa-regular fa-window-maximize"></i>, label: "Dashboard", path: "/dashboard" },
-  { icon: <i className="fa-solid fa-map-location-dot"></i>, label: "Map", path: "/map" },
-  { icon: <i className="fa-solid fa-chart-simple"></i>, label: "Graph", path: "/graph" },
-  { icon: <i className="fa-solid fa-gear"></i>, label: "Settings", path: "/settings" }
-];
+  { icon: <i className="fa-solid fa-house"></i>, label: 'Home', path: '/' },
+  {
+    icon: <i className="fa-regular fa-window-maximize"></i>,
+    label: 'Dashboard',
+    path: '/dashboard',
+  },
+  {
+    icon: <i className="fa-solid fa-map-location-dot"></i>,
+    label: 'Map',
+    path: '/map',
+  },
+  {
+    icon: <i className="fa-solid fa-chart-simple"></i>,
+    label: 'Graph',
+    path: '/graph',
+  },
+  {
+    icon: <i className="fa-solid fa-gear"></i>,
+    label: 'Settings',
+    path: '/settings',
+  },
+]
 
 const Sidebar: React.FC = (): JSX.Element => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const links = mockdata.map((link) => (
     <NavbarLink
@@ -48,20 +64,18 @@ const Sidebar: React.FC = (): JSX.Element => {
       key={link.label}
       active={location.pathname === link.path}
       onClick={() => {
-        navigate(link.path);
+        navigate(link.path)
       }}
     />
-  ));
+  ))
 
   return (
     <nav className="w-20 min-h-screen p-4 flex flex-col bg-sidebar fixed top-0 left-0">
       <div className="flex-1 mt-[50px]">
-        <div className="flex flex-col items-center">
-          {links}
-        </div>
+        <div className="flex flex-col items-center">{links}</div>
       </div>
     </nav>
-  );
+  )
 }
 
-export default Sidebar;
+export default Sidebar

@@ -1,20 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { StatsCard } from "./components/StatsCard";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../../components/ui/Card";
-import Button from "../../components/ui/Button";
-import Badge from "../../components/ui/Badge";
-import { getDashboardStats, type DashboardStatsResponse } from "../../apis/stats.api";
-import { toPercent } from "../../lib/utils";
-import { BarChart } from "./components/charts/BarChart";
-import { LineChart } from "./components/charts/LineChart";
-import { PieChart } from "./components/charts/PieChart";
+import React, { useEffect, useState } from 'react'
+import { StatsCard } from './components/StatsCard'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from '../../components/ui/Card'
+import Button from '../../components/ui/Button'
+import Badge from '../../components/ui/Badge'
+import {
+  getDashboardStats,
+  type DashboardStatsResponse,
+} from '../../apis/stats.api'
+import { toPercent } from '../../lib/utils'
+import { BarChart } from './components/charts/BarChart'
+import { LineChart } from './components/charts/LineChart'
+import { PieChart } from './components/charts/PieChart'
 
 const Dashboard: React.FC = () => {
-  const [stats, setStats] = useState<DashboardStatsResponse | null>(null);
+  const [stats, setStats] = useState<DashboardStatsResponse | null>(null)
 
   useEffect(() => {
-    getDashboardStats({ from: new Date("2025-01-01") }).then(setStats);
-  }, []);
+    getDashboardStats({ from: new Date('2025-01-01') }).then(setStats)
+  }, [])
 
   const IconPlaceholder = ({ label }: { label: string }) => (
     <span
@@ -24,17 +33,16 @@ const Dashboard: React.FC = () => {
     >
       {label[0]}
     </span>
-  );
+  )
 
   const DataVisualizationPlaceholder = () => (
     <div className="h-[200px] rounded-lg bg-white/5 flex items-center justify-center text-muted-foreground text-sm w-full">
       Data Visualization Coming Soon
     </div>
-  );
+  )
 
   return (
     <div className="flex flex-col w-full px-8 py-6 gap-8 box-border">
-
       {/* Title */}
       <div className="flex flex-wrap justify-between items-center gap-4">
         <div>
@@ -45,7 +53,10 @@ const Dashboard: React.FC = () => {
             Real-time environmental data from across Nillumbik Shire
           </p>
         </div>
-        <Badge variant="secondary" className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-sidebar text-white">
+        <Badge
+          variant="secondary"
+          className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-sidebar text-white"
+        >
           <IconPlaceholder label="Live" />
           Live Monitoring
         </Badge>
@@ -53,13 +64,18 @@ const Dashboard: React.FC = () => {
 
       {/* Key Statistics */}
       {stats !== null ? (
-        <div className="grid gap-4 w-full" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
+        <div
+          className="grid gap-4 w-full"
+          style={{
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          }}
+        >
           <StatsCard
             title="Total Species Detected"
             value={stats.speciesCount}
             subtitle="Across all monitored areas"
             icon={<span>🔔</span>}
-            trend={{ value: 12, label: "vs last month" }}
+            trend={{ value: 12, label: 'vs last month' }}
             color="forest"
           />
           <StatsCard
@@ -67,7 +83,7 @@ const Dashboard: React.FC = () => {
             value={stats.sitesCount}
             subtitle="Continuous data collection"
             icon={<span>🌁</span>}
-            trend={{ value: 12, label: "vs last month" }}
+            trend={{ value: 12, label: 'vs last month' }}
             color="primary"
           />
           <StatsCard
@@ -75,7 +91,7 @@ const Dashboard: React.FC = () => {
             value={stats.observationCount}
             subtitle="Total recorded observations"
             icon={<span>🔍</span>}
-            trend={{ value: 8, label: "vs last month" }}
+            trend={{ value: 8, label: 'vs last month' }}
             color="accent"
           />
           <StatsCard
@@ -83,7 +99,7 @@ const Dashboard: React.FC = () => {
             value={toPercent(stats.nativeSpeciesCount / stats.speciesCount)}
             subtitle="Of all detected species"
             icon={<span>🦜</span>}
-            trend={{ value: 12, label: "vs last month" }}
+            trend={{ value: 12, label: 'vs last month' }}
             color="secondary"
           />
         </div>
@@ -98,7 +114,9 @@ const Dashboard: React.FC = () => {
             <CardTitle>Species by Year</CardTitle>
             <CardDescription>Distribution across years</CardDescription>
           </CardHeader>
-          <CardContent><BarChart /></CardContent>
+          <CardContent>
+            <BarChart />
+          </CardContent>
         </Card>
 
         <Card>
@@ -106,7 +124,9 @@ const Dashboard: React.FC = () => {
             <CardTitle>Native vs Invasive Trends</CardTitle>
             <CardDescription>Annual variation</CardDescription>
           </CardHeader>
-          <CardContent><LineChart /></CardContent>
+          <CardContent>
+            <LineChart />
+          </CardContent>
         </Card>
 
         <Card>
@@ -114,7 +134,9 @@ const Dashboard: React.FC = () => {
             <CardTitle>Species Composition</CardTitle>
             <CardDescription>Native, Invasive, Rare</CardDescription>
           </CardHeader>
-          <CardContent><PieChart /></CardContent>
+          <CardContent>
+            <PieChart />
+          </CardContent>
         </Card>
 
         <Card>
@@ -122,7 +144,9 @@ const Dashboard: React.FC = () => {
             <CardTitle>Coming Soon</CardTitle>
             <CardDescription>Habitat or Location breakdown</CardDescription>
           </CardHeader>
-          <CardContent><DataVisualizationPlaceholder /></CardContent>
+          <CardContent>
+            <DataVisualizationPlaceholder />
+          </CardContent>
         </Card>
       </div>
 
@@ -142,7 +166,9 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Quick Actions */}
-      <Card className="!bg-transparent !border-transparent !shadow-none"> {/** Override the transparent background*/}
+      <Card className="!bg-transparent !border-transparent !shadow-none">
+        {' '}
+        {/** Override the transparent background*/}
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
           <CardDescription>Common tasks and report generation</CardDescription>
@@ -150,10 +176,10 @@ const Dashboard: React.FC = () => {
         <CardContent>
           <div className="grid gap-3 w-full grid-cols-1 sm:grid-cols-4">
             {[
-              { key: "Map", label: "View Map" },
-              { key: "Tree", label: "Species Report" },
-              { key: "Trnd", label: "Analytics" },
-              { key: "Data", label: "Data Export" },
+              { key: 'Map', label: 'View Map' },
+              { key: 'Tree', label: 'Species Report' },
+              { key: 'Trnd', label: 'Analytics' },
+              { key: 'Data', label: 'Data Export' },
             ].map(({ key, label }) => (
               <Button
                 key={key}
@@ -167,9 +193,8 @@ const Dashboard: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-
     </div>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard

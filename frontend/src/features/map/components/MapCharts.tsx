@@ -1,38 +1,38 @@
-import React, { useState, useEffect } from "react";
-import Select from "../../../components/ui/Select";
+import React, { useState, useEffect } from 'react'
+import Select from '../../../components/ui/Select'
 
 interface Species {
-  id: number;
-  commonName: string;
-  scientificName: string;
-  taxa: string;
-  indicator: boolean;
-  native: boolean;
-  reportable: boolean;
+  id: number
+  commonName: string
+  scientificName: string
+  taxa: string
+  indicator: boolean
+  native: boolean
+  reportable: boolean
 }
 
 const MapCharts: React.FC = () => {
-  const [selectedZone, setSelectedZone] = useState("");
-  const [selectedTaxa, setSelectedTaxa] = useState("");
-  const [selectedSpecies, setSelectedSpecies] = useState("");
+  const [selectedZone, setSelectedZone] = useState('')
+  const [selectedTaxa, setSelectedTaxa] = useState('')
+  const [selectedSpecies, setSelectedSpecies] = useState('')
 
   const [taxaOptions, setTaxaOptions] = useState<
     { value: string; label: string }[]
-  >([]);
+  >([])
   const [speciesOptions, setSpeciesOptions] = useState<
     { value: string; label: string }[]
-  >([]);
-  const [allSpecies, setAllSpecies] = useState<Species[]>([]);
+  >([])
+  const [allSpecies, setAllSpecies] = useState<Species[]>([])
 
-  const [nativeCount, setNativeCount] = useState(0);
-  const [nonNativeCount, setNonNativeCount] = useState(0);
+  const [nativeCount, setNativeCount] = useState(0)
+  const [nonNativeCount, setNonNativeCount] = useState(0)
 
   // Fetch species from API
   useEffect(() => {
-    fetch("http://localhost:8000/species")
+    fetch('http://localhost:8000/species')
       .then((res) => res.json())
       .then((data: Species[]) => {
-        setAllSpecies(data);
+        setAllSpecies(data)
 
         // Get unique taxa
         const uniqueTaxa = Array.from(
@@ -42,18 +42,18 @@ const MapCharts: React.FC = () => {
               { value: item.taxa, label: item.taxa },
             ]),
           ).values(),
-        );
+        )
 
-        setTaxaOptions(uniqueTaxa);
+        setTaxaOptions(uniqueTaxa)
       })
-      .catch((err) => console.error("Failed to fetch species:", err));
-  }, []);
+      .catch((err) => console.error('Failed to fetch species:', err))
+  }, [])
 
   // Update species options when taxa changes
   useEffect(() => {
     if (!selectedTaxa) {
-      setSpeciesOptions([]);
-      return;
+      setSpeciesOptions([])
+      return
     }
 
     const filteredSpecies = allSpecies
@@ -61,17 +61,17 @@ const MapCharts: React.FC = () => {
       .map((s) => ({
         value: s.id.toString(),
         label: s.commonName || s.scientificName,
-      }));
+      }))
 
-    setSpeciesOptions(filteredSpecies);
-    setSelectedSpecies("");
-  }, [selectedTaxa, allSpecies]);
+    setSpeciesOptions(filteredSpecies)
+    setSelectedSpecies('')
+  }, [selectedTaxa, allSpecies])
 
   useEffect(() => {
     if (!selectedZone) {
-      setNativeCount(0);
-      setNonNativeCount(0);
-      return;
+      setNativeCount(0)
+      setNonNativeCount(0)
+      return
     }
 
     // fetch(`http://localhost:8000/stats/observations/sites?zone=${selectedZone}`)
@@ -92,7 +92,7 @@ const MapCharts: React.FC = () => {
     //     setNonNativeCount(nonNative);
     //   })
     //   .catch((err) => console.error("Failed to fetch species stats:", err));
-  }, [selectedZone]);
+  }, [selectedZone])
 
   return (
     <div className="fixed top-10  right-0 h-screen w-[300px] bg-[var(--muted-foreground2)] z-50 p-4 flex flex-col">
@@ -111,10 +111,10 @@ const MapCharts: React.FC = () => {
           <span className="text-sm font-medium mb-1 text-black">Zone</span>
           <Select
             options={[
-              { value: "Zone 1", label: "Zone 1" },
-              { value: "Zone 2", label: "Zone 2" },
-              { value: "Zone 3", label: "Zone 3" },
-              { value: "Zone 4", label: "Zone 4" },
+              { value: 'Zone 1', label: 'Zone 1' },
+              { value: 'Zone 2', label: 'Zone 2' },
+              { value: 'Zone 3', label: 'Zone 3' },
+              { value: 'Zone 4', label: 'Zone 4' },
             ]}
             value={selectedZone}
             onChange={setSelectedZone}
@@ -151,17 +151,17 @@ const MapCharts: React.FC = () => {
 
       {/* Display selected zone specific info */}
       <h1 className="text-black text-xl font-semibold mt-6">
-        {selectedZone ? selectedZone : "Zone"}
+        {selectedZone ? selectedZone : 'Zone'}
       </h1>
 
       <div className="mb-4 flex flex-col w-full">
         <span className="text-sm font-medium mb-1 text-black">
-          Total Species in this Zone:{" "}
+          Total Species in this Zone:{' '}
         </span>
         <input
           type="text"
           readOnly
-          value={"Total: "}
+          value={'Total: '}
           className="w-full p-2 border border-gray-300 rounded-lg bg-gray-100 text-black"
         />
       </div>
@@ -188,7 +188,7 @@ const MapCharts: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full"></div>
     </div>
-  );
-};
+  )
+}
 
-export default MapCharts;
+export default MapCharts
