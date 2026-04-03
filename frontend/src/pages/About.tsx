@@ -1,8 +1,8 @@
-import type { JSX } from "react";
-import About from "../features/about";
+import type { JSX } from 'react'
+import About from '../features/about'
 
 const page: React.FC = (): JSX.Element => {
-    return <About />;
+  return <About />
 }
 
-export default page;
+export default page

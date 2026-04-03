@@ -1,8 +1,8 @@
-import type { JSX } from "react";
-import Settings from "../features/settings";
+import type { JSX } from 'react'
+import Settings from '../features/settings'
 
 const page: React.FC = (): JSX.Element => {
-    return <Settings />;
+  return <Settings />
 }
 
-export default page;
+export default page

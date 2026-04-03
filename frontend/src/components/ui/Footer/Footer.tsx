@@ -1,10 +1,9 @@
-import React, { type JSX } from "react";
+import React, { type JSX } from 'react'
 
 const Footer: React.FC = (): JSX.Element => {
   return (
     <footer className="bg-[var(--background)] border-t border-white/10 ml-[var(--sidebar-width)]">
       <div className="max-w-screen-xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-        
         {/* Copyright */}
         <p className="text-sm text-muted-foreground">
           © BiOM 2025. All rights reserved.
@@ -40,10 +39,9 @@ const Footer: React.FC = (): JSX.Element => {
             <i className="fa-brands fa-linkedin text-base" />
           </a>
         </div>
-
       </div>
     </footer>
-  );
-};
+  )
+}
 
-export default Footer;
+export default Footer
