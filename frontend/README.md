@@ -21,6 +21,7 @@ A modern React + TypeScript application powered by Vite, Mantine UI, and modular
 ---
 
 ## Folder Structure
+
 ```
 src/
   apis/               # API request logic
@@ -49,9 +50,11 @@ src/
 ## Installation & Launch
 
 ### Prerequisites
+
 - Node.js (v18+ recommended)
 
 ### Setup
+
 ```bash
 # Install dependencies
 npm install
@@ -77,6 +80,7 @@ yarn build
 ---
 
 ## References & Acknowledgements
+
 - [React](https://react.dev/)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vitejs.dev/)

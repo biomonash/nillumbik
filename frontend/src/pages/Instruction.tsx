@@ -1,8 +1,8 @@
-import type { JSX } from "react";
-import Instruction from "../features/instruction";
+import type { JSX } from 'react'
+import Instruction from '../features/instruction'
 
 const page: React.FC = (): JSX.Element => {
-    return <Instruction />;
+  return <Instruction />
 }
 
-export default page;
+export default page

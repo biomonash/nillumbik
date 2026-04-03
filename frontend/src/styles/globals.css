@@ -1,32 +1,32 @@
-@import "tailwindcss";
- 
-@import "@fontsource/lato/100.css";
-@import "@fontsource/lato/100-italic.css";
-@import "@fontsource/lato/300.css";
-@import "@fontsource/lato/300-italic.css";
-@import "@fontsource/lato/400.css";
-@import "@fontsource/lato/400-italic.css";
-@import "@fontsource/lato/700.css";
-@import "@fontsource/lato/700-italic.css";
-@import "@fontsource/lato/900.css";
-@import "@fontsource/lato/900-italic.css";
- 
+@import 'tailwindcss';
+
+@import '@fontsource/lato/100.css';
+@import '@fontsource/lato/100-italic.css';
+@import '@fontsource/lato/300.css';
+@import '@fontsource/lato/300-italic.css';
+@import '@fontsource/lato/400.css';
+@import '@fontsource/lato/400-italic.css';
+@import '@fontsource/lato/700.css';
+@import '@fontsource/lato/700-italic.css';
+@import '@fontsource/lato/900.css';
+@import '@fontsource/lato/900-italic.css';
+
 @theme {
   /* Colors */
   --color-text: #eee;
-  --background: #1F2421;
+  --background: #1f2421;
   --color-primary: #2f343d;
   --color-secondary: #404a5a;
   --color-accent: #00f3f3;
   --color-sidebar: #216869;
- 
+
   /* Screens */
   --breakpoint-xs: 20em;
   --breakpoint-sm: 30em;
   --breakpoint-md: 50em;
   --breakpoint-lg: 75em;
   --breakpoint-xl: 100em;
- 
+
   /* Font size */
   --font-size-300: 0.875rem;
   --font-size-400: 1rem;
@@ -35,21 +35,21 @@
   --font-size-700: 2rem;
   --font-size-800: 2.5rem;
   --font-size-900: 3.5rem;
- 
+
   /* Font family */
-  --font-family-sans: "Lato", system-ui, sans-serif;
+  --font-family-sans: 'Lato', system-ui, sans-serif;
 }
- 
+
 /* Keep your CSS variables for non-Tailwind usage (e.g. var(--header-height)) */
 :root {
   --foreground: #ffffff;
   --muted-foreground: #e4e4e4;
-  --muted-foreground2: #F5F5F5;
+  --muted-foreground2: #f5f5f5;
   --header-bg: #eaeaea;
   --header-height: 56px;
   --sidebar-width: 80px;
 }
- 
+
 body {
   background-color: var(--color-background);
   color: var(--color-text);
