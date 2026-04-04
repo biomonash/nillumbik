@@ -8,7 +8,7 @@ const chartTheme = {
 }
 
 export const PieChart = () => {
-  const [data, setData] = useState<any[]>([])
+  const [data, setData] = useState<{ id: string; value: number }[]>([])
 
   useEffect(() => {
     getObservationsOverview({}).then((res) => {
