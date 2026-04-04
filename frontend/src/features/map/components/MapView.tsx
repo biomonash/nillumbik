@@ -24,7 +24,7 @@ function FlyToUser({
 }
 
 export default function MapView() {
-  const [geoData, setGeoData] = useState<any>(null)
+  const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
 
