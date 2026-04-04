@@ -12,7 +12,9 @@ const chartTheme = {
 }
 
 export const LineChart = () => {
-  const [data, setData] = useState<any[]>([])
+  const [data, setData] = useState<
+    { id: string; data: { x: string; y: number }[] }[]
+  >([])
 
   useEffect(() => {
     getObservationsTimeseries({}).then((res) => {

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { ResponsiveBar } from '@nivo/bar'
 import { getObservationsTimeseries } from '../../../../apis/stats.api'
 
+type YearEntry = { year: string; Native: number; Invasive: number }
+
 const chartTheme = {
   axis: {
     ticks: { text: { fill: '#ffffff', fontSize: 11 } },
@@ -13,13 +15,13 @@ const chartTheme = {
 }
 
 export const BarChart = () => {
-  const [data, setData] = useState<any[]>([])
+  const [data, setData] = useState<YearEntry[]>([])
 
   useEffect(() => {
     getObservationsTimeseries({})
       .then((res) => {
         if (res && res.series) {
-          const yearMap: Record<string, any> = {}
+          const yearMap: Record<string, YearEntry> = {}
 
           Object.entries(res.series).forEach(([type, points]) => {
             // Normalizing keys to match 'Native' and 'Invasive'
@@ -28,9 +30,9 @@ export const BarChart = () => {
                 ? 'Native'
                 : 'Invasive'
 
-            points.forEach((p: any) => {
+            points.forEach((p) => {
               // FIX: Use p.timestamp (matching your API definition)
-              const rawDate = p.timestamp || p.year
+              const rawDate = p.timestamp
               const yearDate = rawDate ? new Date(rawDate) : new Date()
               const yearStr = yearDate.getFullYear().toString()
 
@@ -43,7 +45,7 @@ export const BarChart = () => {
             })
           })
 
-          const finalData = Object.values(yearMap).sort((a: any, b: any) =>
+          const finalData = Object.values(yearMap).sort((a, b) =>
             a.year.localeCompare(b.year),
           )
 

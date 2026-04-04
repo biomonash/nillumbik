@@ -20,6 +20,8 @@
     "@nivo/line": "^0.99.0",
     "@nivo/pie": "^0.99.0",
     "@reduxjs/toolkit": "^2.9.0",
+    "@turf/boolean-point-in-polygon": "^7.3.4",
+    "@turf/helpers": "^7.3.4",
     "@types/axios": "^0.14.4",
     "axios": "^1.11.0",
     "leaflet": "^1.9.4",
