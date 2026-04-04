@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { ResponsiveLine } from '@nivo/line';
-import { getObservationsTimeseries } from '../../../../apis/stats.api';
+import { useEffect, useState } from 'react'
+import { ResponsiveLine } from '@nivo/line'
+import { getObservationsTimeseries } from '../../../../apis/stats.api'
 
 const chartTheme = {
   axis: {
@@ -9,10 +9,10 @@ const chartTheme = {
   },
   legends: { text: { fill: '#ffffff' } },
   grid: { line: { stroke: 'rgba(255,255,255,0.1)' } },
-};
+}
 
 export const LineChart = () => {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<any[]>([])
 
   useEffect(() => {
     getObservationsTimeseries({}).then((res) => {
@@ -23,11 +23,11 @@ export const LineChart = () => {
             x: new Date(p.timestamp).getFullYear().toString(),
             y: p.observationCount,
           })),
-        }));
-        setData(formatted);
+        }))
+        setData(formatted)
       }
-    });
-  }, []);
+    })
+  }, [])
 
   return (
     <div className="h-[300px]">
@@ -37,11 +37,15 @@ export const LineChart = () => {
           margin={{ top: 20, right: 110, bottom: 50, left: 85 }} // Increased left margin for large numbers
           xScale={{ type: 'point' }}
           yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: false }}
-          axisBottom={{ legend: 'Year', legendOffset: 40, legendPosition: 'middle' }}
-          axisLeft={{ 
-            legend: 'Observations', 
+          axisBottom={{
+            legend: 'Year',
+            legendOffset: 40,
+            legendPosition: 'middle',
+          }}
+          axisLeft={{
+            legend: 'Observations',
             legendOffset: -70, // Increased offset so it doesn't hit the numbers
-            legendPosition: 'middle' 
+            legendPosition: 'middle',
           }}
           pointSize={8}
           pointBorderWidth={2}
@@ -52,8 +56,13 @@ export const LineChart = () => {
             <div className="bg-[#1a1a1a] text-white px-3 py-2 rounded-lg text-xs border border-white/10 shadow-xl">
               <span className="text-gray-400">Year {point.data.x}:</span>
               <div className="flex items-center gap-2 mt-1">
-                <div className="w-3 h-3 rounded-full" style={{ background: point.seriesColor }} />
-                <strong>{point.seriesId}: {point.data.yFormatted} Detections</strong>
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ background: point.seriesColor }}
+                />
+                <strong>
+                  {point.seriesId}: {point.data.yFormatted} Detections
+                </strong>
               </div>
             </div>
           )}
@@ -68,12 +77,14 @@ export const LineChart = () => {
               itemTextColor: '#ffffff',
               symbolSize: 12,
               symbolShape: 'circle',
-            }
+            },
           ]}
         />
       ) : (
-        <div className="flex items-center justify-center h-full text-white">Loading Trends...</div>
+        <div className="flex items-center justify-center h-full text-white">
+          Loading Trends...
+        </div>
       )}
     </div>
-  );
-};
+  )
+}

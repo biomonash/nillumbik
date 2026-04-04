@@ -23,10 +23,10 @@ export default function MapView() {
   const { coords, loading, error, locate } = useUserLocation();
 
   useEffect(() => {
-    fetch("/nillumbik_30zones.geojson")
+    fetch('/nillumbik_30zones.geojson')
       .then((res) => res.json())
-      .then((data) => setGeoData(data));
-  }, []);
+      .then((data) => setGeoData(data))
+  }, [])
 
   useEffect(() => {
     if (coords && geoData) {
@@ -98,12 +98,12 @@ export default function MapView() {
       center={[-37.6, 145.2]}
       zoom={10}
       style={{
-        height: "100vh",
-        width: "100%",
-        position: "absolute",
+        height: '100vh',
+        width: '100%',
+        position: 'absolute',
         top: 0,
         left: 0,
-        zIndex: 0
+        zIndex: 0,
       }}
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -112,20 +112,17 @@ export default function MapView() {
       {geoData && (
         <GeoJSON
           data={geoData}
-
           // 🔥 STYLE EACH ZONE
           style={() => ({
-            color: "green",
-            fillColor: "green",
-            fillOpacity: 0.3
+            color: 'green',
+            fillColor: 'green',
+            fillOpacity: 0.3,
           })}
-
           // 🔥 INTERACTION
           onEachFeature={(feature, layer) => {
-            layer.on("click", () => {
-              console.log("Clicked zone:", feature.properties);
-
-            });
+            layer.on('click', () => {
+              console.log('Clicked zone:', feature.properties)
+            })
           }}
         />
       )}
