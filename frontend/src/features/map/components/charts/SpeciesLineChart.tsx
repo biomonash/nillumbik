@@ -8,6 +8,16 @@ type Props = {
   selectedSpecies?: string
 }
 
+type LinePoint = {
+  x: string
+  y: number
+}
+
+type LineSeries = {
+  id: string
+  data: LinePoint[]
+}
+
 const chartTheme = {
   axis: {
     ticks: { text: { fill: '#000000', fontSize: 11 } },
@@ -18,21 +28,29 @@ const chartTheme = {
 }
 
 export const SpeciesLineChart = ({ filters, selectedSpecies }: Props) => {
-  const [data, setData] = useState<any[]>([])
+  const [data, setData] = useState<LineSeries[]>([])
 
   useEffect(() => {
     getObservationsTimeseries(filters).then((res) => {
       if (res && res.series) {
-        const formatted = Object.entries(res.series).map(([id, points]) => ({
-          id,
-          data: points.map((p) => ({
-            x: new Date(p.timestamp).getFullYear().toString(),
-            y:
-              selectedSpecies && selectedSpecies !== ''
-                ? p.observationCount
-                : p.speciesCount,
-          })),
-        }))
+        const formatted = Object.entries(res.series).map(([id, points]) => {
+          const typedPoints = points as {
+            timestamp: string
+            observationCount: number
+            speciesCount: number
+          }[]
+
+          return {
+            id,
+            data: typedPoints.map((p) => ({
+              x: new Date(p.timestamp).getFullYear().toString(),
+              y:
+                selectedSpecies && selectedSpecies !== ''
+                  ? p.observationCount
+                  : p.speciesCount,
+            })),
+          }
+        })
         setData(formatted)
       }
     })

@@ -19,46 +19,45 @@ import {
 import { SpeciesLineChart } from './charts/SpeciesLineChart'
 import { NativeBarChart } from './charts/NativeBarChart'
 
+const DEFAULT_FROM = new Date('2020-01-01')
+// Extracion Functions
+function capitalize(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+}
+
+function extractSortedZones(
+  data: GetObservationBlocksResponse,
+): ChartInput[] {
+  const sorted = [...data.blocks]
+    .sort((a, b) => a.block - b.block)
+    .map((b) => ({ value: String(b.block), label: `Zone ${b.block}` }))
+  return [{ value: 'all', label: 'All Zones' }, ...sorted]
+}
+
+function extractTaxaOptions(data: GetObservationStatsResponse): ChartInput[] {
+  const taxa = Object.keys(data.countByTaxa)
+    .sort()
+    .map((t) => ({ value: t, label: capitalize(t) }))
+  return [{ value: 'all', label: 'All Taxa' }, ...taxa]
+}
+
+function extractSpeciesOptions(
+  allSpecies: Species[],
+  selectedTaxa: string | null,
+): ChartInput[] {
+  const filtered = selectedTaxa
+    ? allSpecies.filter(
+      (s) => s.taxa.toLowerCase() === selectedTaxa.toLowerCase(),
+    )
+    : allSpecies
+  const unique = [...new Map(filtered.map((s) => [s.commonName, s])).values()]
+  return [
+    { value: '', label: 'All Species' },
+    ...unique.map((s) => ({ value: s.commonName, label: s.commonName })),
+  ]
+}
+
 const MapCharts: React.FC = () => {
-  const DEFAULT_FROM = new Date('2020-01-01')
-
-  // Extracion Functions
-  function capitalize(text: string) {
-    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
-  }
-
-  function extractSortedZones(
-    data: GetObservationBlocksResponse,
-  ): ChartInput[] {
-    const sorted = [...data.blocks]
-      .sort((a, b) => a.block - b.block)
-      .map((b) => ({ value: String(b.block), label: `Zone ${b.block}` }))
-    return [{ value: 'all', label: 'All Zones' }, ...sorted]
-  }
-
-  function extractTaxaOptions(data: GetObservationStatsResponse): ChartInput[] {
-    const taxa = Object.keys(data.countByTaxa)
-      .sort()
-      .map((t) => ({ value: t, label: capitalize(t) }))
-    return [{ value: 'all', label: 'All Taxa' }, ...taxa]
-  }
-
-  function extractSpeciesOptions(
-    allSpecies: Species[],
-    selectedTaxa: string | null,
-  ): ChartInput[] {
-    const filtered = selectedTaxa
-      ? allSpecies.filter(
-          (s) => s.taxa.toLowerCase() === selectedTaxa.toLowerCase(),
-        )
-      : allSpecies
-    const unique = [...new Map(filtered.map((s) => [s.commonName, s])).values()]
-    return [
-      { value: '', label: 'All Species' },
-      ...unique.map((s) => ({ value: s.commonName, label: s.commonName })),
-    ]
-  }
-
   // States
   const [selectedZone, setSelectedZone] = useState<string>('all')
   const [zoneOptions, setZoneOptions] = useState<ChartInput[]>([])
