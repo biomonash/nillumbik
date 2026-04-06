@@ -25,9 +25,7 @@ function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 }
 
-function extractSortedZones(
-  data: GetObservationBlocksResponse,
-): ChartInput[] {
+function extractSortedZones(data: GetObservationBlocksResponse): ChartInput[] {
   const sorted = [...data.blocks]
     .sort((a, b) => a.block - b.block)
     .map((b) => ({ value: String(b.block), label: `Zone ${b.block}` }))
@@ -47,8 +45,8 @@ function extractSpeciesOptions(
 ): ChartInput[] {
   const filtered = selectedTaxa
     ? allSpecies.filter(
-      (s) => s.taxa.toLowerCase() === selectedTaxa.toLowerCase(),
-    )
+        (s) => s.taxa.toLowerCase() === selectedTaxa.toLowerCase(),
+      )
     : allSpecies
   const unique = [...new Map(filtered.map((s) => [s.commonName, s])).values()]
   return [
