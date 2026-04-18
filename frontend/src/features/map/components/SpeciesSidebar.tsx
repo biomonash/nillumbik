@@ -31,10 +31,11 @@ export default function SpeciesSidebar({zoneName, species,onClose}: SpeciesSideb
                 position: "sticky",
                 top: 0,
                 zIndex: 1,
+                backgroundColor: "white",
             }}
             >
                 <div>
-                    <h2 style={{fontWeight:"bold", fontSize:"16px", margin:0}}>
+                    <h2 style={{fontWeight:"bold", fontSize:"16px", margin:0, color: "black"}}>
                         {zoneName}
                     </h2>
                     <p style={{fontSize: "12px", color: "#6b7280", margin: "4px 0 0 0"}}>
