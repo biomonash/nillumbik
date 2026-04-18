@@ -5,6 +5,8 @@ import { useUserLocation } from "../../../hooks/useUserLocation";
 import { findSiteForLocation } from "../../../helpers/siteLocation";
 import type { ZonesGeoJSON, SiteProperties } from "../../../helpers/siteLocation";
 import { Marker, Popup, useMap } from "react-leaflet";
+import SpeciesSidebar from "./SpeciesSidebar";
+import { SPECIES } from "../data/species";
 
 function FlyToUser({coords}: {coords: {latitude: number; longitude: number} | null}) {
   const map = useMap();
@@ -21,6 +23,7 @@ export default function MapView() {
   const [geoData, setGeoData] = useState<any>(null);
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null);
   const { coords, loading, error, locate } = useUserLocation();
+  const [selectedZone, setSelectedZone] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/nillumbik_30zones.geojson")
@@ -124,6 +127,7 @@ export default function MapView() {
           onEachFeature={(feature, layer) => {
             layer.on("click", () => {
               console.log("Clicked zone:", feature.properties);
+              setSelectedZone(`Zone ${feature.properties.site}`);
 
             });
           }}
@@ -137,6 +141,13 @@ export default function MapView() {
         </Marker>
       )}
     </MapContainer>
+    {selectedZone && (
+      <SpeciesSidebar
+      zoneName={selectedZone}
+      species={SPECIES}
+      onClose={() => setSelectedZone(null)}
+      />
+    )}
     </div>
   );
 }
