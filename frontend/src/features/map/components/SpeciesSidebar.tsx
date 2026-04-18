@@ -52,7 +52,9 @@ export default function SpeciesSidebar({zoneName, species,onClose}: SpeciesSideb
                     fontSize: "18px",
                     cursor: "pointer",
                     color: "#6b7280",
-                }}></button>
+                }}>
+                    x
+                </button>
             </div>
 
             {/* Species Cards */}
