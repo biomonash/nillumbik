@@ -17,24 +17,25 @@ export default function SpeciesCard({species}: SpeciesCardProps) {
                 />
             <CardContent className="p-4">
                 {/* Common Name and Native/Non-native Badge*/}
-                <div className="flex items-center justify-between gap-2 mb-1">
-                    <span className="font-semibold text-sm">{species.commonName}</span>
-                    <Badge className="bg-green-100 text-green-800 border-green-200">
+                <div className="flex items-center justify-between gap-2 mb-3 mt-4">
+                    <span className="font-semibold text-sm text-gray-900">{species.commonName}</span>
+                    <Badge style={{backgroundColor: "#dcfce7", color:"#166534", border: "1px solid #bbf7d0"}}>
                         {species.native ? "Native" : "Non-native"}
                     </Badge>
                 </div>
 
-                {/* Scientific Name */}
-                <p className="text-xs italic text-gray-500 mb-2">
+                {/* Scientific Name and Indicator tag*/}
+                <div className="flex items-center justify-between gap-2">
+                <p className="text-xs italic text-gray-500 mb-0">
                     {species.scientificName}
                 </p>
-
-                {/* Indicator badge - only shows if indicator is true */}
-                {species.indicator && (
-                    <Badge className="bg-purple-100 text-purple-800 border-purple-200">
+                    {species.indicator && (
+                    <Badge style={{backgroundColor: "#f3e8ff", color:"#6b21a8", border:"1px solid #e9d5ff"}}>
                         Indicator
                     </Badge>
                 )}
+                </div>
+
             </CardContent>
         </Card>
     );
