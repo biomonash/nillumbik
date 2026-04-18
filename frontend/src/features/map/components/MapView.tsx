@@ -5,8 +5,16 @@ import { useUserLocation } from "../../../hooks/useUserLocation";
 import { findSiteForLocation } from "../../../helpers/siteLocation";
 import type { ZonesGeoJSON, SiteProperties } from "../../../helpers/siteLocation";
 import { Marker, Popup, useMap } from "react-leaflet";
+import {divIcon} from "leaflet";
 import SpeciesSidebar from "./SpeciesSidebar";
 import { SPECIES } from "../data/species";
+
+const locationPin = divIcon({
+  html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
+  className: "",
+  iconSize: [32,32],
+  iconAnchor: [16,32],
+});
 
 function FlyToUser({coords}: {coords: {latitude: number; longitude: number} | null}) {
   const map = useMap();
@@ -46,9 +54,9 @@ export default function MapView() {
       onClick={locate}
       disabled={loading}
       style={{
-        position: "absolute",
-        top: "10px",
-        right: "10px",
+        position: "fixed",
+        bottom: "30px",
+        left: "90px",
         zIndex: 1000,
         padding: "8px 16px",
         color: "darkgreen",
@@ -136,7 +144,8 @@ export default function MapView() {
 
       //pin
       {coords && (
-        <Marker position={[coords.latitude, coords.longitude ]}>
+        <Marker position={[coords.latitude, coords.longitude ]}
+          icon={locationPin}>
           <Popup>You are here</Popup>
         </Marker>
       )}
