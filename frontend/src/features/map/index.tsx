@@ -1,11 +1,9 @@
 import MapView from './components/MapView'
 import MapCharts from './components/MapCharts'
-import SpeciesList from './components/SpeciesList'
 
 export default function MapPage() {
   return (
     <div style={{ position: 'relative' }}>
-      <SpeciesList />
       <MapCharts />
       {/* Background Map */}
       <MapView />
