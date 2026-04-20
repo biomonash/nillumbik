@@ -15,6 +15,7 @@ GO_MAIN=cmd/api/main.go
 GO_IMPORTER=cmd/importer/main.go
 DOCKER_COMPOSE_FILE=docker/compose.yml
 # POSTGRESQL_URL=postgres://biom:supersecretpassword@localhost:5432/nillumbik?sslmode=disable
+API_BASE_URL=/api
 
 # Colors for output
 GREEN=\033[0;32m
@@ -198,7 +199,7 @@ install-frontend: ## Install Node.js dependencies
 build-frontend: ## Build the TypeScript frontend
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Building TypeScript frontend...$(NC)\n"; \
-		cd $(FRONTEND_DIR) && yarn build --outDir ../backend/assets/dist; \
+		cd $(FRONTEND_DIR) && VITE_API_BASE_URL=$(API_BASE_URL) yarn build --outDir ../backend/assets/dist; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend build.$(NC)\n"; \
 	fi

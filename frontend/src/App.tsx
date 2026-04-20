@@ -1,6 +1,6 @@
-import './styles/globals.css';
-import useBrowserRouter from './hooks/useBrowserRouter';
-import { RouterProvider } from "react-router/dom";
+import './styles/globals.css'
+import useBrowserRouter from './hooks/useBrowserRouter'
+import { RouterProvider } from 'react-router/dom'
 
 function App() {
   const router = useBrowserRouter()
