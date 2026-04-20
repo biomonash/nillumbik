@@ -1,8 +1,8 @@
-import type { JSX } from "react";
-import Gallery from "../features/gallery";
+import type { JSX } from 'react'
+import Gallery from '../features/gallery'
 
 const page: React.FC = (): JSX.Element => {
-    return <Gallery />;
+  return <Gallery />
 }
 
-export default page;
+export default page

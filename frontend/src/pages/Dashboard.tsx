@@ -1,8 +1,8 @@
-import type { JSX } from "react";
-import Dashboard from "../features/dashboard";
+import type { JSX } from 'react'
+import Dashboard from '../features/dashboard'
 
 const page: React.FC = (): JSX.Element => {
-  return <Dashboard />;
+  return <Dashboard />
 }
 
-export default page;
+export default page

@@ -1,19 +1,19 @@
-import axios, { type AxiosResponse } from "axios";
+import axios, { type AxiosResponse } from 'axios'
 
 // Create Axios instance
 const fetcher = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
   timeout: 10000,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
-});
+})
 
 // Request middleware
 fetcher.interceptors.request.use(
   (config) => {
     // Example: Add auth token if available
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token')
 
     if (token) {
       // config.headers = {
@@ -22,10 +22,10 @@ fetcher.interceptors.request.use(
       // };
     }
 
-    return config;
+    return config
   },
   (error) => Promise.reject(error),
-);
+)
 
 // Response middleware
 fetcher.interceptors.response.use(
@@ -36,8 +36,8 @@ fetcher.interceptors.response.use(
       // Handle unauthorized
       // e.g., redirect to login
     }
-    return Promise.reject(error);
+    return Promise.reject(error)
   },
-);
+)
 
-export default fetcher;
+export default fetcher

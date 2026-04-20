@@ -1,24 +1,24 @@
-import { lazy } from "react";
-import { createBrowserRouter } from "react-router";
-import routes from "../constants/route";
+import { lazy } from 'react'
+import { createBrowserRouter } from 'react-router'
+import routes from '../constants/route'
 
 //? LAZY LOADING PAGES & LAYOUTS
 // Layouts
-const MainLayout = lazy(() => import("../layouts/MainLayout"));
-const DashboardLayout = lazy(() => import("../layouts/DashboardLayout"));
-const AdminLayout = lazy(() => import("../layouts/AdminLayout"));
+const MainLayout = lazy(() => import('../layouts/MainLayout'))
+const DashboardLayout = lazy(() => import('../layouts/DashboardLayout'))
+const AdminLayout = lazy(() => import('../layouts/AdminLayout'))
 
 // Pages
-const Home = lazy(() => import("../pages/Home"));
-const About = lazy(() => import("../pages/About"));
-const Instruction = lazy(() => import("../pages/Instruction"));
-const Dashboard = lazy(() => import("../pages/Dashboard"));
-const Gallery = lazy(() => import("../pages/Gallery"));
-const Map = lazy(() => import("../pages/Map"));
-const Graph = lazy(() => import("../pages/Graph.tsx"));
-const Settings = lazy(() => import("../pages/Settings"));
-const Admin = lazy(() => import("../pages/Admin"));
-const Error = lazy(() => import("../pages/Error"));
+const Home = lazy(() => import('../pages/Home'))
+const About = lazy(() => import('../pages/About'))
+const Instruction = lazy(() => import('../pages/Instruction'))
+const Dashboard = lazy(() => import('../pages/Dashboard'))
+const Gallery = lazy(() => import('../pages/Gallery'))
+const Map = lazy(() => import('../pages/Map'))
+const Graph = lazy(() => import('../pages/Graph.tsx'))
+const Settings = lazy(() => import('../pages/Settings'))
+const Admin = lazy(() => import('../pages/Admin'))
+const Error = lazy(() => import('../pages/Error'))
 
 const useBrowserRouter = () => {
   const router = createBrowserRouter([
@@ -41,7 +41,7 @@ const useBrowserRouter = () => {
       ],
     },
     {
-      path: "",
+      path: '',
       Component: DashboardLayout,
       children: [
         {
@@ -77,11 +77,11 @@ const useBrowserRouter = () => {
       ],
     },
     {
-      path: "*",
+      path: '*',
       Component: Error,
     },
-  ]);
-  return router;
-};
+  ])
+  return router
+}
 
-export default useBrowserRouter;
+export default useBrowserRouter

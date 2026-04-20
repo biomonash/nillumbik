@@ -1,8 +1,8 @@
-import type { JSX } from "react";
-import Map from "../features/map";
+import type { JSX } from 'react'
+import Map from '../features/map'
 
 const page: React.FC = (): JSX.Element => {
-    return <Map />;
+  return <Map />
 }
 
-export default page;
+export default page
