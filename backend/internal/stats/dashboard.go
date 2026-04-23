@@ -62,7 +62,7 @@ func (u *Controller) DashboardStats(c *gin.Context) {
 		}
 	}
 
-	resp.SitesCount, err = u.q.CountActiveSites(ctx, db.CountActiveSitesParams{From: req.From.ToPGTime(), To: req.From.ToPGTime()})
+	resp.SitesCount, err = u.q.CountActiveSites(ctx, db.CountActiveSitesParams{From: req.From.ToPGTime(), To: req.To.ToPGTime()})
 	if err != nil {
 		c.Error(fmt.Errorf("Failed to count active sites: %w", err))
 		return
