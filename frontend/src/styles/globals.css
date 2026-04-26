@@ -50,7 +50,7 @@
   --sidebar-width: 80px;
 
   --button: #689c5e;
-  --button-hover: #a1a1a1;
+  --button-hover: #4f7f49;
 }
 
 body {
@@ -58,3 +58,4 @@ body {
   color: var(--color-text);
   font-family: var(--font-family-sans);
 }
+
