@@ -19,6 +19,10 @@ import {
 import { SpeciesLineChart } from './charts/SpeciesLineChart'
 import { NativeBarChart } from './charts/NativeBarChart'
 
+interface MapChartsProps {
+  selectedBlock: string;
+}
+
 const DEFAULT_FROM = new Date('2020-01-01')
 // Extracion Functions
 function capitalize(text: string) {
@@ -55,7 +59,7 @@ function extractSpeciesOptions(
   ]
 }
 
-const MapCharts: React.FC = () => {
+const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
   // States
   const [selectedZone, setSelectedZone] = useState<string>('all')
   const [zoneOptions, setZoneOptions] = useState<ChartInput[]>([])
@@ -72,6 +76,11 @@ const MapCharts: React.FC = () => {
   const [nonNativeCount, setNonNativeCount] = useState(0)
 
   const [drawerOpen, setDrawerOpen] = useState(false) // For responsive view
+
+  // Updates zone dropdown when user clicks on a zone
+  useEffect(() => {
+    setSelectedZone(selectedBlock);
+  }, [selectedBlock]);
 
   // Loads initial data
   useEffect(() => {
