@@ -118,7 +118,8 @@ const MapCharts: React.FC = () => {
       setSearchParams((prev) => {
         Object.entries(updates).forEach(([k, v]) => {
           const empty = empties[k] ?? 'all'
-          v === empty ? prev.delete(k) : prev.set(k, v)
+          if (v === empty) prev.delete(k)
+          else prev.set(k, v)
         })
         return prev
       })
@@ -182,10 +183,10 @@ const MapCharts: React.FC = () => {
   }, [params])
 
   useEffect(() => {
-  return () => {
-    if (timerRef.current) clearTimeout(timerRef.current)
-  }
-}, [])
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [])
   // Shared content used in both desktop and mobile
   const content = (
     <>
