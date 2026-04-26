@@ -38,6 +38,7 @@ export default function MapView() {
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
   const [selectedZone, setSelectedZone] = useState<string | null>(null)
+  const [hoveredZone, setHoveredZone] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/nillumbik_30zones.geojson')
@@ -130,15 +131,35 @@ export default function MapView() {
         <FlyToUser coords={coords} />
         {geoData && (
           <GeoJSON
+            key={selectedZone}
             data={geoData}
-            // 🔥 STYLE EACH ZONE
-            style={() => ({
-              color: 'green',
-              fillColor: 'green',
-              fillOpacity: 0.3,
-            })}
+            
+            // 🔥 STYLE EACH ZONE (selected/hovered/default)
+            style={(feature) => {
+              const site = feature?.properties?.site;
+              const isSelected = selectedZone === `Zone ${site}`;
+              const isHovered = hoveredZone === site;
+
+              return {
+                color: isSelected ? "#b45309" : "green",
+                fillColor: isSelected ? "#f59e0b" : isHovered ? "#86efac" : "green",
+                fillOpacity: isSelected ? 0.6 : isHovered ? 0.5 : 0.3,
+                weight: isSelected ? 3 : 2,
+              };
+            }}
+
             // 🔥 INTERACTION
             onEachFeature={(feature, layer) => {
+              const site = feature.properties.site;
+
+              layer.on("mouseover", () => {
+                setHoveredZone(site);
+              });
+
+              layer.on("mouseout", () => {
+                setHoveredZone(null);
+              });
+
               layer.on('click', () => {
                 console.log('Clicked zone:', feature.properties)
                 setSelectedZone(`Zone ${feature.properties.site}`)
