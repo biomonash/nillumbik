@@ -12,6 +12,10 @@ import { divIcon } from 'leaflet'
 import SpeciesSidebar from './SpeciesSidebar'
 import { SPECIES } from '../data/species'
 
+interface MapViewProps {
+  onZoneSelect: (block: string) => void;
+}
+
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
   className: '',
@@ -33,7 +37,7 @@ function FlyToUser({
   return null
 }
 
-export default function MapView() {
+export default function MapView({ onZoneSelect }: MapViewProps) {
   const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
@@ -165,6 +169,8 @@ export default function MapView() {
                 console.log('Clicked zone:', feature.properties)
                 const zoneName = `Zone ${feature.properties.site}`;
                 setSelectedZone(prev => prev === zoneName ? null : zoneName);
+                const block = String(feature.properties.block);
+                onZoneSelect(block);
               })
             }}
           />
