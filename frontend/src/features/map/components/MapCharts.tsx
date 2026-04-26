@@ -20,7 +20,7 @@ import {
 } from '../../../apis/mapCharts.api'
 import { SpeciesLineChart } from './charts/SpeciesLineChart'
 import { NativeBarChart } from './charts/NativeBarChart'
-import { useSearchParams } from "react-router";
+import { useSearchParams } from 'react-router'
 
 const DEFAULT_FROM = new Date('2020-01-01')
 // Extraction Functions
@@ -43,7 +43,7 @@ function extractSortedSites(data: GetObservationSitesResponse): ChartInput[] {
       label: `Site ${site.siteCode}`,
     }))
 
-  return [{ value: "all", label: "All Sites" }, ...sorted]
+  return [{ value: 'all', label: 'All Sites' }, ...sorted]
 }
 
 function extractTaxaOptions(data: GetObservationStatsResponse): ChartInput[] {
@@ -59,8 +59,8 @@ function extractSpeciesOptions(
 ): ChartInput[] {
   const filtered = selectedTaxa
     ? allSpecies.filter(
-      (s) => s.taxa.toLowerCase() === selectedTaxa.toLowerCase(),
-    )
+        (s) => s.taxa.toLowerCase() === selectedTaxa.toLowerCase(),
+      )
     : allSpecies
   const unique = [...new Map(filtered.map((s) => [s.commonName, s])).values()]
   return [
@@ -70,28 +70,36 @@ function extractSpeciesOptions(
 }
 
 const MapCharts: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams()
 
   // derived from url
-  const selectedZone = searchParams.get("zone") ?? "all"
-  const selectedSite = searchParams.get("site") ?? "all"
-  const selectedTaxa = searchParams.get("taxa") ?? "all"
-  const selectedSpecies = searchParams.get("species") ?? ""
+  const selectedZone = searchParams.get('zone') ?? 'all'
+  const selectedSite = searchParams.get('site') ?? 'all'
+  const selectedTaxa = searchParams.get('taxa') ?? 'all'
+  const selectedSpecies = searchParams.get('species') ?? ''
   // state
   const [zoneOptions, setZoneOptions] = useState<ChartInput[]>([])
   const [siteOptions, setSiteOptions] = useState<ChartInput[]>([])
   const [taxaOptions, setTaxaOptions] = useState<ChartInput[]>([])
   const [allSpecies, setAllSpecies] = useState<Species[]>([])
-  const [stats, setStats] = useState({ total: 0, nativeCount: 0, nonNativeCount: 0 })
+  const [stats, setStats] = useState({
+    total: 0,
+    nativeCount: 0,
+    nonNativeCount: 0,
+  })
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [showToast, setShowToast] = useState(false);
+  const [showToast, setShowToast] = useState(false)
   // refs
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null)
 
   const { total, nativeCount, nonNativeCount } = stats
   const speciesOptions = useMemo(
-    () => extractSpeciesOptions(allSpecies, selectedTaxa !== 'all' ? selectedTaxa : null),
-    [allSpecies, selectedTaxa]
+    () =>
+      extractSpeciesOptions(
+        allSpecies,
+        selectedTaxa !== 'all' ? selectedTaxa : null,
+      ),
+    [allSpecies, selectedTaxa],
   )
   // useMemo() : Memorizes params to avoid recalculating on every render
   const params = useMemo(
@@ -105,34 +113,36 @@ const MapCharts: React.FC = () => {
     [selectedZone, selectedSite, selectedTaxa, selectedSpecies],
   )
   const handleReset = useCallback(() => setSearchParams({}), [setSearchParams])
-  const setParam = useCallback((updates: Record<string, string>, empties: Record<string, string> = {}) => {
-    setSearchParams(prev => {
-      Object.entries(updates).forEach(([k, v]) => {
-        const empty = empties[k] ?? "all"
-        v === empty ? prev.delete(k) : prev.set(k, v)
+  const setParam = useCallback(
+    (updates: Record<string, string>, empties: Record<string, string> = {}) => {
+      setSearchParams((prev) => {
+        Object.entries(updates).forEach(([k, v]) => {
+          const empty = empties[k] ?? 'all'
+          v === empty ? prev.delete(k) : prev.set(k, v)
+        })
+        return prev
       })
-      return prev
-    })
-  }, [setSearchParams])
+    },
+    [setSearchParams],
+  )
 
   const copy = useCallback(() => {
     if (!navigator.clipboard) return
-    navigator.clipboard.writeText(window.location.href)
-      .then(() => {
-        if (timerRef.current) clearTimeout(timerRef.current)
-        setShowToast(true)
-        timerRef.current = setTimeout(() => setShowToast(false), 2000)
-      })
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+      setShowToast(true)
+      timerRef.current = setTimeout(() => setShowToast(false), 2000)
+    })
   }, [])
 
   useEffect(() => {
     getObservationBlocks({ from: DEFAULT_FROM })
-      .then(data => setZoneOptions(extractSortedZones(data)))
-      .catch(err => console.error('Failed to fetch zones:', err))
+      .then((data) => setZoneOptions(extractSortedZones(data)))
+      .catch((err) => console.error('Failed to fetch zones:', err))
 
     getAllSpecies()
       .then(setAllSpecies)
-      .catch(err => console.error('Failed to fetch species:', err))
+      .catch((err) => console.error('Failed to fetch species:', err))
   }, [])
 
   useEffect(() => {
@@ -141,8 +151,8 @@ const MapCharts: React.FC = () => {
       from: DEFAULT_FROM,
       block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
     })
-      .then(data => setSiteOptions(extractSortedSites(data)))
-      .catch(err => console.error('Failed to fetch sites:', err))
+      .then((data) => setSiteOptions(extractSortedSites(data)))
+      .catch((err) => console.error('Failed to fetch sites:', err))
   }, [selectedZone])
 
   useEffect(() => {
@@ -152,8 +162,8 @@ const MapCharts: React.FC = () => {
       block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
       siteCode: selectedSite !== 'all' ? selectedSite : undefined,
     })
-      .then(data => setTaxaOptions(extractTaxaOptions(data)))
-      .catch(err => console.error('Failed to fetch taxa:', err))
+      .then((data) => setTaxaOptions(extractTaxaOptions(data)))
+      .catch((err) => console.error('Failed to fetch taxa:', err))
   }, [selectedZone, selectedSite])
 
   useEffect(() => {
@@ -168,12 +178,15 @@ const MapCharts: React.FC = () => {
           nonNativeCount: statsData.speciesCount - statsData.nativeSpeciesCount,
         })
       })
-      .catch(err => console.error('Failed to fetch stats:', err))
+      .catch((err) => console.error('Failed to fetch stats:', err))
   }, [params])
 
-  useEffect(() => () => {
-    if (timerRef.current) clearTimeout(timerRef.current)
-  }, [])
+  useEffect(
+    () => () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    },
+    [],
+  )
   // Shared content used in both desktop and mobile
   const content = (
     <>
@@ -185,17 +198,18 @@ const MapCharts: React.FC = () => {
         <div className="flex items-center gap-1.5 my-2">
           <button
             onClick={copy}
-            className="border-2 border-[var(--button)] text-[var(--button)] font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:scale-105 hover:bg-[var(--button-hover)] hover:text-white hover:shadow-md">
+            className="border-2 border-[var(--button)] text-[var(--button)] font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:scale-105 hover:bg-[var(--button-hover)] hover:text-white hover:shadow-md"
+          >
             Copy Link
           </button>
           <button
             onClick={handleReset}
-            className="border-2 border-[var(--button)] bg-[var(--button)] font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:bg-[var(--button-hover)] hover:scale-105 hover:shadow-lg">
+            className="border-2 border-[var(--button)] bg-[var(--button)] font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:bg-[var(--button-hover)] hover:scale-105 hover:shadow-lg"
+          >
             Reset Filters
           </button>
         </div>
       </div>
-
 
       {/* Select Filters */}
       <div className="flex flex-col gap-3">
@@ -206,7 +220,7 @@ const MapCharts: React.FC = () => {
           <Select
             options={zoneOptions}
             value={selectedZone}
-            onChange={(z) => setParam({ zone: z, site: "all" })}
+            onChange={(z) => setParam({ zone: z, site: 'all' })}
             placeholder="Select Zone"
             className="w-full"
           />
@@ -234,7 +248,9 @@ const MapCharts: React.FC = () => {
           <Select
             options={taxaOptions}
             value={selectedTaxa}
-            onChange={(t) => setParam({ taxa: t, species: "" }, { species: "" })}
+            onChange={(t) =>
+              setParam({ taxa: t, species: '' }, { species: '' })
+            }
             placeholder="Select Taxa"
             className="w-full"
           />
@@ -249,7 +265,7 @@ const MapCharts: React.FC = () => {
           <Select
             options={speciesOptions}
             value={selectedSpecies}
-            onChange={(s) => setParam({ species: s }, { species: "" })}
+            onChange={(s) => setParam({ species: s }, { species: '' })}
             placeholder="Select Species"
             disabled={selectedTaxa === 'all'}
             className="w-full"
@@ -351,7 +367,9 @@ const MapCharts: React.FC = () => {
     <>
       {showToast && (
         <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none flex items-center gap-2 bg-white text-gray-800 text-xs font-medium px-4 py-2.5 rounded-xl shadow-xl border border-gray-100">
-          <span className="text-green-500 text-sm">✓ Link copied to clipboard</span>
+          <span className="text-green-500 text-sm">
+            ✓ Link copied to clipboard
+          </span>
         </div>
       )}
       {/* Desktop sidebar */}

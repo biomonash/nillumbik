@@ -1,5 +1,8 @@
 import fetcher from '../lib/fetcher'
-import type { ObservationSitesResponse, ObservationStatsRequest } from './stats.api'
+import type {
+  ObservationSitesResponse,
+  ObservationStatsRequest,
+} from './stats.api'
 // Req:
 // Zone | Taxa | Species | Total per Zone | Native/Non Native observed species per zone/taxa
 // Zone = Block, each zone has sites
@@ -13,7 +16,7 @@ export type BlockStat = {
 }
 
 export type SiteStat = {
-  siteCode: string 
+  siteCode: string
   observationCount: number
   speciesCount: number
 }
