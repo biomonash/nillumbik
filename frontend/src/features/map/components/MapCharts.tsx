@@ -181,12 +181,11 @@ const MapCharts: React.FC = () => {
       .catch((err) => console.error('Failed to fetch stats:', err))
   }, [params])
 
-  useEffect(
-    () => () => {
-      if (timerRef.current) clearTimeout(timerRef.current)
-    },
-    [],
-  )
+  useEffect(() => {
+  return () => {
+    if (timerRef.current) clearTimeout(timerRef.current)
+  }
+}, [])
   // Shared content used in both desktop and mobile
   const content = (
     <>

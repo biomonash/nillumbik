@@ -1,6 +1,5 @@
 import fetcher from '../lib/fetcher'
 import type {
-  ObservationSitesResponse,
   ObservationStatsRequest,
 } from './stats.api'
 // Req:
