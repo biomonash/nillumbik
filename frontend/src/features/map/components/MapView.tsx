@@ -60,13 +60,14 @@ export default function MapView() {
 
   return (
     <div style={{ position: 'relative' }}>
+      {/* Find My Location Button */}
       <button
         onClick={locate}
         disabled={loading}
         style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
+          position: 'fixed',
+          bottom: '30px',
+          left: '90px',
           zIndex: 1000,
           padding: '8px 16px',
           color: 'darkgreen',
@@ -78,7 +79,7 @@ export default function MapView() {
       >
         {loading ? 'Locating...' : 'Find My Location'}
       </button>
-      //Site info
+      {/* Location Info */}
       {coords && (
         <div
           style={{
@@ -148,7 +149,7 @@ export default function MapView() {
               };
             }}
 
-            // 🔥 INTERACTION
+            // 🔥 INTERACTION (hover/select/deselect)
             onEachFeature={(feature, layer) => {
               const site = feature.properties.site;
 
@@ -162,12 +163,13 @@ export default function MapView() {
 
               layer.on('click', () => {
                 console.log('Clicked zone:', feature.properties)
-                setSelectedZone(`Zone ${feature.properties.site}`)
+                const zoneName = `Zone ${feature.properties.site}`;
+                setSelectedZone(prev => prev === zoneName ? null : zoneName);
               })
             }}
           />
         )}
-        //pin
+        {/* Location Pin */}
         {coords && (
           <Marker
             position={[coords.latitude, coords.longitude]}
