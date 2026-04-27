@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 export default function MapPage() {
   const [selectedBlock, setSelectedBlock] = useState<string>('all')
-  
+
   return (
     <div style={{ position: 'relative' }}>
       <MapCharts selectedBlock={selectedBlock} />

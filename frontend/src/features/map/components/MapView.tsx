@@ -193,7 +193,11 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
               const isHovered = hoveredZone === site
               return {
                 color: isSelected ? '#b45309' : 'green',
-                fillColor: isSelected ? '#f59e0b' : isHovered ? '#86efac' : 'green',
+                fillColor: isSelected
+                  ? '#f59e0b'
+                  : isHovered
+                    ? '#86efac'
+                    : 'green',
                 fillOpacity: isSelected ? 0.6 : isHovered ? 0.5 : 0.3,
                 weight: isSelected ? 3 : 2,
               }
