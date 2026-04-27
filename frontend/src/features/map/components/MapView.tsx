@@ -1,14 +1,20 @@
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
+import {
+  MapContainer,
+  TileLayer,
+  GeoJSON,
+  Marker,
+  Popup,
+  useMap,
+} from 'react-leaflet'
 import { useEffect, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
+import { divIcon } from 'leaflet'
 import { useUserLocation } from '../../../hooks/useUserLocation'
 import { findSiteForLocation } from '../../../helpers/siteLocation'
 import type {
   ZonesGeoJSON,
   SiteProperties,
 } from '../../../helpers/siteLocation'
-import { Marker, Popup, useMap } from 'react-leaflet'
-import { divIcon } from 'leaflet'
 import SpeciesSidebar from './SpeciesSidebar'
 import { SPECIES } from '../data/species'
 
@@ -35,19 +41,22 @@ function FlyToUser({
 
 export default function MapView() {
   const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
+  const [viewType, setViewType] = useState('zones')
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
-  const { coords, loading, error, locate } = useUserLocation()
   const [selectedZone, setSelectedZone] = useState<string | null>(null)
+  const { coords, loading, error, locate } = useUserLocation()
 
   useEffect(() => {
-    fetch('/nillumbik_30zones.geojson')
+    const file =
+      viewType === 'zones' ? '/nillumbik_30zones.geojson' : '/blocks.geojson'
+    setGeoData(null)
+    fetch(file)
       .then((res) => res.json())
       .then((data) => setGeoData(data))
-  }, [])
+  }, [viewType])
 
   useEffect(() => {
     if (coords && geoData) {
-      //const site = findSiteForLocation(-37.67773, 145.091362, geoData);
       const site = findSiteForLocation(
         coords.latitude,
         coords.longitude,
@@ -59,13 +68,54 @@ export default function MapView() {
 
   return (
     <div style={{ position: 'relative' }}>
+      <div
+        style={{
+          position: 'absolute',
+          top: 20,
+          right: 20,
+          zIndex: 2000,
+          background: 'white',
+          padding: '8px',
+          borderRadius: '10px',
+          display: 'flex',
+          gap: '10px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+        }}
+      >
+        <button
+          onClick={() => setViewType('zones')}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            background: viewType === 'zones' ? 'green' : 'white',
+            color: viewType === 'zones' ? 'white' : 'black',
+            cursor: 'pointer',
+          }}
+        >
+          30 Zones
+        </button>
+        <button
+          onClick={() => setViewType('blocks')}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            background: viewType === 'blocks' ? 'green' : 'white',
+            color: viewType === 'blocks' ? 'white' : 'black',
+            cursor: 'pointer',
+          }}
+        >
+          Blocks
+        </button>
+      </div>
       <button
         onClick={locate}
         disabled={loading}
         style={{
           position: 'absolute',
-          top: '10px',
-          right: '10px',
+          bottom: '40px',
+          left: '10px',
           zIndex: 1000,
           padding: '8px 16px',
           color: 'darkgreen',
@@ -77,7 +127,6 @@ export default function MapView() {
       >
         {loading ? 'Locating...' : 'Find My Location'}
       </button>
-      //Site info
       {coords && (
         <div
           style={{
@@ -115,6 +164,7 @@ export default function MapView() {
         </div>
       )}
       <MapContainer
+        key={viewType}
         center={[-37.6, 145.2]}
         zoom={10}
         style={{
@@ -130,14 +180,13 @@ export default function MapView() {
         <FlyToUser coords={coords} />
         {geoData && (
           <GeoJSON
+            key={viewType}
             data={geoData}
-            // 🔥 STYLE EACH ZONE
             style={() => ({
               color: 'green',
               fillColor: 'green',
               fillOpacity: 0.3,
             })}
-            // 🔥 INTERACTION
             onEachFeature={(feature, layer) => {
               layer.on('click', () => {
                 console.log('Clicked zone:', feature.properties)
@@ -146,7 +195,6 @@ export default function MapView() {
             }}
           />
         )}
-        //pin
         {coords && (
           <Marker
             position={[coords.latitude, coords.longitude]}
