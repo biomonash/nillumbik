@@ -1,19 +1,25 @@
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
+import {
+  MapContainer,
+  TileLayer,
+  GeoJSON,
+  Marker,
+  Popup,
+  useMap,
+} from 'react-leaflet'
 import { useEffect, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
+import { divIcon } from 'leaflet'
 import { useUserLocation } from '../../../hooks/useUserLocation'
 import { findSiteForLocation } from '../../../helpers/siteLocation'
 import type {
   ZonesGeoJSON,
   SiteProperties,
 } from '../../../helpers/siteLocation'
-import { Marker, Popup, useMap } from 'react-leaflet'
-import { divIcon } from 'leaflet'
 import SpeciesSidebar from './SpeciesSidebar'
 import { SPECIES } from '../data/species'
 
 interface MapViewProps {
-  onZoneSelect: (block: string) => void;
+  onZoneSelect: (block: string) => void
 }
 
 const locationPin = divIcon({
@@ -39,20 +45,23 @@ function FlyToUser({
 
 export default function MapView({ onZoneSelect }: MapViewProps) {
   const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
+  const [viewType, setViewType] = useState('zones')
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
-  const { coords, loading, error, locate } = useUserLocation()
   const [selectedZone, setSelectedZone] = useState<string | null>(null)
-  const [hoveredZone, setHoveredZone] = useState<string | null>(null);
+  const [hoveredZone, setHoveredZone] = useState<string | null>(null)
+  const { coords, loading, error, locate } = useUserLocation()
 
   useEffect(() => {
-    fetch('/nillumbik_30zones.geojson')
+    const file =
+      viewType === 'zones' ? '/nillumbik_30zones.geojson' : '/blocks.geojson'
+    setGeoData(null)
+    fetch(file)
       .then((res) => res.json())
       .then((data) => setGeoData(data))
-  }, [])
+  }, [viewType])
 
   useEffect(() => {
     if (coords && geoData) {
-      //const site = findSiteForLocation(-37.67773, 145.091362, geoData);
       const site = findSiteForLocation(
         coords.latitude,
         coords.longitude,
@@ -64,7 +73,47 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
 
   return (
     <div style={{ position: 'relative' }}>
-      {/* Find My Location Button */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 20,
+          right: 20,
+          zIndex: 2000,
+          background: 'white',
+          padding: '8px',
+          borderRadius: '10px',
+          display: 'flex',
+          gap: '10px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+        }}
+      >
+        <button
+          onClick={() => setViewType('zones')}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            background: viewType === 'zones' ? 'green' : 'white',
+            color: viewType === 'zones' ? 'white' : 'black',
+            cursor: 'pointer',
+          }}
+        >
+          30 Zones
+        </button>
+        <button
+          onClick={() => setViewType('blocks')}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            background: viewType === 'blocks' ? 'green' : 'white',
+            color: viewType === 'blocks' ? 'white' : 'black',
+            cursor: 'pointer',
+          }}
+        >
+          Blocks
+        </button>
+      </div>
       <button
         onClick={locate}
         disabled={loading}
@@ -83,7 +132,6 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
       >
         {loading ? 'Locating...' : 'Find My Location'}
       </button>
-      {/* Location Info */}
       {coords && (
         <div
           style={{
@@ -121,6 +169,7 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
         </div>
       )}
       <MapContainer
+        key={viewType}
         center={[-37.6, 145.2]}
         zoom={10}
         style={{
@@ -136,46 +185,32 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
         <FlyToUser coords={coords} />
         {geoData && (
           <GeoJSON
-            key={selectedZone}
+            key={`${viewType}-${selectedZone}`}
             data={geoData}
-            
-            // 🔥 STYLE EACH ZONE (selected/hovered/default)
             style={(feature) => {
-              const site = feature?.properties?.site;
-              const isSelected = selectedZone === `Zone ${site}`;
-              const isHovered = hoveredZone === site;
-
+              const site = feature?.properties?.site
+              const isSelected = selectedZone === `Zone ${site}`
+              const isHovered = hoveredZone === site
               return {
-                color: isSelected ? "#b45309" : "green",
-                fillColor: isSelected ? "#f59e0b" : isHovered ? "#86efac" : "green",
+                color: isSelected ? '#b45309' : 'green',
+                fillColor: isSelected ? '#f59e0b' : isHovered ? '#86efac' : 'green',
                 fillOpacity: isSelected ? 0.6 : isHovered ? 0.5 : 0.3,
                 weight: isSelected ? 3 : 2,
-              };
+              }
             }}
-
-            // 🔥 INTERACTION (hover/select/deselect)
             onEachFeature={(feature, layer) => {
-              const site = feature.properties.site;
-
-              layer.on("mouseover", () => {
-                setHoveredZone(site);
-              });
-
-              layer.on("mouseout", () => {
-                setHoveredZone(null);
-              });
-
+              const site = feature.properties.site
+              layer.on('mouseover', () => setHoveredZone(site))
+              layer.on('mouseout', () => setHoveredZone(null))
               layer.on('click', () => {
                 console.log('Clicked zone:', feature.properties)
-                const zoneName = `Zone ${feature.properties.site}`;
-                setSelectedZone(prev => prev === zoneName ? null : zoneName);
-                const block = String(feature.properties.block);
-                onZoneSelect(block);
+                const zoneName = `Zone ${feature.properties.site}`
+                setSelectedZone((prev) => (prev === zoneName ? null : zoneName))
+                onZoneSelect(String(feature.properties.block))
               })
             }}
           />
         )}
-        {/* Location Pin */}
         {coords && (
           <Marker
             position={[coords.latitude, coords.longitude]}
