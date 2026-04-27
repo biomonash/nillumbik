@@ -22,6 +22,10 @@ import { SpeciesLineChart } from './charts/SpeciesLineChart'
 import { NativeBarChart } from './charts/NativeBarChart'
 import { useSearchParams } from 'react-router'
 
+interface MapChartsProps {
+  selectedBlock: string
+}
+
 const DEFAULT_FROM = new Date('2020-01-01')
 // Extraction Functions
 function capitalize(text: string) {
@@ -69,7 +73,8 @@ function extractSpeciesOptions(
   ]
 }
 
-const MapCharts: React.FC = () => {
+const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
+  // States
   const [searchParams, setSearchParams] = useSearchParams()
 
   // derived from url
@@ -105,12 +110,17 @@ const MapCharts: React.FC = () => {
   const params = useMemo(
     () => ({
       from: DEFAULT_FROM,
-      block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
+      block:
+        selectedZone !== 'all'
+          ? Number(selectedZone)
+          : selectedBlock !== ''
+            ? Number(selectedBlock)
+            : undefined,
       siteCode: selectedSite !== 'all' ? selectedSite : undefined,
       taxa: selectedTaxa !== 'all' ? selectedTaxa : undefined,
       commonName: selectedSpecies !== '' ? selectedSpecies : undefined,
     }),
-    [selectedZone, selectedSite, selectedTaxa, selectedSpecies],
+    [selectedZone, selectedSite, selectedBlock, selectedTaxa, selectedSpecies],
   )
   const handleReset = useCallback(() => setSearchParams({}), [setSearchParams])
   const setParam = useCallback(
@@ -226,6 +236,7 @@ const MapCharts: React.FC = () => {
           />
         </div>
         <div className="flex flex-col">
+          <p className="text-primary">{selectedBlock}</p>
           <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
             Site
           </span>
