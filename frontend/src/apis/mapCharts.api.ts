@@ -12,8 +12,18 @@ export type BlockStat = {
   speciesCount: number
 }
 
+export type SiteStat = {
+  siteCode: string
+  observationCount: number
+  speciesCount: number
+}
+
 export type GetObservationBlocksResponse = {
   blocks: BlockStat[]
+}
+
+export type GetObservationSitesResponse = {
+  sites: SiteStat[]
 }
 
 export type GetObservationStatsResponse = {
@@ -40,6 +50,16 @@ export async function getObservationBlocks(
 ): Promise<GetObservationBlocksResponse> {
   const response = await fetcher.get<GetObservationBlocksResponse>(
     '/stats/observations/blocks',
+    { params },
+  )
+  return response.data
+}
+
+export async function getObservationSites(
+  params: Partial<ObservationStatsRequest> = {},
+): Promise<GetObservationSitesResponse> {
+  const response = await fetcher.get<GetObservationSitesResponse>(
+    '/stats/observations/sites',
     { params },
   )
   return response.data
