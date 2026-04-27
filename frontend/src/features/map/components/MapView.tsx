@@ -18,6 +18,10 @@ import type {
 import SpeciesSidebar from './SpeciesSidebar'
 import { SPECIES } from '../data/species'
 
+interface MapViewProps {
+  onZoneSelect: (block: string) => void
+}
+
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
   className: '',
@@ -39,11 +43,12 @@ function FlyToUser({
   return null
 }
 
-export default function MapView() {
+export default function MapView({ onZoneSelect }: MapViewProps) {
   const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
   const [viewType, setViewType] = useState('zones')
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
   const [selectedZone, setSelectedZone] = useState<string | null>(null)
+  const [hoveredZone, setHoveredZone] = useState<string | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
 
   useEffect(() => {
@@ -113,9 +118,9 @@ export default function MapView() {
         onClick={locate}
         disabled={loading}
         style={{
-          position: 'absolute',
-          bottom: '40px',
-          left: '10px',
+          position: 'fixed',
+          bottom: '30px',
+          left: '90px',
           zIndex: 1000,
           padding: '8px 16px',
           color: 'darkgreen',
@@ -180,17 +185,32 @@ export default function MapView() {
         <FlyToUser coords={coords} />
         {geoData && (
           <GeoJSON
-            key={viewType}
+            key={`${viewType}-${selectedZone}`}
             data={geoData}
-            style={() => ({
-              color: 'green',
-              fillColor: 'green',
-              fillOpacity: 0.3,
-            })}
+            style={(feature) => {
+              const site = feature?.properties?.site
+              const isSelected = selectedZone === `Zone ${site}`
+              const isHovered = hoveredZone === site
+              return {
+                color: isSelected ? '#b45309' : 'green',
+                fillColor: isSelected
+                  ? '#f59e0b'
+                  : isHovered
+                    ? '#86efac'
+                    : 'green',
+                fillOpacity: isSelected ? 0.6 : isHovered ? 0.5 : 0.3,
+                weight: isSelected ? 3 : 2,
+              }
+            }}
             onEachFeature={(feature, layer) => {
+              const site = feature.properties.site
+              layer.on('mouseover', () => setHoveredZone(site))
+              layer.on('mouseout', () => setHoveredZone(null))
               layer.on('click', () => {
                 console.log('Clicked zone:', feature.properties)
-                setSelectedZone(`Zone ${feature.properties.site}`)
+                const zoneName = `Zone ${feature.properties.site}`
+                setSelectedZone((prev) => (prev === zoneName ? null : zoneName))
+                onZoneSelect(String(feature.properties.block))
               })
             }}
           />
