@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import {
   Card,
   CardHeader,
@@ -15,16 +15,19 @@ import {
   type GetObservationStatsResponse,
   type Species,
   type ChartInput,
+  type GetObservationSitesResponse,
+  getObservationSites,
 } from '../../../apis/mapCharts.api'
 import { SpeciesLineChart } from './charts/SpeciesLineChart'
 import { NativeBarChart } from './charts/NativeBarChart'
+import { useSearchParams } from 'react-router'
 
 interface MapChartsProps {
-  selectedBlock: string;
+  selectedBlock: string
 }
 
 const DEFAULT_FROM = new Date('2020-01-01')
-// Extracion Functions
+// Extraction Functions
 function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 }
@@ -34,6 +37,17 @@ function extractSortedZones(data: GetObservationBlocksResponse): ChartInput[] {
     .sort((a, b) => a.block - b.block)
     .map((b) => ({ value: String(b.block), label: `Zone ${b.block}` }))
   return [{ value: 'all', label: 'All Zones' }, ...sorted]
+}
+
+function extractSortedSites(data: GetObservationSitesResponse): ChartInput[] {
+  const sorted = [...data.sites]
+    .sort((a, b) => a.siteCode.localeCompare(b.siteCode))
+    .map((site) => ({
+      value: site.siteCode,
+      label: `Site ${site.siteCode}`,
+    }))
+
+  return [{ value: 'all', label: 'All Sites' }, ...sorted]
 }
 
 function extractTaxaOptions(data: GetObservationStatsResponse): ChartInput[] {
@@ -61,100 +75,150 @@ function extractSpeciesOptions(
 
 const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
   // States
-  const [selectedZone, setSelectedZone] = useState<string>('all')
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // derived from url
+  const selectedZone = searchParams.get('zone') ?? 'all'
+  const selectedSite = searchParams.get('site') ?? 'all'
+  const selectedTaxa = searchParams.get('taxa') ?? 'all'
+  const selectedSpecies = searchParams.get('species') ?? ''
+  // state
   const [zoneOptions, setZoneOptions] = useState<ChartInput[]>([])
-
-  const [selectedTaxa, setSelectedTaxa] = useState<string>('all')
+  const [siteOptions, setSiteOptions] = useState<ChartInput[]>([])
   const [taxaOptions, setTaxaOptions] = useState<ChartInput[]>([])
-
-  const [selectedSpecies, setSelectedSpecies] = useState<string>('')
-  const [speciesOptions, setSpeciesOptions] = useState<ChartInput[]>([])
   const [allSpecies, setAllSpecies] = useState<Species[]>([])
+  const [stats, setStats] = useState({
+    total: 0,
+    nativeCount: 0,
+    nonNativeCount: 0,
+  })
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [showToast, setShowToast] = useState(false)
+  // refs
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(null)
 
-  const [observationCount, setObservationCount] = useState(0) // Outputs
-  const [nativeCount, setNativeCount] = useState(0)
-  const [nonNativeCount, setNonNativeCount] = useState(0)
-
-  const [drawerOpen, setDrawerOpen] = useState(false) // For responsive view
-
-  // Updates zone dropdown when user clicks on a zone
-  useEffect(() => {
-    setSelectedZone(selectedBlock);
-  }, [selectedBlock]);
-
-  // Loads initial data
-  useEffect(() => {
-    getObservationBlocks({ from: DEFAULT_FROM }).then((data) =>
-      setZoneOptions(extractSortedZones(data)),
-    )
-    getObservationStats({ from: DEFAULT_FROM }).then((data) =>
-      setTaxaOptions(extractTaxaOptions(data)),
-    )
-    getAllSpecies().then(setAllSpecies)
-  }, [])
-
-  useEffect(() => {
-    setSpeciesOptions(
+  const { total, nativeCount, nonNativeCount } = stats
+  const speciesOptions = useMemo(
+    () =>
       extractSpeciesOptions(
         allSpecies,
         selectedTaxa !== 'all' ? selectedTaxa : null,
       ),
-    )
-    setSelectedSpecies('') // Default as empty string for "all" options
-  }, [selectedTaxa, allSpecies])
-
+    [allSpecies, selectedTaxa],
+  )
   // useMemo() : Memorizes params to avoid recalculating on every render
   const params = useMemo(
     () => ({
       from: DEFAULT_FROM,
-      block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
+      block:
+        selectedZone !== 'all'
+          ? Number(selectedZone)
+          : selectedBlock !== ''
+            ? Number(selectedBlock)
+            : undefined,
+      siteCode: selectedSite !== 'all' ? selectedSite : undefined,
       taxa: selectedTaxa !== 'all' ? selectedTaxa : undefined,
       commonName: selectedSpecies !== '' ? selectedSpecies : undefined,
     }),
-    [selectedZone, selectedTaxa, selectedSpecies],
+    [selectedZone, selectedSite, selectedBlock, selectedTaxa, selectedSpecies],
+  )
+  const handleReset = useCallback(() => setSearchParams({}), [setSearchParams])
+  const setParam = useCallback(
+    (updates: Record<string, string>, empties: Record<string, string> = {}) => {
+      setSearchParams((prev) => {
+        Object.entries(updates).forEach(([k, v]) => {
+          const empty = empties[k] ?? 'all'
+          if (v === empty) prev.delete(k)
+          else prev.set(k, v)
+        })
+        return prev
+      })
+    },
+    [setSearchParams],
   )
 
-  // fetch obs stats when filter state changes
-  useEffect(() => {
-    Promise.all([
-      getObservationBlocks(params),
-      getObservationStats(params),
-    ]).then(([blocksData, statsData]) => {
-      const total = blocksData.blocks.reduce(
-        (sum, b) => sum + b.observationCount,
-        0,
-      )
-      setObservationCount(total)
-      setNativeCount(statsData.nativeSpeciesCount)
-      setNonNativeCount(statsData.speciesCount - statsData.nativeSpeciesCount)
+  const copy = useCallback(() => {
+    if (!navigator.clipboard) return
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+      setShowToast(true)
+      timerRef.current = setTimeout(() => setShowToast(false), 2000)
     })
+  }, [])
+
+  useEffect(() => {
+    getObservationBlocks({ from: DEFAULT_FROM })
+      .then((data) => setZoneOptions(extractSortedZones(data)))
+      .catch((err) => console.error('Failed to fetch zones:', err))
+
+    getAllSpecies()
+      .then(setAllSpecies)
+      .catch((err) => console.error('Failed to fetch species:', err))
+  }, [])
+
+  useEffect(() => {
+    setSiteOptions([])
+    getObservationSites({
+      from: DEFAULT_FROM,
+      block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
+    })
+      .then((data) => setSiteOptions(extractSortedSites(data)))
+      .catch((err) => console.error('Failed to fetch sites:', err))
+  }, [selectedZone])
+
+  useEffect(() => {
+    setTaxaOptions([])
+    getObservationStats({
+      from: DEFAULT_FROM,
+      block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
+      siteCode: selectedSite !== 'all' ? selectedSite : undefined,
+    })
+      .then((data) => setTaxaOptions(extractTaxaOptions(data)))
+      .catch((err) => console.error('Failed to fetch taxa:', err))
+  }, [selectedZone, selectedSite])
+
+  useEffect(() => {
+    Promise.all([getObservationBlocks(params), getObservationStats(params)])
+      .then(([blocksData, statsData]) => {
+        const total = params.siteCode
+          ? statsData.observationCount
+          : blocksData.blocks.reduce((sum, b) => sum + b.observationCount, 0)
+        setStats({
+          total,
+          nativeCount: statsData.nativeSpeciesCount,
+          nonNativeCount: statsData.speciesCount - statsData.nativeSpeciesCount,
+        })
+      })
+      .catch((err) => console.error('Failed to fetch stats:', err))
   }, [params])
 
-  const handleReset = () => {
-    setSelectedZone('all')
-    setSelectedTaxa('all')
-    setSelectedSpecies('')
-  }
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [])
   // Shared content used in both desktop and mobile
   const content = (
     <>
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex relative justify-between items-center">
         <h1 className="text-black text-lg font-semibold tracking-tight">
           Zone Filter 🔎
         </h1>
-        <button
-          onClick={handleReset}
-          className="bg-[var(--button)] hover:bg-[var(--button-hover)] text-white font-semibold py-1.5 px-3 rounded-full text-xs transition-colors"
-        >
-          Reset Filters
-        </button>
-
-        {/**TODO: Add a download button or share link button(selections need to query/params in links)  
-        <button className="bg-[var(--button)] hover:bg-[var(--button-hover)] text-white font-semibold py-1.5 px-3 rounded-full text-xs transition-colors">
-          Download
-        </button>
-        */}
+        <div className="flex items-center gap-1.5 my-2">
+          <button
+            onClick={copy}
+            className="border-2 border-[var(--button)] text-[var(--button)] font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:scale-105 hover:bg-[var(--button-hover)] hover:text-white hover:shadow-md"
+          >
+            Copy Link
+          </button>
+          <button
+            onClick={handleReset}
+            className="border-2 border-[var(--button)] bg-[var(--button)] font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:bg-[var(--button-hover)] hover:scale-105 hover:shadow-lg"
+          >
+            Reset Filters
+          </button>
+        </div>
       </div>
 
       {/* Select Filters */}
@@ -166,8 +230,22 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
           <Select
             options={zoneOptions}
             value={selectedZone}
-            onChange={(val) => setSelectedZone(val)}
+            onChange={(z) => setParam({ zone: z, site: 'all' })}
             placeholder="Select Zone"
+            className="w-full"
+          />
+        </div>
+        <div className="flex flex-col">
+          <p className="text-primary">{selectedBlock}</p>
+          <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
+            Site
+          </span>
+          <Select
+            options={siteOptions}
+            value={selectedSite}
+            onChange={(s) => setParam({ site: s })}
+            disabled={selectedZone === 'all'}
+            placeholder="Select Site"
             className="w-full"
           />
         </div>
@@ -181,7 +259,9 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
           <Select
             options={taxaOptions}
             value={selectedTaxa}
-            onChange={setSelectedTaxa}
+            onChange={(t) =>
+              setParam({ taxa: t, species: '' }, { species: '' })
+            }
             placeholder="Select Taxa"
             className="w-full"
           />
@@ -196,7 +276,7 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
           <Select
             options={speciesOptions}
             value={selectedSpecies}
-            onChange={setSelectedSpecies}
+            onChange={(s) => setParam({ species: s }, { species: '' })}
             placeholder="Select Species"
             disabled={selectedTaxa === 'all'}
             className="w-full"
@@ -205,7 +285,7 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
       </div>
 
       {/* Species badge */}
-      {selectedSpecies && selectedSpecies !== '' && (
+      {selectedSpecies && (
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-600">Species Type:</span>
           <span
@@ -223,14 +303,14 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
         </span>
         <div className="flex items-baseline gap-1">
           <span className="text-2xl font-bold text-black">
-            {observationCount.toLocaleString()}
+            {total.toLocaleString()}
           </span>
           <span className="text-xs text-gray-500">total detections</span>
         </div>
       </div>
 
       {/* Distribution — hidden when species selected */}
-      {(!selectedSpecies || selectedSpecies === '') && (
+      {!selectedSpecies && (
         <div>
           <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2 block">
             Distribution
@@ -262,7 +342,7 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
             </CardDescription>
           </CardHeader>
           <CardContent className="px-2 pb-3">
-            {!selectedSpecies || selectedSpecies === '' ? (
+            {!selectedSpecies ? (
               <NativeBarChart
                 nativeCount={nativeCount}
                 nonNativeCount={nonNativeCount}
@@ -278,7 +358,7 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
           <CardHeader className="pb-1 pt-3 px-3">
             <CardTitle className="text-sm">Species Richness</CardTitle>
             <CardDescription className="text-xs">
-              {!selectedSpecies || selectedSpecies === ''
+              {!selectedSpecies
                 ? 'Unique species observed over time'
                 : `Number of ${selectedSpecies} observed over time`}
             </CardDescription>
@@ -296,9 +376,16 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
 
   return (
     <>
+      {showToast && (
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none flex items-center gap-2 bg-white text-gray-800 text-xs font-medium px-4 py-2.5 rounded-xl shadow-xl border border-gray-100">
+          <span className="text-green-500 text-sm">
+            ✓ Link copied to clipboard
+          </span>
+        </div>
+      )}
       {/* Desktop sidebar */}
       <div className="hidden md:flex fixed right-0 top-0 h-screen w-[350px] bg-[var(--muted-foreground2)] z-50 flex-col shadow-xl">
-        <div className="flex-1 overflow-y-auto p-4 pt-14 flex flex-col gap-4">
+        <div className="flex-1 overflow-y-auto p-2 pt-14 flex flex-col gap-4">
           {content}
         </div>
       </div>
@@ -318,7 +405,7 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
             </span>
             <span className="text-gray-400 text-xs">·</span>
             <span className="text-gray-500 text-xs">
-              {observationCount.toLocaleString()} detections
+              {total.toLocaleString()} detections
             </span>
           </div>
           <i
