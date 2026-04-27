@@ -11,7 +11,10 @@ import 'leaflet/dist/leaflet.css'
 import { divIcon } from 'leaflet'
 import { useUserLocation } from '../../../hooks/useUserLocation'
 import { findSiteForLocation } from '../../../helpers/siteLocation'
-import type { SiteProperties } from '../../../helpers/siteLocation'
+import type {
+  ZonesGeoJSON,
+  SiteProperties,
+} from '../../../helpers/siteLocation'
 import SpeciesSidebar from './SpeciesSidebar'
 import { SPECIES } from '../data/species'
 
@@ -37,7 +40,7 @@ function FlyToUser({
 }
 
 export default function MapView() {
-  const [geoData, setGeoData] = useState<any>(null)
+  const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
   const [viewType, setViewType] = useState('zones')
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
   const [selectedZone, setSelectedZone] = useState<string | null>(null)
