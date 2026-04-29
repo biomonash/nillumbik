@@ -63,4 +63,5 @@ dist-ssr
 frontend/package-lock.json
 frontend/yarn.lock
 
-.gitignore
+backend/package-lock.json
+frontend/yarn.lock
