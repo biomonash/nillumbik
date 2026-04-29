@@ -17,13 +17,32 @@ import { toPercent } from '../../lib/utils'
 import { BarChart } from './components/charts/BarChart'
 import { LineChart } from './components/charts/LineChart'
 import { PieChart } from './components/charts/PieChart'
+import { useSearchParams } from 'react-router'
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStatsResponse | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  
+  const startYear = searchParams.get('startYear') || ''
+  const endYear = searchParams.get('endYear') || ''
+  const isFilterActive = !!(startYear && endYear)
 
   useEffect(() => {
-    getDashboardStats({ from: new Date('2025-01-01') }).then(setStats)
-  }, [])
+    const fromDate = startYear ? new Date(`${startYear}-01-01`) : new Date('2021-01-01')
+    const toDate = endYear ? new Date(`${endYear}-12-31`) : undefined
+
+    getDashboardStats({ from: fromDate, to: toDate }).then(setStats)
+  }, [startYear, endYear])
+
+  const handleYearChange = (key: 'startYear' | 'endYear', value: string) => {
+    if (value === 'all') {
+      searchParams.delete('startYear')
+      searchParams.delete('endYear')
+    } else {
+      searchParams.set(key, value)
+    }
+    setSearchParams(searchParams)
+  }
 
   const IconPlaceholder = ({ label }: { label: string }) => (
     <span
@@ -41,6 +60,8 @@ const Dashboard: React.FC = () => {
     </div>
   )
 
+  const yearOptions = ['2021', '2022', '2023', '2024', '2025', '2026']
+
   return (
     <div className="flex flex-col w-full px-8 py-6 gap-8 box-border">
       {/* Title */}
@@ -53,13 +74,37 @@ const Dashboard: React.FC = () => {
             Real-time environmental data from across Nillumbik Shire
           </p>
         </div>
-        <Badge
-          variant="secondary"
-          className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-sidebar text-white"
-        >
-          <IconPlaceholder label="Live" />
-          Live Monitoring
-        </Badge>
+        <div className="flex items-center gap-3 bg-sidebar/50 p-2 rounded-lg border border-white/10">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-white/50 uppercase font-bold">From</span>
+            <select 
+              value={startYear || 'all'} 
+              onChange={(e) => handleYearChange('startYear', e.target.value)}
+              className="bg-sidebar text-white border border-white/10 rounded-md px-2 py-1 text-sm outline-none cursor-pointer"
+            >
+              <option value="all">Start</option>
+              {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-white/50 uppercase font-bold">To</span>
+            <select 
+              value={endYear || 'all'} 
+              onChange={(e) => handleYearChange('endYear', e.target.value)}
+              className="bg-sidebar text-white border border-white/10 rounded-md px-2 py-1 text-sm outline-none cursor-pointer"
+            >
+              <option value="all">End</option>
+              {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+            </select>
+          </div>
+          <Badge
+            variant="secondary"
+            className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-sidebar text-white"
+          >
+            <IconPlaceholder label="Live" />
+            Live Monitoring
+          </Badge>
+        </div>
       </div>
 
       {/* Key Statistics */}
@@ -109,23 +154,23 @@ const Dashboard: React.FC = () => {
 
       {/* Data Visualizations */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-        <Card>
+        <Card className={isFilterActive ? 'md:col-span-2' : ''}>
           <CardHeader>
             <CardTitle>Species by Year</CardTitle>
             <CardDescription>Distribution across years</CardDescription>
           </CardHeader>
           <CardContent>
-            <BarChart />
+            <BarChart startYear={startYear} endYear={endYear} />
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className={isFilterActive ? 'md:col-span-2 order-last' : ''}>
           <CardHeader>
             <CardTitle>Native vs Invasive Trends</CardTitle>
             <CardDescription>Annual variation</CardDescription>
           </CardHeader>
           <CardContent>
-            <LineChart />
+            <LineChart startYear={startYear} endYear={endYear} />
           </CardContent>
         </Card>
 
@@ -135,7 +180,7 @@ const Dashboard: React.FC = () => {
             <CardDescription>Native, Invasive, Rare</CardDescription>
           </CardHeader>
           <CardContent>
-            <PieChart />
+            <PieChart startYear={startYear} endYear={endYear} />
           </CardContent>
         </Card>
 
