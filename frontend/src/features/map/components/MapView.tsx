@@ -209,15 +209,10 @@ export default function MapView() {
               layer.on('click', () => {
                 console.log('Clicked zone:', feature.properties)
                 const zoneName = `Zone ${feature.properties.site}`
-                setSelectedZone(prev => {
-                  if (prev === zoneName) {
-                    dispatch(setSelectedSite(null));
-                    return null;
-                  } else {
-                    dispatch(setSelectedSite(site));
-                    return zoneName;
-                  }
-                });
+                const isAlreadySelected = selectedZone === zoneName
+
+                setSelectedZone(isAlreadySelected ? null : zoneName)
+                dispatch(setSelectedSite(isAlreadySelected ? null : site))
               })
             }}
           />
