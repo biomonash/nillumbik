@@ -22,7 +22,13 @@ import { SpeciesLineChart } from './charts/SpeciesLineChart'
 import { NativeBarChart } from './charts/NativeBarChart'
 import { useSelector, useDispatch } from 'react-redux'
 import type { RootState } from '../../../store/store'
-import { setSelectedZone, setSelectedSite, setSelectedTaxa, setSelectedSpecies, resetFilters } from '../../../store/mapSlice'
+import {
+  setSelectedZone,
+  setSelectedSite,
+  setSelectedTaxa,
+  setSelectedSpecies,
+  resetFilters,
+} from '../../../store/mapSlice'
 
 const DEFAULT_FROM = new Date('2020-01-01')
 // Extraction Functions
@@ -76,9 +82,12 @@ const MapCharts: React.FC = () => {
 
   // read all filter state from redux
   const selectedZone = useSelector((state: RootState) => state.map.selectedZone)
-  const selectedSite = useSelector((state: RootState) => state.map.selectedSite) ?? 'all'
+  const selectedSite =
+    useSelector((state: RootState) => state.map.selectedSite) ?? 'all'
   const selectedTaxa = useSelector((state: RootState) => state.map.selectedTaxa)
-  const selectedSpecies = useSelector((state: RootState) => state.map.selectedSpecies)
+  const selectedSpecies = useSelector(
+    (state: RootState) => state.map.selectedSpecies,
+  )
   // state
   const [zoneOptions, setZoneOptions] = useState<ChartInput[]>([])
   const [siteOptions, setSiteOptions] = useState<ChartInput[]>([])
@@ -107,10 +116,7 @@ const MapCharts: React.FC = () => {
   const params = useMemo(
     () => ({
       from: DEFAULT_FROM,
-      block:
-        selectedZone !== 'all'
-          ? Number(selectedZone)
-            : undefined,
+      block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
       siteCode: selectedSite !== 'all' ? selectedSite : undefined,
       taxa: selectedTaxa !== 'all' ? selectedTaxa : undefined,
       commonName: selectedSpecies !== '' ? selectedSpecies : undefined,
@@ -240,9 +246,7 @@ const MapCharts: React.FC = () => {
           <Select
             options={taxaOptions}
             value={selectedTaxa}
-            onChange={(t) =>
-              dispatch(setSelectedTaxa(t))
-            }
+            onChange={(t) => dispatch(setSelectedTaxa(t))}
             placeholder="Select Taxa"
             className="w-full"
           />

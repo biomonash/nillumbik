@@ -1,10 +1,10 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore } from '@reduxjs/toolkit'
 import mapReducer from './mapSlice'
 
 export const store = configureStore({
-    reducer: {
-        map: mapReducer,
-    },
+  reducer: {
+    map: mapReducer,
+  },
 })
 
 export type RootState = ReturnType<typeof store.getState>

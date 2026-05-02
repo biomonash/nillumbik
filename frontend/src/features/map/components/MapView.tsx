@@ -20,7 +20,6 @@ import { SPECIES } from '../data/species'
 import { useDispatch } from 'react-redux'
 import { setSelectedSite } from '../../../store/mapSlice'
 
-
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
   className: '',
