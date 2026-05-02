@@ -17,10 +17,8 @@ import type {
 } from '../../../helpers/siteLocation'
 import SpeciesSidebar from './SpeciesSidebar'
 import { SPECIES } from '../data/species'
-
-interface MapViewProps {
-  onZoneSelect: (block: string) => void
-}
+import { useDispatch } from 'react-redux'
+import { setSelectedSite } from '../../../store/mapSlice'
 
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
@@ -43,13 +41,14 @@ function FlyToUser({
   return null
 }
 
-export default function MapView({ onZoneSelect }: MapViewProps) {
+export default function MapView() {
   const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
   const [viewType, setViewType] = useState('zones')
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
   const [selectedZone, setSelectedZone] = useState<string | null>(null)
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const file =
@@ -209,8 +208,10 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
               layer.on('click', () => {
                 console.log('Clicked zone:', feature.properties)
                 const zoneName = `Zone ${feature.properties.site}`
-                setSelectedZone((prev) => (prev === zoneName ? null : zoneName))
-                onZoneSelect(String(feature.properties.block))
+                const isAlreadySelected = selectedZone === zoneName
+
+                setSelectedZone(isAlreadySelected ? null : zoneName)
+                dispatch(setSelectedSite(isAlreadySelected ? null : site))
               })
             }}
           />
