@@ -1,12 +1,16 @@
 package server
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/biomonash/nillumbik/assets"
 	"github.com/biomonash/nillumbik/internal/db"
 	"github.com/biomonash/nillumbik/internal/observation"
 	"github.com/biomonash/nillumbik/internal/site"
 	"github.com/biomonash/nillumbik/internal/species"
 	"github.com/biomonash/nillumbik/internal/stats"
+	"github.com/biomonash/nillumbik/internal/storage"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -58,6 +62,17 @@ func New(querier db.Querier) *Server {
 	stats.Register(api, stats.NewController(querier))
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	s3Client, err := storage.NewS3Client(
+    os.Getenv("S3_ENDPOINT"),
+    "garage",
+    os.Getenv("S3_ACCESS_KEY"),
+    os.Getenv("S3_SECRET_KEY"),
+	)
+	if err != nil {
+		panic(fmt.Sprintf("failed to connect to storage: %v", err))
+	}
+	storage.Register(api, storage.NewController(s3Client, os.Getenv("S3_BUCKET")))
 
 	return &Server{
 		router: r,

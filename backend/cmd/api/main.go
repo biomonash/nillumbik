@@ -39,6 +39,11 @@ func run() error {
 	return s.Run(":8000")
 }
 
+//	@title			Nillubim Shire API
+//	@version		1.0
+//	@description	This is the backend API for Nillumbik Shire project.
+//	@host			localhost:8000
+//	@BasePath		/api/
 func main() {
 	if err := run(); err != nil {
 		log.Fatal(err)

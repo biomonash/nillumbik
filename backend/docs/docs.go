@@ -9,16 +9,7 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "http://swagger.io/terms/",
-        "contact": {
-            "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
+        "contact": {},
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -59,7 +50,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/observation.ListObservationsResponse"
+                            "$ref": "#/definitions/internal_observation.ListObservationsResponse"
                         }
                     }
                 }
@@ -91,7 +82,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/observation.Observation"
+                            "$ref": "#/definitions/internal_observation.Observation"
                         }
                     }
                 }
@@ -116,7 +107,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/db.Site"
+                                "$ref": "#/definitions/github_com_biomonash_nillumbik_internal_db.Site"
                             }
                         }
                     }
@@ -149,7 +140,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/db.Site"
+                            "$ref": "#/definitions/github_com_biomonash_nillumbik_internal_db.Site"
                         }
                     }
                 }
@@ -174,7 +165,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/db.Species"
+                                "$ref": "#/definitions/github_com_biomonash_nillumbik_internal_db.Species"
                             }
                         }
                     }
@@ -207,7 +198,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/db.Species"
+                            "$ref": "#/definitions/github_com_biomonash_nillumbik_internal_db.Species"
                         }
                     }
                 }
@@ -250,7 +241,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/species.ObservedSpeciesResponse"
+                            "$ref": "#/definitions/internal_species.ObservedSpeciesResponse"
                         }
                     }
                 }
@@ -282,7 +273,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/db.Species"
+                            "$ref": "#/definitions/github_com_biomonash_nillumbik_internal_db.Species"
                         }
                     }
                 }
@@ -304,15 +295,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     }
@@ -321,7 +312,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/stats.DashboardStatsResponse"
+                            "$ref": "#/definitions/internal_stats.DashboardStatsResponse"
                         }
                     }
                 }
@@ -343,15 +334,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     },
@@ -384,7 +375,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/stats.ObservationOverviewResponse"
+                            "$ref": "#/definitions/internal_stats.ObservationOverviewResponse"
                         }
                     }
                 }
@@ -406,15 +397,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     },
@@ -447,7 +438,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/stats.ObservationByBlocksResponse"
+                            "$ref": "#/definitions/internal_stats.ObservationByBlocksResponse"
                         }
                     }
                 }
@@ -469,15 +460,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     },
@@ -510,7 +501,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/stats.ObservationBySitesResponse"
+                            "$ref": "#/definitions/internal_stats.ObservationBySitesResponse"
                         }
                     }
                 }
@@ -532,15 +523,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     },
@@ -573,7 +564,86 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/stats.ObservationTimeSeriesResponse"
+                            "$ref": "#/definitions/internal_stats.ObservationTimeSeriesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/storage/upload": {
+            "post": {
+                "description": "Upload a file to object storage",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "storage"
+                ],
+                "summary": "Upload a file",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "File to upload",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/storage/{key}": {
+            "get": {
+                "description": "Get a file from object storage by key",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "storage"
+                ],
+                "summary": "Get a file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "File key",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -581,7 +651,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "db.ForestType": {
+        "github_com_biomonash_nillumbik_internal_db.ForestType": {
             "type": "string",
             "enum": [
                 "dry",
@@ -592,7 +662,7 @@ const docTemplate = `{
                 "ForestTypeWet"
             ]
         },
-        "db.Observation": {
+        "github_com_biomonash_nillumbik_internal_db.Observation": {
             "type": "object",
             "properties": {
                 "appearanceEnd": {
@@ -611,7 +681,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "method": {
-                    "$ref": "#/definitions/db.ObservationMethod"
+                    "$ref": "#/definitions/github_com_biomonash_nillumbik_internal_db.ObservationMethod"
                 },
                 "narrative": {
                     "type": "string"
@@ -630,7 +700,7 @@ const docTemplate = `{
                 }
             }
         },
-        "db.ObservationMethod": {
+        "github_com_biomonash_nillumbik_internal_db.ObservationMethod": {
             "type": "string",
             "enum": [
                 "audio",
@@ -643,7 +713,7 @@ const docTemplate = `{
                 "ObservationMethodObserved"
             ]
         },
-        "db.Site": {
+        "github_com_biomonash_nillumbik_internal_db.Site": {
             "type": "object",
             "properties": {
                 "block": {
@@ -653,7 +723,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "forest": {
-                    "$ref": "#/definitions/db.ForestType"
+                    "$ref": "#/definitions/github_com_biomonash_nillumbik_internal_db.ForestType"
                 },
                 "id": {
                     "type": "integer"
@@ -665,11 +735,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tenure": {
-                    "$ref": "#/definitions/db.TenureType"
+                    "$ref": "#/definitions/github_com_biomonash_nillumbik_internal_db.TenureType"
                 }
             }
         },
-        "db.Species": {
+        "github_com_biomonash_nillumbik_internal_db.Species": {
             "type": "object",
             "properties": {
                 "commonName": {
@@ -691,11 +761,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "taxa": {
-                    "$ref": "#/definitions/db.Taxa"
+                    "$ref": "#/definitions/github_com_biomonash_nillumbik_internal_db.Taxa"
                 }
             }
         },
-        "db.Taxa": {
+        "github_com_biomonash_nillumbik_internal_db.Taxa": {
             "type": "string",
             "enum": [
                 "bird",
@@ -708,7 +778,7 @@ const docTemplate = `{
                 "TaxaReptile"
             ]
         },
-        "db.TenureType": {
+        "github_com_biomonash_nillumbik_internal_db.TenureType": {
             "type": "string",
             "enum": [
                 "public",
@@ -719,7 +789,7 @@ const docTemplate = `{
                 "TenureTypePrivate"
             ]
         },
-        "observation.ListObservationsResponse": {
+        "internal_observation.ListObservationsResponse": {
             "type": "object",
             "properties": {
                 "count": {
@@ -728,12 +798,12 @@ const docTemplate = `{
                 "observations": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/db.Observation"
+                        "$ref": "#/definitions/github_com_biomonash_nillumbik_internal_db.Observation"
                     }
                 }
             }
         },
-        "observation.Observation": {
+        "internal_observation.Observation": {
             "type": "object",
             "properties": {
                 "appearanceIime": {
@@ -757,7 +827,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "method": {
-                    "$ref": "#/definitions/db.ObservationMethod"
+                    "$ref": "#/definitions/github_com_biomonash_nillumbik_internal_db.ObservationMethod"
                 },
                 "narrative": {
                     "type": "string"
@@ -779,7 +849,7 @@ const docTemplate = `{
                 }
             }
         },
-        "species.ObservedSpecies": {
+        "internal_species.ObservedSpecies": {
             "type": "object",
             "properties": {
                 "common_name": {
@@ -796,13 +866,13 @@ const docTemplate = `{
                 }
             }
         },
-        "species.ObservedSpeciesResponse": {
+        "internal_species.ObservedSpeciesResponse": {
             "type": "object",
             "properties": {
                 "species": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/species.ObservedSpecies"
+                        "$ref": "#/definitions/internal_species.ObservedSpecies"
                     }
                 },
                 "total": {
@@ -810,7 +880,7 @@ const docTemplate = `{
                 }
             }
         },
-        "stats.BlockResponse": {
+        "internal_stats.BlockResponse": {
             "type": "object",
             "properties": {
                 "block": {
@@ -824,7 +894,7 @@ const docTemplate = `{
                 }
             }
         },
-        "stats.DashboardStatsResponse": {
+        "internal_stats.DashboardStatsResponse": {
             "type": "object",
             "properties": {
                 "nativeSpeciesCount": {
@@ -841,29 +911,29 @@ const docTemplate = `{
                 }
             }
         },
-        "stats.ObservationByBlocksResponse": {
+        "internal_stats.ObservationByBlocksResponse": {
             "type": "object",
             "properties": {
                 "blocks": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/stats.BlockResponse"
+                        "$ref": "#/definitions/internal_stats.BlockResponse"
                     }
                 }
             }
         },
-        "stats.ObservationBySitesResponse": {
+        "internal_stats.ObservationBySitesResponse": {
             "type": "object",
             "properties": {
                 "sites": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/stats.SiteResponse"
+                        "$ref": "#/definitions/internal_stats.SiteResponse"
                     }
                 }
             }
         },
-        "stats.ObservationOverviewResponse": {
+        "internal_stats.ObservationOverviewResponse": {
             "type": "object",
             "properties": {
                 "countByTaxa": {
@@ -884,7 +954,7 @@ const docTemplate = `{
                 }
             }
         },
-        "stats.ObservationTimeSeriesResponse": {
+        "internal_stats.ObservationTimeSeriesResponse": {
             "type": "object",
             "properties": {
                 "series": {
@@ -892,13 +962,13 @@ const docTemplate = `{
                     "additionalProperties": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/definitions/stats.TimeSeriesPoint"
+                            "$ref": "#/definitions/internal_stats.TimeSeriesPoint"
                         }
                     }
                 }
             }
         },
-        "stats.SiteResponse": {
+        "internal_stats.SiteResponse": {
             "type": "object",
             "properties": {
                 "observationCount": {
@@ -912,7 +982,7 @@ const docTemplate = `{
                 }
             }
         },
-        "stats.TimeSeriesPoint": {
+        "internal_stats.TimeSeriesPoint": {
             "type": "object",
             "properties": {
                 "observationCount": {
@@ -926,15 +996,6 @@ const docTemplate = `{
                 }
             }
         }
-    },
-    "securityDefinitions": {
-        "BasicAuth": {
-            "type": "basic"
-        }
-    },
-    "externalDocs": {
-        "description": "OpenAPI",
-        "url": "https://swagger.io/resources/open-api/"
     }
 }`
 
