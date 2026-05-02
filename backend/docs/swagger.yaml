@@ -1,6 +1,6 @@
 basePath: /api/
 definitions:
-  db.ForestType:
+  github_com_biomonash_nillumbik_internal_db.ForestType:
     enum:
     - dry
     - wet
@@ -8,7 +8,7 @@ definitions:
     x-enum-varnames:
     - ForestTypeDry
     - ForestTypeWet
-  db.Observation:
+  github_com_biomonash_nillumbik_internal_db.Observation:
     properties:
       appearanceEnd:
         type: integer
@@ -21,7 +21,7 @@ definitions:
       id:
         type: integer
       method:
-        $ref: '#/definitions/db.ObservationMethod'
+        $ref: '#/definitions/github_com_biomonash_nillumbik_internal_db.ObservationMethod'
       narrative:
         type: string
       siteId:
@@ -33,7 +33,7 @@ definitions:
       timestamp:
         type: string
     type: object
-  db.ObservationMethod:
+  github_com_biomonash_nillumbik_internal_db.ObservationMethod:
     enum:
     - audio
     - camera
@@ -43,14 +43,14 @@ definitions:
     - ObservationMethodAudio
     - ObservationMethodCamera
     - ObservationMethodObserved
-  db.Site:
+  github_com_biomonash_nillumbik_internal_db.Site:
     properties:
       block:
         type: integer
       code:
         type: string
       forest:
-        $ref: '#/definitions/db.ForestType'
+        $ref: '#/definitions/github_com_biomonash_nillumbik_internal_db.ForestType'
       id:
         type: integer
       location:
@@ -58,9 +58,9 @@ definitions:
       name:
         type: string
       tenure:
-        $ref: '#/definitions/db.TenureType'
+        $ref: '#/definitions/github_com_biomonash_nillumbik_internal_db.TenureType'
     type: object
-  db.Species:
+  github_com_biomonash_nillumbik_internal_db.Species:
     properties:
       commonName:
         type: string
@@ -75,9 +75,9 @@ definitions:
       scientificName:
         type: string
       taxa:
-        $ref: '#/definitions/db.Taxa'
+        $ref: '#/definitions/github_com_biomonash_nillumbik_internal_db.Taxa'
     type: object
-  db.Taxa:
+  github_com_biomonash_nillumbik_internal_db.Taxa:
     enum:
     - bird
     - mammal
@@ -87,7 +87,7 @@ definitions:
     - TaxaBird
     - TaxaMammal
     - TaxaReptile
-  db.TenureType:
+  github_com_biomonash_nillumbik_internal_db.TenureType:
     enum:
     - public
     - private
@@ -95,16 +95,16 @@ definitions:
     x-enum-varnames:
     - TenureTypePublic
     - TenureTypePrivate
-  observation.ListObservationsResponse:
+  internal_observation.ListObservationsResponse:
     properties:
       count:
         type: integer
       observations:
         items:
-          $ref: '#/definitions/db.Observation'
+          $ref: '#/definitions/github_com_biomonash_nillumbik_internal_db.Observation'
         type: array
     type: object
-  observation.Observation:
+  internal_observation.Observation:
     properties:
       appearanceIime:
         properties:
@@ -120,7 +120,7 @@ definitions:
       indicator:
         type: boolean
       method:
-        $ref: '#/definitions/db.ObservationMethod'
+        $ref: '#/definitions/github_com_biomonash_nillumbik_internal_db.ObservationMethod'
       narrative:
         type: string
       reportable:
@@ -134,7 +134,7 @@ definitions:
       timestamp:
         type: string
     type: object
-  species.ObservedSpecies:
+  internal_species.ObservedSpecies:
     properties:
       common_name:
         type: string
@@ -145,16 +145,16 @@ definitions:
       scientific_name:
         type: string
     type: object
-  species.ObservedSpeciesResponse:
+  internal_species.ObservedSpeciesResponse:
     properties:
       species:
         items:
-          $ref: '#/definitions/species.ObservedSpecies'
+          $ref: '#/definitions/internal_species.ObservedSpecies'
         type: array
       total:
         type: integer
     type: object
-  stats.BlockResponse:
+  internal_stats.BlockResponse:
     properties:
       block:
         type: integer
@@ -163,7 +163,7 @@ definitions:
       speciesCount:
         type: integer
     type: object
-  stats.DashboardStatsResponse:
+  internal_stats.DashboardStatsResponse:
     properties:
       nativeSpeciesCount:
         type: integer
@@ -174,21 +174,21 @@ definitions:
       speciesCount:
         type: integer
     type: object
-  stats.ObservationByBlocksResponse:
+  internal_stats.ObservationByBlocksResponse:
     properties:
       blocks:
         items:
-          $ref: '#/definitions/stats.BlockResponse'
+          $ref: '#/definitions/internal_stats.BlockResponse'
         type: array
     type: object
-  stats.ObservationBySitesResponse:
+  internal_stats.ObservationBySitesResponse:
     properties:
       sites:
         items:
-          $ref: '#/definitions/stats.SiteResponse'
+          $ref: '#/definitions/internal_stats.SiteResponse'
         type: array
     type: object
-  stats.ObservationOverviewResponse:
+  internal_stats.ObservationOverviewResponse:
     properties:
       countByTaxa:
         additionalProperties:
@@ -202,16 +202,16 @@ definitions:
       speciesCount:
         type: integer
     type: object
-  stats.ObservationTimeSeriesResponse:
+  internal_stats.ObservationTimeSeriesResponse:
     properties:
       series:
         additionalProperties:
           items:
-            $ref: '#/definitions/stats.TimeSeriesPoint'
+            $ref: '#/definitions/internal_stats.TimeSeriesPoint'
           type: array
         type: object
     type: object
-  stats.SiteResponse:
+  internal_stats.SiteResponse:
     properties:
       observationCount:
         type: integer
@@ -220,7 +220,7 @@ definitions:
       speciesCount:
         type: integer
     type: object
-  stats.TimeSeriesPoint:
+  internal_stats.TimeSeriesPoint:
     properties:
       observationCount:
         type: integer
@@ -229,20 +229,10 @@ definitions:
       timestamp:
         type: string
     type: object
-externalDocs:
-  description: OpenAPI
-  url: https://swagger.io/resources/open-api/
 host: localhost:8000
 info:
-  contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
+  contact: {}
   description: This is the backend API for Nillumbik Shire project.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
   title: Nillubim Shire API
   version: "1.0"
 paths:
@@ -270,7 +260,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/observation.ListObservationsResponse'
+            $ref: '#/definitions/internal_observation.ListObservationsResponse'
       summary: List observations
       tags:
       - observation
@@ -291,7 +281,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/observation.Observation'
+            $ref: '#/definitions/internal_observation.Observation'
       summary: Get Observation Detail
       tags:
       - observation
@@ -307,7 +297,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/db.Site'
+              $ref: '#/definitions/github_com_biomonash_nillumbik_internal_db.Site'
             type: array
       summary: List sites
       tags:
@@ -329,7 +319,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.Site'
+            $ref: '#/definitions/github_com_biomonash_nillumbik_internal_db.Site'
       summary: Get Site Detail
       tags:
       - site
@@ -345,7 +335,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/db.Species'
+              $ref: '#/definitions/github_com_biomonash_nillumbik_internal_db.Species'
             type: array
       summary: List species
       tags:
@@ -367,7 +357,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.Species'
+            $ref: '#/definitions/github_com_biomonash_nillumbik_internal_db.Species'
       summary: Get species detail
       tags:
       - species
@@ -389,7 +379,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.Species'
+            $ref: '#/definitions/github_com_biomonash_nillumbik_internal_db.Species'
       summary: Get species detail by common name
       tags:
       - species
@@ -418,7 +408,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/species.ObservedSpeciesResponse'
+            $ref: '#/definitions/internal_species.ObservedSpeciesResponse'
       summary: List observed species
       tags:
       - species
@@ -429,12 +419,12 @@ paths:
       description: Dashboard stats
       parameters:
       - description: Search start from
-        format: date
+        format: date-time
         in: query
         name: from
         type: string
-      - description: Search start from
-        format: date
+      - description: Search end to
+        format: date-time
         in: query
         name: to
         type: string
@@ -444,7 +434,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/stats.DashboardStatsResponse'
+            $ref: '#/definitions/internal_stats.DashboardStatsResponse'
       summary: Dashboard stats
       tags:
       - statistics
@@ -455,12 +445,12 @@ paths:
       description: Observation overview
       parameters:
       - description: Search start from
-        format: date
+        format: date-time
         in: query
         name: from
         type: string
-      - description: Search start from
-        format: date
+      - description: Search end to
+        format: date-time
         in: query
         name: to
         type: string
@@ -486,7 +476,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/stats.ObservationOverviewResponse'
+            $ref: '#/definitions/internal_stats.ObservationOverviewResponse'
       summary: Observation overview
       tags:
       - statistics
@@ -497,12 +487,12 @@ paths:
       description: Observation stats group by blocks
       parameters:
       - description: Search start from
-        format: date
+        format: date-time
         in: query
         name: from
         type: string
-      - description: Search start from
-        format: date
+      - description: Search end to
+        format: date-time
         in: query
         name: to
         type: string
@@ -528,7 +518,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/stats.ObservationByBlocksResponse'
+            $ref: '#/definitions/internal_stats.ObservationByBlocksResponse'
       summary: Observation stats group by blocks
       tags:
       - statistics
@@ -539,12 +529,12 @@ paths:
       description: Observation stats group by sites
       parameters:
       - description: Search start from
-        format: date
+        format: date-time
         in: query
         name: from
         type: string
-      - description: Search start from
-        format: date
+      - description: Search end to
+        format: date-time
         in: query
         name: to
         type: string
@@ -570,7 +560,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/stats.ObservationBySitesResponse'
+            $ref: '#/definitions/internal_stats.ObservationBySitesResponse'
       summary: Observation stats group by sites
       tags:
       - statistics
@@ -581,12 +571,12 @@ paths:
       description: Observation time series
       parameters:
       - description: Search start from
-        format: date
+        format: date-time
         in: query
         name: from
         type: string
-      - description: Search start from
-        format: date
+      - description: Search end to
+        format: date-time
         in: query
         name: to
         type: string
@@ -612,11 +602,60 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/stats.ObservationTimeSeriesResponse'
+            $ref: '#/definitions/internal_stats.ObservationTimeSeriesResponse'
       summary: Observation time series
       tags:
       - statistics
-securityDefinitions:
-  BasicAuth:
-    type: basic
+  /storage/{key}:
+    get:
+      description: Get a file from object storage by key
+      parameters:
+      - description: File key
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a file
+      tags:
+      - storage
+  /storage/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a file to object storage
+      parameters:
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Upload a file
+      tags:
+      - storage
 swagger: "2.0"

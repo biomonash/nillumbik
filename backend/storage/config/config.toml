@@ -1,0 +1,19 @@
+metadata_dir = "/var/lib/garage/data/meta"
+data_dir = "/var/lib/garage/data/data"
+
+db_engine = "sled"
+
+replication_mode = "none"
+
+rpc_bind_addr = "[::]:3901"
+rpc_public_addr = "127.0.0.1:3901"
+rpc_secret = "775907c35e9cf571f3957bd0444e28c0addb2941b134e14ed33d19d826c71cbc" 
+
+[s3_api]
+s3_bind_addr = "[::]:3900"
+api_bind_addr = "[::]:3900"
+s3_region = "garage"
+root_domain = ".s3.garage.localhost"
+
+[admin]
+api_bind_addr = "[::]:3903"
