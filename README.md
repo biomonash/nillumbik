@@ -1,15 +1,43 @@
 # Nillumbik Shire Project
 
-A TypeScript + Go monorepo with development tooling and database integration.
+## Overview
 
-## Requirements
+A data visualisation platform for wildlife observation data in [Nillumbik Shire](https://nillumbik.vic.gov.au)
+
+[Check Life Demo](https://nillumbik.wancat.cc)
+
+## Project Structure
+
+```
+├── backend/        # Go API server
+├── frontend/       # TypeScript frontend
+├── docker/         # Docker compose files
+└── Makefile        # Build automation
+```
+
+## Frontend Quick Start
+
+### Requirements
 
 * Node.js: version 24
+* Yarn: 1.22
+
+
+    cd frontend
+    yarn install
+    yarn dev
+
+*Note: You don't need to install Docker and database to develop frontend. You will connect to the demo server backend.*
+
+## Backend Quick Start
+
+### Requirements
+
 * Go: 1.24 or later
 * Make
 * Docker
 
-## Quick Start
+We use Make as command runner
 
 ```bash
 # Setup development environment
@@ -70,12 +98,3 @@ make run-import
 ### Utilities
 - `make help` - Show all available commands
 - `make clean` - Clean build artifacts
-
-## Project Structure
-
-```
-├── backend/        # Go API server
-├── frontend/       # TypeScript frontend
-├── docker/         # Docker compose files
-└── Makefile        # Build automation
-```
