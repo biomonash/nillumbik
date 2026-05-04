@@ -304,15 +304,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     }
@@ -343,15 +343,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     },
@@ -406,15 +406,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     },
@@ -469,15 +469,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     },
@@ -532,15 +532,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     },
@@ -941,7 +941,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8000",
+	Host:             "",
 	BasePath:         "/api/",
 	Schemes:          []string{},
 	Title:            "Nillubim Shire API",
