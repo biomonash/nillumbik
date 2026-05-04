@@ -15,7 +15,6 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8000",
     "basePath": "/api/",
     "paths": {
         "/observations": {
@@ -298,15 +297,15 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     }
@@ -337,15 +336,15 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     },
@@ -400,15 +399,15 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     },
@@ -463,15 +462,15 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     },
@@ -526,15 +525,15 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "date",
+                        "format": "date-time",
                         "description": "Search start from",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "format": "date",
-                        "description": "Search start from",
+                        "format": "date-time",
+                        "description": "Search end to",
                         "name": "to",
                         "in": "query"
                     },
