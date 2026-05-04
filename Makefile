@@ -208,7 +208,7 @@ build-frontend: ## Build the TypeScript frontend
 dev-frontend: ## Start frontend in development mode
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Starting frontend development server...$(NC)\n"; \
-		cd $(FRONTEND_DIR) && yarn dev; \
+		cd $(FRONTEND_DIR) && yarn dev:local; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend dev server.$(NC)\n"; \
 	fi

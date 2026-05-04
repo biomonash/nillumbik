@@ -232,7 +232,6 @@ definitions:
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
-host: localhost:8000
 info:
   contact:
     email: support@swagger.io
@@ -429,12 +428,12 @@ paths:
       description: Dashboard stats
       parameters:
       - description: Search start from
-        format: date
+        format: date-time
         in: query
         name: from
         type: string
-      - description: Search start from
-        format: date
+      - description: Search end to
+        format: date-time
         in: query
         name: to
         type: string
@@ -455,12 +454,12 @@ paths:
       description: Observation overview
       parameters:
       - description: Search start from
-        format: date
+        format: date-time
         in: query
         name: from
         type: string
-      - description: Search start from
-        format: date
+      - description: Search end to
+        format: date-time
         in: query
         name: to
         type: string
@@ -497,12 +496,12 @@ paths:
       description: Observation stats group by blocks
       parameters:
       - description: Search start from
-        format: date
+        format: date-time
         in: query
         name: from
         type: string
-      - description: Search start from
-        format: date
+      - description: Search end to
+        format: date-time
         in: query
         name: to
         type: string
@@ -539,12 +538,12 @@ paths:
       description: Observation stats group by sites
       parameters:
       - description: Search start from
-        format: date
+        format: date-time
         in: query
         name: from
         type: string
-      - description: Search start from
-        format: date
+      - description: Search end to
+        format: date-time
         in: query
         name: to
         type: string
@@ -581,12 +580,12 @@ paths:
       description: Observation time series
       parameters:
       - description: Search start from
-        format: date
+        format: date-time
         in: query
         name: from
         type: string
-      - description: Search start from
-        format: date
+      - description: Search end to
+        format: date-time
         in: query
         name: to
         type: string
