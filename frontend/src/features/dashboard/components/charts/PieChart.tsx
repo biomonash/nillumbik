@@ -7,7 +7,13 @@ const chartTheme = {
   labels: { text: { fill: '#ffffff', fontSize: 12 } },
 }
 
-export const PieChart = ({ startYear, endYear }: { startYear?: string; endYear?: string }) => {
+export const PieChart = ({
+  startYear,
+  endYear,
+}: {
+  startYear?: string
+  endYear?: string
+}) => {
   const [data, setData] = useState<{ id: string; value: number }[]>([])
 
   useEffect(() => {

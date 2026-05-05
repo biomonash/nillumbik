@@ -11,7 +11,13 @@ const chartTheme = {
   grid: { line: { stroke: 'rgba(255,255,255,0.1)' } },
 }
 
-export const LineChart = ({ startYear, endYear }: { startYear?: string; endYear?: string }) => {
+export const LineChart = ({
+  startYear,
+  endYear,
+}: {
+  startYear?: string
+  endYear?: string
+}) => {
   const [data, setData] = useState<
     { id: string; data: { x: string; y: number }[] }[]
   >([])
