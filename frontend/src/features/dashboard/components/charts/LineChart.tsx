@@ -11,13 +11,22 @@ const chartTheme = {
   grid: { line: { stroke: 'rgba(255,255,255,0.1)' } },
 }
 
-export const LineChart = () => {
+export const LineChart = ({
+  startYear,
+  endYear,
+}: {
+  startYear?: string
+  endYear?: string
+}) => {
   const [data, setData] = useState<
     { id: string; data: { x: string; y: number }[] }[]
   >([])
 
   useEffect(() => {
-    getObservationsTimeseries({}).then((res) => {
+    const fromDate = startYear ? new Date(`${startYear}-01-01`) : undefined
+    const toDate = endYear ? new Date(`${endYear}-12-31`) : undefined
+
+    getObservationsTimeseries({ from: fromDate, to: toDate }).then((res) => {
       if (res && res.series) {
         const formatted = Object.entries(res.series).map(([id, points]) => ({
           id: id,
@@ -29,14 +38,14 @@ export const LineChart = () => {
         setData(formatted)
       }
     })
-  }, [])
+  }, [startYear, endYear])
 
   return (
     <div className="h-[300px]">
       {data.length > 0 ? (
         <ResponsiveLine
           data={data}
-          margin={{ top: 20, right: 110, bottom: 50, left: 85 }} // Increased left margin for large numbers
+          margin={{ top: 20, right: 110, bottom: 50, left: 100 }} // Increased left margin for large numbers
           xScale={{ type: 'point' }}
           yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: false }}
           axisBottom={{
@@ -46,7 +55,7 @@ export const LineChart = () => {
           }}
           axisLeft={{
             legend: 'Observations',
-            legendOffset: -70, // Increased offset so it doesn't hit the numbers
+            legendOffset: -85, // Increased offset so it doesn't hit the numbers
             legendPosition: 'middle',
           }}
           pointSize={8}
