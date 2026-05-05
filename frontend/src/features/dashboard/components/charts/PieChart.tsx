@@ -7,11 +7,20 @@ const chartTheme = {
   labels: { text: { fill: '#ffffff', fontSize: 12 } },
 }
 
-export const PieChart = () => {
+export const PieChart = ({
+  startYear,
+  endYear,
+}: {
+  startYear?: string
+  endYear?: string
+}) => {
   const [data, setData] = useState<{ id: string; value: number }[]>([])
 
   useEffect(() => {
-    getObservationsOverview({}).then((res) => {
+    const fromDate = startYear ? new Date(`${startYear}-01-01`) : undefined
+    const toDate = endYear ? new Date(`${endYear}-12-31`) : undefined
+
+    getObservationsOverview({ from: fromDate, to: toDate }).then((res) => {
       if (res) {
         setData([
           { id: 'Native', value: res.nativeSpeciesCount },
@@ -19,7 +28,7 @@ export const PieChart = () => {
         ])
       }
     })
-  }, [])
+  }, [startYear, endYear])
 
   return (
     <div className="h-[300px]">

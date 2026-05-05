@@ -14,24 +14,31 @@ const chartTheme = {
   tooltip: { container: { background: '#1a1a1a', color: '#ffffff' } },
 }
 
-export const BarChart = () => {
+export const BarChart = ({
+  startYear,
+  endYear,
+}: {
+  startYear?: string
+  endYear?: string
+}) => {
   const [data, setData] = useState<YearEntry[]>([])
 
   useEffect(() => {
-    getObservationsTimeseries({})
+    const fromDate = startYear ? new Date(`${startYear}-01-01`) : undefined
+    const toDate = endYear ? new Date(`${endYear}-12-31`) : undefined
+
+    getObservationsTimeseries({ from: fromDate, to: toDate })
       .then((res) => {
         if (res && res.series) {
           const yearMap: Record<string, YearEntry> = {}
 
           Object.entries(res.series).forEach(([type, points]) => {
-            // Normalizing keys to match 'Native' and 'Invasive'
             const normalizedType =
               type.toLowerCase().includes('native') || type === 'true'
                 ? 'Native'
                 : 'Invasive'
 
             points.forEach((p) => {
-              // FIX: Use p.timestamp (matching your API definition)
               const rawDate = p.timestamp
               const yearDate = rawDate ? new Date(rawDate) : new Date()
               const yearStr = yearDate.getFullYear().toString()
@@ -40,7 +47,6 @@ export const BarChart = () => {
                 yearMap[yearStr] = { year: yearStr, Native: 0, Invasive: 0 }
               }
 
-              // Sum the counts (in case there are multiple entries per year)
               yearMap[yearStr][normalizedType] += p.speciesCount
             })
           })
@@ -48,14 +54,11 @@ export const BarChart = () => {
           const finalData = Object.values(yearMap).sort((a, b) =>
             a.year.localeCompare(b.year),
           )
-
-          console.log('BarChart: Verified Data Structure')
-          console.table(finalData) // Check your F12 console to see the table!
           setData(finalData)
         }
       })
       .catch((err) => console.error('BarChart API Error:', err))
-  }, [])
+  }, [startYear, endYear])
 
   return (
     <div className="h-[300px]">
