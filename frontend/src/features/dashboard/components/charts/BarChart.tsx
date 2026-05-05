@@ -14,7 +14,13 @@ const chartTheme = {
   tooltip: { container: { background: '#1a1a1a', color: '#ffffff' } },
 }
 
-export const BarChart = ({ startYear, endYear }: { startYear?: string; endYear?: string }) => {
+export const BarChart = ({
+  startYear,
+  endYear,
+}: {
+  startYear?: string
+  endYear?: string
+}) => {
   const [data, setData] = useState<YearEntry[]>([])
 
   useEffect(() => {
