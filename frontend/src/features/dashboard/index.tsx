@@ -18,17 +18,18 @@ import { BarChart } from './components/charts/BarChart'
 import { LineChart } from './components/charts/LineChart'
 import { PieChart } from './components/charts/PieChart'
 import { useSearchParams } from 'react-router'
+import dataConst from '../../constants/data'
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStatsResponse | null>(null)
   const [searchParams, setSearchParams] = useSearchParams()
-  
+
   const startYear = searchParams.get('startYear') || ''
   const endYear = searchParams.get('endYear') || ''
   const isFilterActive = !!(startYear && endYear)
 
   useEffect(() => {
-    const fromDate = startYear ? new Date(`${startYear}-01-01`) : new Date('2021-01-01')
+    const fromDate = startYear ? new Date(`${startYear}-01-01`) : undefined
     const toDate = endYear ? new Date(`${endYear}-12-31`) : undefined
 
     getDashboardStats({ from: fromDate, to: toDate }).then(setStats)
@@ -60,7 +61,7 @@ const Dashboard: React.FC = () => {
     </div>
   )
 
-  const yearOptions = ['2021', '2022', '2023', '2024', '2025', '2026']
+  const yearOptions = dataConst.YEAR_OPTIONS
 
   return (
     <div className="flex flex-col w-full px-8 py-6 gap-8 box-border">
@@ -76,25 +77,37 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="flex items-center gap-3 bg-sidebar/50 p-2 rounded-lg border border-white/10">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-white/50 uppercase font-bold">From</span>
-            <select 
-              value={startYear || 'all'} 
+            <span className="text-xs text-white/50 uppercase font-bold">
+              From
+            </span>
+            <select
+              value={startYear || 'all'}
               onChange={(e) => handleYearChange('startYear', e.target.value)}
               className="bg-sidebar text-white border border-white/10 rounded-md px-2 py-1 text-sm outline-none cursor-pointer"
             >
               <option value="all">Start</option>
-              {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+              {yearOptions.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-white/50 uppercase font-bold">To</span>
-            <select 
-              value={endYear || 'all'} 
+            <span className="text-xs text-white/50 uppercase font-bold">
+              To
+            </span>
+            <select
+              value={endYear || 'all'}
               onChange={(e) => handleYearChange('endYear', e.target.value)}
               className="bg-sidebar text-white border border-white/10 rounded-md px-2 py-1 text-sm outline-none cursor-pointer"
             >
               <option value="all">End</option>
-              {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+              {yearOptions.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
             </select>
           </div>
           <Badge
