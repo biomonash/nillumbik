@@ -166,8 +166,11 @@ const MapCharts: React.FC = () => {
   }, [selectedZone, selectedSite])
 
   useEffect(() => {
+    let cancelled = false
+
     Promise.all([getObservationBlocks(params), getObservationStats(params)])
       .then(([blocksData, statsData]) => {
+        if (cancelled) return // ignore result if params changed
         const total = params.siteCode
           ? statsData.observationCount
           : blocksData.blocks.reduce((sum, b) => sum + b.observationCount, 0)
@@ -177,7 +180,12 @@ const MapCharts: React.FC = () => {
           nonNativeCount: statsData.speciesCount - statsData.nativeSpeciesCount,
         })
       })
-      .catch((err) => console.error('Failed to fetch stats:', err))
+      .catch((err) => {
+        if (!cancelled) console.error('Failed to fetch stats:', err)
+      })
+    return () => {
+      cancelled = true 
+    }
   }, [params])
 
   useEffect(() => {
