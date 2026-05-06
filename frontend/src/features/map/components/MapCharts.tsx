@@ -184,7 +184,7 @@ const MapCharts: React.FC = () => {
         if (!cancelled) console.error('Failed to fetch stats:', err)
       })
     return () => {
-      cancelled = true 
+      cancelled = true
     }
   }, [params])
 

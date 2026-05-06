@@ -18,7 +18,10 @@ import type {
 import SpeciesSidebar from './SpeciesSidebar'
 import { SPECIES } from '../data/species'
 import { useDispatch } from 'react-redux'
-import { setSelectedSite, setSelectedZone as setReduxZone } from '../../../store/mapSlice'
+import {
+  setSelectedSite,
+  setSelectedZone as setReduxZone,
+} from '../../../store/mapSlice'
 
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
@@ -187,8 +190,10 @@ export default function MapView() {
             key={`${viewType}-${selectedZone}`}
             data={geoData}
             style={(feature) => {
-              const id = viewType === 'zones' ? feature?.properties?.site
-              : String(feature?.properties?.block)
+              const id =
+                viewType === 'zones'
+                  ? feature?.properties?.site
+                  : String(feature?.properties?.block)
               const isSelected = selectedZone === `Zone ${id}`
               const isHovered = hoveredZone === id
               return {
@@ -203,8 +208,10 @@ export default function MapView() {
               }
             }}
             onEachFeature={(feature, layer) => {
-              const id = viewType === 'zones' ? feature.properties.site
-              : String(feature.properties.block)
+              const id =
+                viewType === 'zones'
+                  ? feature.properties.site
+                  : String(feature.properties.block)
               layer.on('mouseover', () => setHoveredZone(id))
               layer.on('mouseout', () => setHoveredZone(null))
               layer.on('click', () => {
