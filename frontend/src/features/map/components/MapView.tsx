@@ -187,9 +187,10 @@ export default function MapView() {
             key={`${viewType}-${selectedZone}`}
             data={geoData}
             style={(feature) => {
-              const site = feature?.properties?.site
-              const isSelected = selectedZone === `Zone ${site}`
-              const isHovered = hoveredZone === site
+              const id = viewType === 'zones' ? feature?.properties?.site
+              : String(feature?.properties?.block)
+              const isSelected = selectedZone === `Zone ${id}`
+              const isHovered = hoveredZone === id
               return {
                 color: isSelected ? '#b45309' : 'green',
                 fillColor: isSelected
@@ -202,18 +203,24 @@ export default function MapView() {
               }
             }}
             onEachFeature={(feature, layer) => {
-              const site = feature.properties.site
-              layer.on('mouseover', () => setHoveredZone(site))
+              const id = viewType === 'zones' ? feature.properties.site
+              : String(feature.properties.block)
+              layer.on('mouseover', () => setHoveredZone(id))
               layer.on('mouseout', () => setHoveredZone(null))
               layer.on('click', () => {
-                console.log('Clicked zone:', feature.properties)
-                const zoneName = `Zone ${feature.properties.site}`
+                const zoneName = `Zone ${id}`
                 const block = String(feature.properties.block)
                 const isAlreadySelected = selectedZone === zoneName
 
                 setSelectedZone(isAlreadySelected ? null : zoneName)
-                dispatch(setSelectedSite(isAlreadySelected ? null : site))
-                dispatch(setReduxZone(isAlreadySelected ? 'all' : block))
+
+                if (viewType === 'blocks') {
+                  dispatch(setSelectedSite(null))
+                  dispatch(setReduxZone(isAlreadySelected ? 'all' : block))
+                } else {
+                  dispatch(setSelectedSite(isAlreadySelected ? null : id))
+                  dispatch(setReduxZone(isAlreadySelected ? 'all' : block))
+                }
               })
             }}
           />
