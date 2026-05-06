@@ -17,10 +17,11 @@ import type {
 } from '../../../helpers/siteLocation'
 import SpeciesSidebar from './SpeciesSidebar'
 import { SPECIES } from '../data/species'
-
-interface MapViewProps {
-  onZoneSelect: (block: string) => void
-}
+import { useDispatch } from 'react-redux'
+import {
+  setSelectedSite,
+  setSelectedZone as setReduxZone,
+} from '../../../store/mapSlice'
 
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
@@ -43,13 +44,14 @@ function FlyToUser({
   return null
 }
 
-export default function MapView({ onZoneSelect }: MapViewProps) {
+export default function MapView() {
   const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
   const [viewType, setViewType] = useState('zones')
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
   const [selectedZone, setSelectedZone] = useState<string | null>(null)
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const file =
@@ -188,9 +190,12 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
             key={`${viewType}-${selectedZone}`}
             data={geoData}
             style={(feature) => {
-              const site = feature?.properties?.site
-              const isSelected = selectedZone === `Zone ${site}`
-              const isHovered = hoveredZone === site
+              const id =
+                viewType === 'zones'
+                  ? feature?.properties?.site
+                  : String(feature?.properties?.block)
+              const isSelected = selectedZone === `Zone ${id}`
+              const isHovered = hoveredZone === id
               return {
                 color: isSelected ? '#b45309' : 'green',
                 fillColor: isSelected
@@ -203,14 +208,26 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
               }
             }}
             onEachFeature={(feature, layer) => {
-              const site = feature.properties.site
-              layer.on('mouseover', () => setHoveredZone(site))
+              const id =
+                viewType === 'zones'
+                  ? feature.properties.site
+                  : String(feature.properties.block)
+              layer.on('mouseover', () => setHoveredZone(id))
               layer.on('mouseout', () => setHoveredZone(null))
               layer.on('click', () => {
-                console.log('Clicked zone:', feature.properties)
-                const zoneName = `Zone ${feature.properties.site}`
-                setSelectedZone((prev) => (prev === zoneName ? null : zoneName))
-                onZoneSelect(String(feature.properties.block))
+                const zoneName = `Zone ${id}`
+                const block = String(feature.properties.block)
+                const isAlreadySelected = selectedZone === zoneName
+
+                setSelectedZone(isAlreadySelected ? null : zoneName)
+
+                if (viewType === 'blocks') {
+                  dispatch(setSelectedSite(null))
+                  dispatch(setReduxZone(isAlreadySelected ? 'all' : block))
+                } else {
+                  dispatch(setSelectedSite(isAlreadySelected ? null : id))
+                  dispatch(setReduxZone(isAlreadySelected ? 'all' : block))
+                }
               })
             }}
           />
