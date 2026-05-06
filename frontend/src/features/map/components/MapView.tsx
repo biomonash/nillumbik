@@ -18,7 +18,7 @@ import type {
 import SpeciesSidebar from './SpeciesSidebar'
 import { SPECIES } from '../data/species'
 import { useDispatch } from 'react-redux'
-import { setSelectedSite } from '../../../store/mapSlice'
+import { setSelectedSite, setSelectedZone as setReduxZone } from '../../../store/mapSlice'
 
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
@@ -208,10 +208,12 @@ export default function MapView() {
               layer.on('click', () => {
                 console.log('Clicked zone:', feature.properties)
                 const zoneName = `Zone ${feature.properties.site}`
+                const block = String(feature.properties.block)
                 const isAlreadySelected = selectedZone === zoneName
 
                 setSelectedZone(isAlreadySelected ? null : zoneName)
                 dispatch(setSelectedSite(isAlreadySelected ? null : site))
+                dispatch(setReduxZone(isAlreadySelected ? 'all' : block))
               })
             }}
           />
