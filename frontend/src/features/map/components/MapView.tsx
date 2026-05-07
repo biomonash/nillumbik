@@ -16,7 +16,11 @@ import type {
   SiteProperties,
 } from '../../../helpers/siteLocation'
 import SpeciesSidebar from './SpeciesSidebar'
-import { SPECIES } from '../data/species'
+import {
+  getSpeciesDetailBySite,
+  getSpeciesDetailByBlock,
+  type Species,
+} from '../../../apis/speciesList.api'
 
 interface MapViewProps {
   onZoneSelect: (block: string) => void
@@ -36,9 +40,7 @@ function FlyToUser({
 }) {
   const map = useMap()
   useEffect(() => {
-    if (coords) {
-      map.flyTo([coords.latitude, coords.longitude], 14)
-    }
+    if (coords) map.flyTo([coords.latitude, coords.longitude], 14)
   }, [coords, map])
   return null
 }
@@ -49,6 +51,11 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
   const [selectedZone, setSelectedZone] = useState<string | null>(null)
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
+  const [selectedSiteCode, setSelectedSiteCode] = useState<string | null>(null)
+  const [selectedBlockCode, setSelectedBlockCode] = useState<string | null>(null)
+  const [species, setSpecies] = useState<Species[]>([])
+  const [speciesLoading, setSpeciesLoading] = useState(false)
+  const [speciesError, setSpeciesError] = useState<string | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
 
   useEffect(() => {
@@ -70,6 +77,39 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
       setCurrentSite(site)
     }
   }, [coords, geoData])
+
+  useEffect(() => {
+    if (!selectedSiteCode && !selectedBlockCode) return
+
+    let cancelled = false
+
+    setSpeciesLoading(true)
+    setSpeciesError(null)
+    setSpecies([])
+
+    const request =
+      selectedSiteCode !== null
+        ? getSpeciesDetailBySite(selectedSiteCode)
+        : getSpeciesDetailByBlock(Number(selectedBlockCode))
+
+    request
+      .then((data) => {
+        if (!cancelled) {
+          setSpecies(data)
+          setSpeciesLoading(false)
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setSpeciesError(err.message)
+          setSpeciesLoading(false)
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [selectedSiteCode, selectedBlockCode])
 
   return (
     <div style={{ position: 'relative' }}>
@@ -98,7 +138,7 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
             cursor: 'pointer',
           }}
         >
-          30 Zones
+          30 Sites
         </button>
         <button
           onClick={() => setViewType('blocks')}
@@ -109,11 +149,13 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
             background: viewType === 'blocks' ? 'green' : 'white',
             color: viewType === 'blocks' ? 'white' : 'black',
             cursor: 'pointer',
+            position: 'relative',
           }}
         >
-          Blocks
+          5 Zones
         </button>
       </div>
+
       <button
         onClick={locate}
         disabled={loading}
@@ -132,6 +174,7 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
       >
         {loading ? 'Locating...' : 'Find My Location'}
       </button>
+
       {coords && (
         <div
           style={{
@@ -152,6 +195,7 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
             : 'You are outside Nillumbik monitoring zones'}
         </div>
       )}
+
       {error && (
         <div
           style={{
@@ -168,6 +212,7 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
           {error}
         </div>
       )}
+
       <MapContainer
         key={viewType}
         center={[-37.6, 145.2]}
@@ -188,9 +233,21 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
             key={`${viewType}-${selectedZone}`}
             data={geoData}
             style={(feature) => {
-              const site = feature?.properties?.site
-              const isSelected = selectedZone === `Zone ${site}`
-              const isHovered = hoveredZone === site
+              const siteCode = feature?.properties?.site
+              const block = String(
+                feature?.properties.block ??
+                feature?.properties.BLOCK ??
+                feature?.properties.zone ??
+                feature?.properties.id,
+              )
+
+              const selectedName =
+                viewType === 'zones' ? `Site ${siteCode}` : `Zone ${block}`
+
+              const hoverId = viewType === 'zones' ? siteCode : block
+
+              const isSelected = selectedZone === selectedName
+              const isHovered = hoveredZone === hoverId
               return {
                 color: isSelected ? '#b45309' : 'green',
                 fillColor: isSelected
@@ -203,14 +260,59 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
               }
             }}
             onEachFeature={(feature, layer) => {
-              const site = feature.properties.site
-              layer.on('mouseover', () => setHoveredZone(site))
+              const hoverId =
+                viewType === 'zones'
+                  ? String(feature.properties.site)
+                  : String(
+                    feature.properties.block ??
+                    feature.properties.BLOCK ??
+                    feature.properties.zone ??
+                    feature.properties.id,
+                  )
+
+              layer.on('mouseover', () => setHoveredZone(hoverId))
               layer.on('mouseout', () => setHoveredZone(null))
               layer.on('click', () => {
-                console.log('Clicked zone:', feature.properties)
-                const zoneName = `Zone ${feature.properties.site}`
-                setSelectedZone((prev) => (prev === zoneName ? null : zoneName))
-                onZoneSelect(String(feature.properties.block))
+                console.log('Clicked:', feature.properties)
+
+                const rawSiteCode = String(
+                  feature.properties.site ??
+                  feature.properties.code ??
+                  feature.properties.siteCode ??
+                  '',
+                )
+
+                const siteCode = rawSiteCode.replaceAll('-', '')
+                const block = String(
+                  feature.properties.block ??
+                  feature.properties.BLOCK ??
+                  feature.properties.zone ??
+                  feature.properties.id,
+                )
+
+                const name =
+                  viewType === 'zones' ? `Site ${siteCode}` : `Zone ${block}`
+
+                const isDeselecting = selectedZone === name
+
+                setSelectedZone(isDeselecting ? null : name)
+
+                if (isDeselecting) {
+                  setSelectedSiteCode(null)
+                  setSelectedBlockCode(null)
+                  onZoneSelect('')
+                  return
+                }
+
+                if (viewType === 'zones') {
+                  setSelectedSiteCode(siteCode)
+                  setSelectedBlockCode(null)
+                  onZoneSelect(block)
+                } else {
+                  setSelectedSiteCode(null)
+                  setSelectedBlockCode(block)
+                  onZoneSelect(block)
+                }
               })
             }}
           />
@@ -224,11 +326,19 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
           </Marker>
         )}
       </MapContainer>
+
       {selectedZone && (
         <SpeciesSidebar
           zoneName={selectedZone}
-          species={SPECIES}
-          onClose={() => setSelectedZone(null)}
+          species={species}
+          loading={speciesLoading}
+          error={speciesError}
+          onClose={() => {
+            setSelectedZone(null)
+            setSelectedSiteCode(null)
+            setSelectedBlockCode(null)
+            onZoneSelect('')
+          }}
         />
       )}
     </div>

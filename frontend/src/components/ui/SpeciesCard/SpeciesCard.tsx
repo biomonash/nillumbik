@@ -1,6 +1,6 @@
 import { Card, CardContent } from '../Card'
 import Badge from '../Badge'
-import { type Species } from '../../../features/map/data/species'
+import { type Species } from '../../../apis/speciesList.api'
 
 interface SpeciesCardProps {
   species: Species
@@ -11,7 +11,7 @@ export default function SpeciesCard({ species }: SpeciesCardProps) {
     <Card className="overflow-hidden">
       {/* Species Photo */}
       <img
-        src={species.image}
+        src={species.image ?? 'https://placehold.co/600x400?text=Species+photo'} //placeholder
         alt={species.commonName}
         className="w-full h-48 object-cover"
       />
