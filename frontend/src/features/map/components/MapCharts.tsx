@@ -93,6 +93,7 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
     nonNativeCount: 0,
   })
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [mobileTab, setMobileTab] = useState<'filters' | 'species'>('filters')
   const [showToast, setShowToast] = useState(false)
   // refs
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null)
@@ -107,21 +108,26 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
     [allSpecies, selectedTaxa],
   )
   // useMemo() : Memorizes params to avoid recalculating on every render
-  const params = useMemo(
-    () => ({
+  const params = useMemo(() => {
+    const zoneBlock = selectedZone !== 'all' ? Number(selectedZone) : undefined
+
+    const mapBlock = selectedBlock !== '' ? Number(selectedBlock) : undefined
+
+    const block =
+      zoneBlock !== undefined && !Number.isNaN(zoneBlock)
+        ? zoneBlock
+        : mapBlock !== undefined && !Number.isNaN(mapBlock)
+          ? mapBlock
+          : undefined
+
+    return {
       from: DEFAULT_FROM,
-      block:
-        selectedZone !== 'all'
-          ? Number(selectedZone)
-          : selectedBlock !== ''
-            ? Number(selectedBlock)
-            : undefined,
+      block,
       siteCode: selectedSite !== 'all' ? selectedSite : undefined,
       taxa: selectedTaxa !== 'all' ? selectedTaxa : undefined,
       commonName: selectedSpecies !== '' ? selectedSpecies : undefined,
-    }),
-    [selectedZone, selectedSite, selectedBlock, selectedTaxa, selectedSpecies],
-  )
+    }
+  }, [selectedZone, selectedSite, selectedBlock, selectedTaxa, selectedSpecies])
   const handleReset = useCallback(() => setSearchParams({}), [setSearchParams])
   const setParam = useCallback(
     (updates: Record<string, string>, empties: Record<string, string> = {}) => {

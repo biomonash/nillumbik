@@ -1,9 +1,11 @@
-import { type Species } from '../data/species'
 import SpeciesCard from '../../../components/ui/SpeciesCard'
+import { type Species } from '../../../apis/speciesList.api'
 
 interface SpeciesSidebarProps {
   zoneName: string
   species: Species[]
+  loading: boolean
+  error: string | null
   onClose: () => void
 }
 
@@ -11,6 +13,8 @@ export default function SpeciesSidebar({
   zoneName,
   species,
   onClose,
+  loading,
+  error,
 }: SpeciesSidebarProps) {
   return (
     <div
@@ -53,7 +57,7 @@ export default function SpeciesSidebar({
           <p
             style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}
           >
-            Wildlife species recorded in this zone
+            Wildlife species recorded here
           </p>
           <p
             style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}
@@ -84,9 +88,17 @@ export default function SpeciesSidebar({
           gap: '16px',
         }}
       >
-        {species.map((s) => (
-          <SpeciesCard key={s.id} species={s} />
-        ))}
+        {loading && <p style={{ color: '#6b7280' }}>Loading species...</p>}
+
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+
+        {!loading && !error && species.length === 0 && (
+          <p style={{ color: '#6b7280' }}>No species found.</p>
+        )}
+
+        {!loading &&
+          !error &&
+          species.map((s) => <SpeciesCard key={s.id} species={s} />)}
       </div>
     </div>
   )
