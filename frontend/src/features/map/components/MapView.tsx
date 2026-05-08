@@ -154,9 +154,7 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
         /> */}
 
       {coords && (
-        <div
-          className="fixed bottom-16 left-1/2 -translate-x-1/2 lg:bottom-6 z-[1000] max-w-[85vw] px-3 py-2 bg-white text-green-900 text-xs sm:text-sm font-medium rounded-full shadow-lg border border-green-200 text-center"
-          >
+        <div className="fixed bottom-16 left-1/2 -translate-x-1/2 lg:bottom-6 z-[1000] max-w-[85vw] px-3 py-2 bg-white text-green-900 text-xs sm:text-sm font-medium rounded-full shadow-lg border border-green-200 text-center">
           {currentSite
             ? `You are in monitoring site: ${currentSite.site} (Block ${currentSite.block})`
             : 'You are outside Nillumbik monitoring zones'}
