@@ -21,6 +21,7 @@ import {
   getSpeciesDetailByBlock,
   type Species,
 } from '../../../apis/speciesList.api'
+//import { LocateFixed } from 'lucide-react'
 
 interface MapViewProps {
   onZoneSelect: (block: string) => void
@@ -143,32 +144,24 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
       <button
         onClick={locate}
         disabled={loading}
-        className="fixed bottom-15 left-[90px] z-[10] px-4 py-2 text-green-900 bg-white border-2 border-green-900 rounded cursor-pointer disabled:opacity-50"
+        className="fixed bottom-20 left-4 sm:left-6lg:bottom-6 lg:left-24 z-[10] px-3 py-2 text-sm font-medium text-green-900 bg-white border border-green-900 rounded-full shadow-lg cursor-pointer transition-all hover:bg-green-50 disabled:opacity-50"
       >
         {loading ? 'Locating...' : 'Find My Location'}
       </button>
+      {/**<LocateFixed
+          size={22}
+          className={loading ? 'animate-pulse text-green-900' : 'text-green-900'}
+        /> */}
 
       {coords && (
         <div
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 1000,
-            backgroundColor: 'white',
-            color: 'darkgreen',
-            padding: '10px 16px',
-            borderRadius: '8px',
-            border: '2px solid darkgreen',
-          }}
-        >
+          className="fixed bottom-16 left-1/2 -translate-x-1/2 lg:bottom-6 z-[1000] max-w-[85vw] px-3 py-2 bg-white text-green-900 text-xs sm:text-sm font-medium rounded-full shadow-lg border border-green-200 text-center"
+          >
           {currentSite
             ? `You are in monitoring site: ${currentSite.site} (Block ${currentSite.block})`
             : 'You are outside Nillumbik monitoring zones'}
         </div>
       )}
-
       {error && (
         <div
           style={{
