@@ -52,7 +52,9 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
   const [selectedZone, setSelectedZone] = useState<string | null>(null)
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
   const [selectedSiteCode, setSelectedSiteCode] = useState<string | null>(null)
-  const [selectedBlockCode, setSelectedBlockCode] = useState<string | null>(null)
+  const [selectedBlockCode, setSelectedBlockCode] = useState<string | null>(
+    null,
+  )
   const [species, setSpecies] = useState<Species[]>([])
   const [speciesLoading, setSpeciesLoading] = useState(false)
   const [speciesError, setSpeciesError] = useState<string | null>(null)
@@ -112,65 +114,36 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
   }, [selectedSiteCode, selectedBlockCode])
 
   return (
-    <div style={{ position: 'relative' }}>
-      <div
-        style={{
-          position: 'absolute',
-          top: 20,
-          right: 20,
-          zIndex: 2000,
-          background: 'white',
-          padding: '8px',
-          borderRadius: '10px',
-          display: 'flex',
-          gap: '10px',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-        }}
-      >
-        <button
-          onClick={() => setViewType('zones')}
-          style={{
-            padding: '6px 12px',
-            borderRadius: '6px',
-            border: '1px solid #ccc',
-            background: viewType === 'zones' ? 'green' : 'white',
-            color: viewType === 'zones' ? 'white' : 'black',
-            cursor: 'pointer',
-          }}
-        >
-          30 Sites
-        </button>
-        <button
-          onClick={() => setViewType('blocks')}
-          style={{
-            padding: '6px 12px',
-            borderRadius: '6px',
-            border: '1px solid #ccc',
-            background: viewType === 'blocks' ? 'green' : 'white',
-            color: viewType === 'blocks' ? 'white' : 'black',
-            cursor: 'pointer',
-            position: 'relative',
-          }}
-        >
-          5 Zones
-        </button>
+    <div>
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 lg:top-5 lg:right-[370px] z-[2000] bg-white p-1.5 sm:p-2 rounded-lg sm:rounded-xl shadow-md">
+        <div className="flex flex-row lg:flex-col gap-1.5 sm:gap-2">
+          <button
+            onClick={() => setViewType('zones')}
+            className={`px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-md border cursor-pointer text-xs sm:text-sm whitespace-nowrap transition-all ${
+              viewType === 'zones'
+                ? 'bg-green-700 text-white border-green-700 shadow-sm'
+                : 'bg-white text-black border-gray-300 hover:border-green-500 hover:bg-green-50'
+            }`}
+          >
+            <span className="hidden sm:inline">30 Sites</span>
+          </button>
+          <button
+            onClick={() => setViewType('blocks')}
+            className={`px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-md border cursor-pointer text-xs sm:text-sm whitespace-nowrap transition-all ${
+              viewType === 'blocks'
+                ? 'bg-green-700 text-white border-green-700 shadow-sm'
+                : 'bg-white text-black border-gray-300 hover:border-green-500 hover:bg-green-50'
+            }`}
+          >
+            <span className="hidden sm:inline">5 Zones</span>
+          </button>
+        </div>
       </div>
 
       <button
         onClick={locate}
         disabled={loading}
-        style={{
-          position: 'fixed',
-          bottom: '30px',
-          left: '90px',
-          zIndex: 1000,
-          padding: '8px 16px',
-          color: 'darkgreen',
-          backgroundColor: 'white',
-          border: '2px solid darkgreen',
-          borderRadius: '4px',
-          cursor: 'pointer',
-        }}
+        className="fixed bottom-15 left-[90px] z-[10] px-4 py-2 text-green-900 bg-white border-2 border-green-900 rounded cursor-pointer disabled:opacity-50"
       >
         {loading ? 'Locating...' : 'Find My Location'}
       </button>
@@ -236,9 +209,9 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
               const siteCode = feature?.properties?.site
               const block = String(
                 feature?.properties.block ??
-                feature?.properties.BLOCK ??
-                feature?.properties.zone ??
-                feature?.properties.id,
+                  feature?.properties.BLOCK ??
+                  feature?.properties.zone ??
+                  feature?.properties.id,
               )
 
               const selectedName =
@@ -264,11 +237,11 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
                 viewType === 'zones'
                   ? String(feature.properties.site)
                   : String(
-                    feature.properties.block ??
-                    feature.properties.BLOCK ??
-                    feature.properties.zone ??
-                    feature.properties.id,
-                  )
+                      feature.properties.block ??
+                        feature.properties.BLOCK ??
+                        feature.properties.zone ??
+                        feature.properties.id,
+                    )
 
               layer.on('mouseover', () => setHoveredZone(hoverId))
               layer.on('mouseout', () => setHoveredZone(null))
@@ -277,17 +250,17 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
 
                 const rawSiteCode = String(
                   feature.properties.site ??
-                  feature.properties.code ??
-                  feature.properties.siteCode ??
-                  '',
+                    feature.properties.code ??
+                    feature.properties.siteCode ??
+                    '',
                 )
 
                 const siteCode = rawSiteCode.replaceAll('-', '')
                 const block = String(
                   feature.properties.block ??
-                  feature.properties.BLOCK ??
-                  feature.properties.zone ??
-                  feature.properties.id,
+                    feature.properties.BLOCK ??
+                    feature.properties.zone ??
+                    feature.properties.id,
                 )
 
                 const name =
