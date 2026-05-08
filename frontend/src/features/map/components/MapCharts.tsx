@@ -390,7 +390,7 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
         </div>
       )}
       {/* Desktop sidebar */}
-      <div className="hidden md:flex fixed right-0 top-0 h-screen w-[350px] bg-[var(--muted-foreground2)] z-50 flex-col shadow-xl">
+      <div className="hidden lg:flex fixed right-0 top-0 h-screen w-[350px] bg-[var(--muted-foreground2)] z-50 flex-col shadow-xl">
         <div className="flex-1 overflow-y-auto p-2 pt-14 flex flex-col gap-4">
           {content}
         </div>
@@ -398,7 +398,7 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
 
       {/* Mobile bottom drawer */}
       <div
-        className={`md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--muted-foreground2)] rounded-t-2xl shadow-xl transition-transform duration-300 ease-in-out ${drawerOpen ? 'translate-y-0' : 'translate-y-[calc(100%-56px)]'}`}
+        className={`lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--muted-foreground2)] rounded-t-2xl shadow-xl transition-transform duration-300 ease-in-out ${drawerOpen ? 'translate-y-0' : 'translate-y-[calc(100%-56px)]'}`}
       >
         {/* Handle bar */}
         <div
