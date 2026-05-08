@@ -93,7 +93,6 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
     nonNativeCount: 0,
   })
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [mobileTab, setMobileTab] = useState<'filters' | 'species'>('filters')
   const [showToast, setShowToast] = useState(false)
   // refs
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null)
