@@ -97,6 +97,11 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
   // refs
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null)
 
+  useEffect(() => {
+    const height = drawerOpen ? '65vh' : '56px'
+    document.documentElement.style.setProperty('--drawer-height', height)
+  }, [drawerOpen])
+
   const { total, nativeCount, nonNativeCount } = stats
   const speciesOptions = useMemo(
     () =>
