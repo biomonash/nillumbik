@@ -51,6 +51,14 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
 
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   useEffect(() => {
     const file =
       viewType === 'zones' ? '/nillumbik_30zones.geojson' : '/blocks.geojson'
@@ -71,20 +79,27 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
     }
   }, [coords, geoData])
 
+  const isDesktop = windowWidth >= 768
+  const leftSidebarVisible = !!selectedZone
+  const rightSidebarWidth = 350
+  const leftSidebarWidth = 320
+  const navWidth = 80
+
   return (
     <div style={{ position: 'relative' }}>
       <div
         style={{
-          position: 'absolute',
-          top: 20,
-          right: 20,
-          zIndex: 2000,
+          position: 'fixed',
+          top: 80,
+          right: isDesktop ? rightSidebarWidth + 20 : 20,
+          zIndex: 40,
           background: 'white',
           padding: '8px',
           borderRadius: '10px',
           display: 'flex',
           gap: '10px',
           boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+          transition: 'right 0.3s ease',
         }}
       >
         <button
@@ -114,37 +129,43 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
           Blocks
         </button>
       </div>
+
       <button
         onClick={locate}
         disabled={loading}
         style={{
           position: 'fixed',
-          bottom: '30px',
-          left: '90px',
-          zIndex: 1000,
+          bottom: isDesktop ? '30px' : '80px',
+          left: (isDesktop && leftSidebarVisible) ? (navWidth + leftSidebarWidth + 20) : '90px',
+          zIndex: 40,
           padding: '8px 16px',
           color: 'darkgreen',
           backgroundColor: 'white',
           border: '2px solid darkgreen',
           borderRadius: '4px',
           cursor: 'pointer',
+          transition: 'left 0.3s ease, bottom 0.3s ease',
         }}
       >
         {loading ? 'Locating...' : 'Find My Location'}
       </button>
+
       {coords && (
         <div
           style={{
             position: 'fixed',
-            bottom: '20px',
+            bottom: isDesktop ? '20px' : '130px',
             left: '50%',
             transform: 'translateX(-50%)',
-            zIndex: 1000,
+            zIndex: 40,
             backgroundColor: 'white',
             color: 'darkgreen',
             padding: '10px 16px',
             borderRadius: '8px',
             border: '2px solid darkgreen',
+            transition: 'bottom 0.3s ease',
+            whiteSpace: 'nowrap',
+            fontSize: isDesktop ? '14px' : '12px'
           }}
         >
           {currentSite
@@ -152,22 +173,26 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
             : 'You are outside Nillumbik monitoring zones'}
         </div>
       )}
+
       {error && (
         <div
           style={{
-            position: 'absolute',
-            top: '50px',
-            right: '10px',
-            zIndex: 1000,
+            position: 'fixed',
+            top: '140px',
+            right: isDesktop ? rightSidebarWidth + 20 : 20,
+            zIndex: 40,
             color: 'red',
             backgroundColor: 'white',
             padding: '8px',
             borderRadius: '4px',
+            transition: 'right 0.3s ease',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
           }}
         >
           {error}
         </div>
       )}
+
       <MapContainer
         key={viewType}
         center={[-37.6, 145.2]}
@@ -207,7 +232,6 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
               layer.on('mouseover', () => setHoveredZone(site))
               layer.on('mouseout', () => setHoveredZone(null))
               layer.on('click', () => {
-                console.log('Clicked zone:', feature.properties)
                 const zoneName = `Zone ${feature.properties.site}`
                 setSelectedZone((prev) => (prev === zoneName ? null : zoneName))
                 onZoneSelect(String(feature.properties.block))
