@@ -17,15 +17,14 @@ import type {
 } from '../../../helpers/siteLocation'
 import SpeciesSidebar from './SpeciesSidebar'
 import {
-  getSpeciesDetailBySite,
-  getSpeciesDetailByBlock,
-  type Species,
-} from '../../../apis/speciesList.api'
-//import { LocateFixed } from 'lucide-react'
-
-interface MapViewProps {
-  onZoneSelect: (block: string) => void
-}
+  selectCurrentRegion,
+  selectMode,
+  updateMode,
+  updateSelectedBlock,
+  updateSelectedSite,
+} from '../../../store/mapSlice'
+import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
+import { SPECIES } from '../data/species'
 
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
@@ -46,11 +45,13 @@ function FlyToUser({
   return null
 }
 
-export default function MapView({ onZoneSelect }: MapViewProps) {
+export default function MapView() {
   const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
-  const [viewType, setViewType] = useState('zones')
+  const mode = useAppSelector(selectMode)
+  const dispatch = useAppDispatch()
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
-  const [selectedZone, setSelectedZone] = useState<string | null>(null)
+  const currentRegion = useAppSelector(selectCurrentRegion)
+  // const [selectedZone, setSelectedZone] = useState<string | null>(null)
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
   const [selectedSiteCode, setSelectedSiteCode] = useState<string | null>(null)
   const [selectedBlockCode, setSelectedBlockCode] = useState<string | null>(
@@ -63,12 +64,12 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
 
   useEffect(() => {
     const file =
-      viewType === 'zones' ? '/nillumbik_30zones.geojson' : '/blocks.geojson'
+      mode === 'site' ? '/nillumbik_30zones.geojson' : '/blocks.geojson'
     setGeoData(null)
     fetch(file)
       .then((res) => res.json())
       .then((data) => setGeoData(data))
-  }, [viewType])
+  }, [mode])
 
   useEffect(() => {
     if (coords && geoData) {
@@ -115,30 +116,47 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
   }, [selectedSiteCode, selectedBlockCode])
 
   return (
-    <div>
-      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 lg:top-5 lg:right-[370px] z-[2000] bg-white p-1.5 sm:p-2 rounded-lg sm:rounded-xl shadow-md">
-        <div className="flex flex-row lg:flex-col gap-1.5 sm:gap-2">
-          <button
-            onClick={() => setViewType('zones')}
-            className={`px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-md border cursor-pointer text-xs sm:text-sm whitespace-nowrap transition-all ${
-              viewType === 'zones'
-                ? 'bg-green-700 text-white border-green-700 shadow-sm'
-                : 'bg-white text-black border-gray-300 hover:border-green-500 hover:bg-green-50'
-            }`}
-          >
-            <span className="hidden sm:inline">30 Sites</span>
-          </button>
-          <button
-            onClick={() => setViewType('blocks')}
-            className={`px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-md border cursor-pointer text-xs sm:text-sm whitespace-nowrap transition-all ${
-              viewType === 'blocks'
-                ? 'bg-green-700 text-white border-green-700 shadow-sm'
-                : 'bg-white text-black border-gray-300 hover:border-green-500 hover:bg-green-50'
-            }`}
-          >
-            <span className="hidden sm:inline">5 Zones</span>
-          </button>
-        </div>
+    <div style={{ position: 'relative' }}>
+      <div
+        style={{
+          position: 'absolute',
+          top: 20,
+          right: 20,
+          zIndex: 2000,
+          background: 'white',
+          padding: '8px',
+          borderRadius: '10px',
+          display: 'flex',
+          gap: '10px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+        }}
+      >
+        <button
+          onClick={() => dispatch(updateMode('site'))}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            background: mode === 'site' ? 'green' : 'white',
+            color: mode === 'site' ? 'white' : 'black',
+            cursor: 'pointer',
+          }}
+        >
+          30 Sites
+        </button>
+        <button
+          onClick={() => dispatch(updateMode('block'))}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            background: mode === 'block' ? 'green' : 'white',
+            color: mode === 'block' ? 'white' : 'black',
+            cursor: 'pointer',
+          }}
+        >
+          5 Blocks
+        </button>
       </div>
 
       <button
@@ -178,7 +196,7 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
       )}
 
       <MapContainer
-        key={viewType}
+        key={mode}
         center={[-37.6, 145.2]}
         zoom={10}
         style={{
@@ -194,24 +212,15 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
         <FlyToUser coords={coords} />
         {geoData && (
           <GeoJSON
-            key={`${viewType}-${selectedZone}`}
+            key={`${mode}-${currentRegion}`}
             data={geoData}
             style={(feature) => {
-              const siteCode = feature?.properties?.site
-              const block = String(
-                feature?.properties.block ??
-                  feature?.properties.BLOCK ??
-                  feature?.properties.zone ??
-                  feature?.properties.id,
-              )
-
-              const selectedName =
-                viewType === 'zones' ? `Site ${siteCode}` : `Zone ${block}`
-
-              const hoverId = viewType === 'zones' ? siteCode : block
-
-              const isSelected = selectedZone === selectedName
-              const isHovered = hoveredZone === hoverId
+              const id =
+                mode === 'site'
+                  ? feature?.properties?.site
+                  : String(feature?.properties?.block)
+              const isSelected = currentRegion === id
+              const isHovered = hoveredZone === id
               return {
                 color: isSelected ? '#b45309' : 'green',
                 fillColor: isSelected
@@ -224,58 +233,20 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
               }
             }}
             onEachFeature={(feature, layer) => {
-              const hoverId =
-                viewType === 'zones'
-                  ? String(feature.properties.site)
-                  : String(
-                      feature.properties.block ??
-                        feature.properties.BLOCK ??
-                        feature.properties.zone ??
-                        feature.properties.id,
-                    )
-
-              layer.on('mouseover', () => setHoveredZone(hoverId))
+              const id =
+                mode === 'site'
+                  ? feature.properties.site
+                  : String(feature.properties.block)
+              layer.on('mouseover', () => setHoveredZone(id))
               layer.on('mouseout', () => setHoveredZone(null))
               layer.on('click', () => {
-                console.log('Clicked:', feature.properties)
+                const block = String(feature.properties.block)
+                const isAlreadySelected = currentRegion === id
 
-                const rawSiteCode = String(
-                  feature.properties.site ??
-                    feature.properties.code ??
-                    feature.properties.siteCode ??
-                    '',
-                )
-
-                const siteCode = rawSiteCode.replaceAll('-', '')
-                const block = String(
-                  feature.properties.block ??
-                    feature.properties.BLOCK ??
-                    feature.properties.zone ??
-                    feature.properties.id,
-                )
-
-                const name =
-                  viewType === 'zones' ? `Site ${siteCode}` : `Zone ${block}`
-
-                const isDeselecting = selectedZone === name
-
-                setSelectedZone(isDeselecting ? null : name)
-
-                if (isDeselecting) {
-                  setSelectedSiteCode(null)
-                  setSelectedBlockCode(null)
-                  onZoneSelect('')
-                  return
-                }
-
-                if (viewType === 'zones') {
-                  setSelectedSiteCode(siteCode)
-                  setSelectedBlockCode(null)
-                  onZoneSelect(block)
+                if (mode === 'block') {
+                  dispatch(updateSelectedBlock(block))
                 } else {
-                  setSelectedSiteCode(null)
-                  setSelectedBlockCode(block)
-                  onZoneSelect(block)
+                  dispatch(updateSelectedSite(isAlreadySelected ? null : id))
                 }
               })
             }}
@@ -290,21 +261,7 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
           </Marker>
         )}
       </MapContainer>
-
-      {selectedZone && (
-        <SpeciesSidebar
-          zoneName={selectedZone}
-          species={species}
-          loading={speciesLoading}
-          error={speciesError}
-          onClose={() => {
-            setSelectedZone(null)
-            setSelectedSiteCode(null)
-            setSelectedBlockCode(null)
-            onZoneSelect('')
-          }}
-        />
-      )}
+      <SpeciesSidebar zoneName={'Zone'} species={SPECIES} onClose={() => {}} />
     </div>
   )
 }
