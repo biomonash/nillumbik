@@ -64,8 +64,3 @@ export async function getObservationSites(
   )
   return response.data
 }
-
-export async function getAllSpecies(): Promise<Species[]> {
-  const response = await fetcher.get<Species[]>('/species')
-  return response.data
-}
