@@ -10,7 +10,6 @@ import Select from '../../../components/ui/Select'
 import {
   getAllSpecies,
   getObservationBlocks,
-  getObservationStats,
   type GetObservationBlocksResponse,
   type GetObservationStatsResponse,
   type Species,
@@ -22,8 +21,6 @@ import { NativeBarChart } from './charts/NativeBarChart'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../../store/store'
 import {
-  setSelectedTaxa,
-  setSelectedSpecies,
   resetFilters,
   updateSelectedBlock,
   updateSelectedSite,
@@ -118,17 +115,6 @@ const MapCharts: React.FC = () => {
       ),
     [allSpecies, selectedTaxa],
   )
-  // useMemo() : Memorizes params to avoid recalculating on every render
-  // const params = useMemo(
-  //   () => ({
-  //     from: DEFAULT_FROM,
-  //     block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
-  //     siteCode: selectedSite !== 'all' ? selectedSite : undefined,
-  //     taxa: selectedTaxa !== 'all' ? selectedTaxa : undefined,
-  //     commonName: selectedSpecies !== '' ? selectedSpecies : undefined,
-  //   }),
-  //   [selectedZone, selectedSite, selectedTaxa, selectedSpecies],
-  // )
 
   const copy = useCallback(() => {
     if (!navigator.clipboard) return
@@ -264,7 +250,7 @@ const MapCharts: React.FC = () => {
           <Select
             options={taxaOptions}
             value={selectedTaxa ?? 'all'}
-            onChange={(t) => dispatch(setSelectedTaxa(t))}
+            // onChange={(t) => dispatch(setSelectedTaxa(t))}
             placeholder="Select Taxa"
             className="w-full"
           />
@@ -279,7 +265,7 @@ const MapCharts: React.FC = () => {
           <Select
             options={speciesOptions}
             value={selectedSpecies ?? 'all'}
-            onChange={(s) => dispatch(setSelectedSpecies(s))}
+            // onChange={(s) => dispatch(setSelectedSpecies(s))}
             placeholder="Select Species"
             disabled={selectedTaxa === null}
             className="w-full"

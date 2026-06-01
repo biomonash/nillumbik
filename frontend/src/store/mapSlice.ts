@@ -7,6 +7,7 @@ import {
 } from '../apis/stats.api'
 
 interface MapState {
+  mode: 'block' | 'site'
   selectedBlock: number | null
   selectedSite: string | null
   selectedTaxa: string | null
@@ -18,6 +19,7 @@ interface MapState {
 }
 
 const initialState: MapState = {
+  mode: 'site',
   selectedSite: null,
   selectedBlock: null,
   selectedTaxa: null,
@@ -32,6 +34,11 @@ const mapSlice = createSlice({
   name: 'map',
   initialState,
   reducers: {
+    setMode(state, action: PayloadAction<'block' | 'site'>) {
+      state.mode = action.payload
+      state.selectedBlock = null
+      state.selectedSite = null
+    },
     setSelectedSite(state, action: PayloadAction<string | null>) {
       state.selectedBlock = null
       state.selectedSite = action.payload
@@ -67,7 +74,7 @@ const mapSlice = createSlice({
       state.nonNativeSpeciesCount = nonNativeCount
     },
 
-    resetFilters(state) {
+    reset(state) {
       state.selectedSite = null
       state.selectedBlock = null
       state.selectedTaxa = null
@@ -113,6 +120,13 @@ function updateQuery() {
   }
 }
 
+export function updateMode(mode: 'site' | 'block') {
+  return (dispatch: AppDispatch) => {
+    dispatch(setMode(mode))
+    dispatch(updateQuery())
+  }
+}
+
 export function updateSelectedSite(site: string | null) {
   return (dispatch: AppDispatch) => {
     dispatch(setSelectedSite(site))
@@ -127,24 +141,35 @@ export function updateSelectedBlock(block: string | null) {
   }
 }
 
+export function resetFilters() {
+  return (dispatch: AppDispatch) => {
+    dispatch(reset())
+    dispatch(updateQuery())
+  }
+}
+
 // export function updateSelectedTaxa(site: string | null) {
 //   return (dispatch: AppDispatch) => {
 //     dispatch(setSelectedSite(site))
 //     dispatch(updateQuery())
 //   }
 // }
-export const {
+
+const {
+  setMode,
   setSelectedSite,
   setSelectedBlock,
   setSelectedTaxa,
   setSelectedSpecies,
   setStats,
   setTimeseries,
-  resetFilters,
+  reset,
 } = mapSlice.actions
 
 export const selectTimeSeries = (state: RootState) => state.map.timeseries
 
 export const selectSpecies = (state: RootState) => state.map.selectedSpecies
+
+export const selectMode = (state: RootState) => state.map.mode
 
 export default mapSlice.reducer
