@@ -134,21 +134,39 @@ func (q *Queries) GetSpeciesByScientificName(ctx context.Context, lower string) 
 
 const listObservedSpecies = `-- name: ListObservedSpecies :many
 SELECT
-    sp.id,
-    sp.scientific_name,
-    sp.common_name,
-    COUNT(o.id) AS observation_count
-FROM observations o
-JOIN species sp ON o.species_id = sp.id
-JOIN sites s ON o.site_id = s.id
-WHERE
-  ($1::timestamp IS NULL OR o.timestamp >= $1::timestamp)
-  AND ($2::timestamp IS NULL OR o.timestamp <= $2::timestamp)
-  AND (
-      $3::text IS NULL
-      OR s.code = $3::text
-    )
-GROUP BY sp.id, sp.scientific_name, sp.common_name
+  sp.id,
+  sp.scientific_name,
+  sp.common_name,
+  sp.native,
+  sp.taxa,
+  sp.indicator,
+  sp.reportable,
+  observation_count
+FROM species sp
+JOIN
+(
+  SELECT
+      species_id,
+      COUNT(id) AS observation_count
+  FROM observations_with_details
+  WHERE
+    ($1::timestamp IS NULL OR timestamp >= $1::timestamp)
+    AND ($2::timestamp IS NULL OR timestamp <= $2::timestamp)
+    AND (
+        $3::text IS NULL
+        OR site_code = $3::text
+      )
+    AND (
+        $4::integer IS NULL
+        OR block = $4::integer
+      )
+    AND (
+        $5::taxa IS NULL
+        OR taxa = $5::taxa
+      )
+  GROUP BY species_id
+) as observed
+ON sp.id = species_id
 ORDER BY observation_count DESC
 `
 
@@ -156,12 +174,18 @@ type ListObservedSpeciesParams struct {
 	From     pgtype.Timestamp `json:"from"`
 	To       pgtype.Timestamp `json:"to"`
 	SiteCode *string          `json:"siteCode"`
+	Block    *int32           `json:"block"`
+	Taxa     NullTaxa         `json:"taxa"`
 }
 
 type ListObservedSpeciesRow struct {
 	ID               int64  `json:"id"`
 	ScientificName   string `json:"scientificName"`
 	CommonName       string `json:"commonName"`
+	Native           bool   `json:"native"`
+	Taxa             Taxa   `json:"taxa"`
+	Indicator        bool   `json:"indicator"`
+	Reportable       bool   `json:"reportable"`
 	ObservationCount int64  `json:"observationCount"`
 }
 
@@ -169,7 +193,13 @@ type ListObservedSpeciesRow struct {
 // If site_code is NULL, results include all sites.
 // Returns species details along with observation count.
 func (q *Queries) ListObservedSpecies(ctx context.Context, arg ListObservedSpeciesParams) ([]ListObservedSpeciesRow, error) {
-	rows, err := q.db.Query(ctx, listObservedSpecies, arg.From, arg.To, arg.SiteCode)
+	rows, err := q.db.Query(ctx, listObservedSpecies,
+		arg.From,
+		arg.To,
+		arg.SiteCode,
+		arg.Block,
+		arg.Taxa,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -181,6 +211,10 @@ func (q *Queries) ListObservedSpecies(ctx context.Context, arg ListObservedSpeci
 			&i.ID,
 			&i.ScientificName,
 			&i.CommonName,
+			&i.Native,
+			&i.Taxa,
+			&i.Indicator,
+			&i.Reportable,
 			&i.ObservationCount,
 		); err != nil {
 			return nil, err

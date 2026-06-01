@@ -24,7 +24,6 @@ import {
   updateSelectedSite,
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
-import { SPECIES } from '../data/species'
 
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
@@ -40,9 +39,7 @@ function FlyToUser({
 }) {
   const map = useMap()
   useEffect(() => {
-    if (coords) {
-      map.flyTo([coords.latitude, coords.longitude], 14)
-    }
+    if (coords) map.flyTo([coords.latitude, coords.longitude], 14)
   }, [coords, map])
   return null
 }
@@ -76,6 +73,39 @@ export default function MapView() {
       setCurrentSite(site)
     }
   }, [coords, geoData])
+
+  // useEffect(() => {
+  //   if (!selectedSiteCode && !selectedBlockCode) return
+
+  //   let cancelled = false
+
+  //   setSpeciesLoading(true)
+  //   setSpeciesError(null)
+  //   setSpecies([])
+
+  //   const request =
+  //     selectedSiteCode !== null
+  //       ? getSpeciesDetailBySite(selectedSiteCode)
+  //       : getSpeciesDetailByBlock(Number(selectedBlockCode))
+
+  //   request
+  //     .then((data) => {
+  //       if (!cancelled) {
+  //         setSpecies(data)
+  //         setSpeciesLoading(false)
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       if (!cancelled) {
+  //         setSpeciesError(err.message)
+  //         setSpeciesLoading(false)
+  //       }
+  //     })
+
+  //   return () => {
+  //     cancelled = true
+  //   }
+  // }, [selectedSiteCode, selectedBlockCode])
 
   return (
     <div style={{ position: 'relative' }}>
@@ -120,39 +150,21 @@ export default function MapView() {
           5 Blocks
         </button>
       </div>
+
       <button
         onClick={locate}
         disabled={loading}
-        style={{
-          position: 'fixed',
-          bottom: '30px',
-          left: '90px',
-          zIndex: 1000,
-          padding: '8px 16px',
-          color: 'darkgreen',
-          backgroundColor: 'white',
-          border: '2px solid darkgreen',
-          borderRadius: '4px',
-          cursor: 'pointer',
-        }}
+        className="fixed bottom-20 left-4 sm:left-6lg:bottom-6 lg:left-24 z-[10] px-3 py-2 text-sm font-medium text-green-900 bg-white border border-green-900 rounded-full shadow-lg cursor-pointer transition-all hover:bg-green-50 disabled:opacity-50"
       >
         {loading ? 'Locating...' : 'Find My Location'}
       </button>
+      {/**<LocateFixed
+          size={22}
+          className={loading ? 'animate-pulse text-green-900' : 'text-green-900'}
+        /> */}
+
       {coords && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 1000,
-            backgroundColor: 'white',
-            color: 'darkgreen',
-            padding: '10px 16px',
-            borderRadius: '8px',
-            border: '2px solid darkgreen',
-          }}
-        >
+        <div className="fixed bottom-16 left-1/2 -translate-x-1/2 lg:bottom-6 z-[1000] max-w-[85vw] px-3 py-2 bg-white text-green-900 text-xs sm:text-sm font-medium rounded-full shadow-lg border border-green-200 text-center">
           {currentSite
             ? `You are in monitoring site: ${currentSite.site} (Block ${currentSite.block})`
             : 'You are outside Nillumbik monitoring zones'}
@@ -174,6 +186,7 @@ export default function MapView() {
           {error}
         </div>
       )}
+
       <MapContainer
         key={mode}
         center={[-37.6, 145.2]}
@@ -240,7 +253,7 @@ export default function MapView() {
           </Marker>
         )}
       </MapContainer>
-      <SpeciesSidebar zoneName={'Zone'} species={SPECIES} onClose={() => {}} />
+      <SpeciesSidebar onClose={() => {}} />
     </div>
   )
 }
