@@ -24,7 +24,6 @@ import {
   updateSelectedSite,
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
-import type { Species } from '../../../types'
 
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
@@ -53,9 +52,6 @@ export default function MapView() {
   const currentRegion = useAppSelector(selectCurrentRegion)
   // const [selectedZone, setSelectedZone] = useState<string | null>(null)
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
-  const [species, setSpecies] = useState<Species[]>([])
-  const [speciesLoading, setSpeciesLoading] = useState(false)
-  const [speciesError, setSpeciesError] = useState<string | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
 
   useEffect(() => {
@@ -257,7 +253,7 @@ export default function MapView() {
           </Marker>
         )}
       </MapContainer>
-      {/*<SpeciesSidebar zoneName={'Zone'} species={[]} onClose={() => {}} />*/}
+      <SpeciesSidebar onClose={() => {}} />
     </div>
   )
 }

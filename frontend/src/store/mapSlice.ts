@@ -6,8 +6,8 @@ import {
   type TimeseriesPoint,
 } from '../apis/stats.api'
 import { getSiteList } from '../apis/sites.api'
-import { getSpeciesList } from '../apis/species.api'
-import type { Site, Species } from '../types'
+import { getObservedSpecies, getSpeciesList } from '../apis/species.api'
+import type { ObservedSpecies, Site, Species } from '../types'
 
 interface MapState {
   mode: 'block' | 'site'
@@ -24,6 +24,7 @@ interface MapState {
   nonNativeSpeciesCount: number
   countByTaxa: Record<string, number>
   timeseries: Record<string, TimeseriesPoint[]>
+  observedSpecies: ObservedSpecies[]
 }
 
 const initialState: MapState = {
@@ -41,6 +42,7 @@ const initialState: MapState = {
   nonNativeSpeciesCount: 0,
   countByTaxa: {},
   timeseries: {},
+  observedSpecies: [],
 }
 
 const mapSlice = createSlice({
@@ -104,6 +106,10 @@ const mapSlice = createSlice({
       state.selectedTaxa = null
       state.selectedSpecies = null
     },
+
+    setObservedSpecies(state, action: PayloadAction<ObservedSpecies[]>) {
+      state.observedSpecies = action.payload
+    },
   },
 })
 
@@ -118,6 +124,7 @@ const {
   setStats,
   setTimeseries,
   reset,
+  setObservedSpecies,
 } = mapSlice.actions
 
 const DEFAULT_FROM = new Date('2020-01-01')
@@ -155,6 +162,10 @@ function updateQuery() {
     getObservationsTimeseries(params).then((res) => {
       dispatch(setTimeseries(res.series))
     })
+
+    getObservedSpecies(params).then((species) =>
+      dispatch(setObservedSpecies(species)),
+    )
   }
 }
 
@@ -219,5 +230,7 @@ export const selectTaxa = (state: RootState) => state.map.selectedTaxa
 export const selectSpecies = (state: RootState) => state.map.selectedSpecies
 export const selectCountByTaxa = (state: RootState) => state.map.countByTaxa
 export const selectTimeSeries = (state: RootState) => state.map.timeseries
+export const selectObservedSpecies = (state: RootState) =>
+  state.map.observedSpecies
 
 export default mapSlice.reducer
