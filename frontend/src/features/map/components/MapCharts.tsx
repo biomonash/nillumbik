@@ -100,6 +100,11 @@ const MapCharts: React.FC = () => {
   // refs
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null)
 
+  useEffect(() => {
+    const height = drawerOpen ? '65vh' : '56px'
+    document.documentElement.style.setProperty('--drawer-height', height)
+  }, [drawerOpen])
+
   const { total, nativeCount, nonNativeCount } = stats
   const speciesOptions = useAppSelector((state) =>
     extractSpeciesOptions(state.map.species, state.map.selectedTaxa),

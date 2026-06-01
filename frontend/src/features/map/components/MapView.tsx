@@ -54,6 +54,14 @@ export default function MapView() {
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
 
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   useEffect(() => {
     const file =
       mode === 'site' ? '/nillumbik_30zones.geojson' : '/blocks.geojson'
@@ -74,53 +82,27 @@ export default function MapView() {
     }
   }, [coords, geoData])
 
-  // useEffect(() => {
-  //   if (!selectedSiteCode && !selectedBlockCode) return
-
-  //   let cancelled = false
-
-  //   setSpeciesLoading(true)
-  //   setSpeciesError(null)
-  //   setSpecies([])
-
-  //   const request =
-  //     selectedSiteCode !== null
-  //       ? getSpeciesDetailBySite(selectedSiteCode)
-  //       : getSpeciesDetailByBlock(Number(selectedBlockCode))
-
-  //   request
-  //     .then((data) => {
-  //       if (!cancelled) {
-  //         setSpecies(data)
-  //         setSpeciesLoading(false)
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       if (!cancelled) {
-  //         setSpeciesError(err.message)
-  //         setSpeciesLoading(false)
-  //       }
-  //     })
-
-  //   return () => {
-  //     cancelled = true
-  //   }
-  // }, [selectedSiteCode, selectedBlockCode])
+  const isDesktop = windowWidth >= 768
+  const leftSidebarVisible = true
+  const rightSidebarWidth = 350
+  const leftSidebarWidth = 320
+  const navWidth = 80
 
   return (
     <div style={{ position: 'relative' }}>
       <div
         style={{
-          position: 'absolute',
-          top: 20,
-          right: 20,
-          zIndex: 2000,
+          position: 'fixed',
+          top: 80,
+          right: isDesktop ? rightSidebarWidth + 20 : 20,
+          zIndex: 40,
           background: 'white',
           padding: '8px',
           borderRadius: '10px',
           display: 'flex',
           gap: '10px',
           boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+          transition: 'right 0.3s ease',
         }}
       >
         <button
@@ -154,33 +136,63 @@ export default function MapView() {
       <button
         onClick={locate}
         disabled={loading}
-        className="fixed bottom-20 left-4 sm:left-6lg:bottom-6 lg:left-24 z-[10] px-3 py-2 text-sm font-medium text-green-900 bg-white border border-green-900 rounded-full shadow-lg cursor-pointer transition-all hover:bg-green-50 disabled:opacity-50"
+        style={{
+          position: 'fixed',
+          bottom: isDesktop ? '30px' : '80px',
+          left:
+            isDesktop && leftSidebarVisible
+              ? navWidth + leftSidebarWidth + 20
+              : '90px',
+          zIndex: 40,
+          padding: '8px 16px',
+          color: 'darkgreen',
+          backgroundColor: 'white',
+          border: '2px solid darkgreen',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          transition: 'left 0.3s ease, bottom 0.3s ease',
+        }}
       >
         {loading ? 'Locating...' : 'Find My Location'}
       </button>
-      {/**<LocateFixed
-          size={22}
-          className={loading ? 'animate-pulse text-green-900' : 'text-green-900'}
-        /> */}
 
       {coords && (
-        <div className="fixed bottom-16 left-1/2 -translate-x-1/2 lg:bottom-6 z-[1000] max-w-[85vw] px-3 py-2 bg-white text-green-900 text-xs sm:text-sm font-medium rounded-full shadow-lg border border-green-200 text-center">
+        <div
+          style={{
+            position: 'fixed',
+            bottom: isDesktop ? '20px' : '130px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 40,
+            backgroundColor: 'white',
+            color: 'darkgreen',
+            padding: '10px 16px',
+            borderRadius: '8px',
+            border: '2px solid darkgreen',
+            transition: 'bottom 0.3s ease',
+            whiteSpace: 'nowrap',
+            fontSize: isDesktop ? '14px' : '12px',
+          }}
+        >
           {currentSite
             ? `You are in monitoring site: ${currentSite.site} (Block ${currentSite.block})`
             : 'You are outside Nillumbik monitoring zones'}
         </div>
       )}
+
       {error && (
         <div
           style={{
-            position: 'absolute',
-            top: '50px',
-            right: '10px',
-            zIndex: 1000,
+            position: 'fixed',
+            top: '140px',
+            right: isDesktop ? rightSidebarWidth + 20 : 20,
+            zIndex: 40,
             color: 'red',
             backgroundColor: 'white',
             padding: '8px',
             borderRadius: '4px',
+            transition: 'right 0.3s ease',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
           }}
         >
           {error}
