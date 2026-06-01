@@ -234,6 +234,12 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "description": "Block number",
+                        "name": "block",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "Start timestamp (RFC3339 format)",
                         "name": "from",
@@ -787,6 +793,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "native": {
+                    "type": "boolean"
                 },
                 "observation_count": {
                     "type": "integer"
