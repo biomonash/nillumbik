@@ -27,6 +27,7 @@ import {
   selectSpecies,
   selectMode,
   selectTaxa,
+  updateSelectedTaxa,
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 
@@ -54,12 +55,13 @@ function extractSortedSites(data: GetObservationSitesResponse): ChartInput[] {
   return [{ value: 'all', label: 'All Sites' }, ...sorted]
 }
 
-function extractTaxaOptions(data: GetObservationStatsResponse): ChartInput[] {
-  const taxa = Object.keys(data.countByTaxa)
-    .sort()
-    .map((t) => ({ value: t, label: capitalize(t) }))
-  return [{ value: 'all', label: 'All Taxa' }, ...taxa]
-}
+const taxaOptions = [
+  { value: 'all', label: 'All Taxa' },
+  ...['bird', 'mammal', 'reptile'].map((t) => ({
+    value: t,
+    label: capitalize(t),
+  })),
+]
 
 function extractSpeciesOptions(
   allSpecies: Species[],
@@ -97,7 +99,12 @@ const MapCharts: React.FC = () => {
   // state
   const [blockOptions, setBlockOptions] = useState<ChartInput[]>([])
   const [siteOptions, setSiteOptions] = useState<ChartInput[]>([])
-  const [taxaOptions, setTaxaOptions] = useState<ChartInput[]>([])
+  // const countByTaxa = useAppSelector(selectCountByTaxa)
+  // const taxaOptions = useMemo(
+  //   () => extractTaxaOptions(countByTaxa),
+  //   [countByTaxa],
+  // )
+  // const [taxaOptions, setTaxaOptions] = useState<ChartInput[]>([])
   const [allSpecies, setAllSpecies] = useState<Species[]>([])
   // const [stats, setStats] = useState({
   //   total: 0,
@@ -137,6 +144,8 @@ const MapCharts: React.FC = () => {
     getAllSpecies()
       .then(setAllSpecies)
       .catch((err) => console.error('Failed to fetch species:', err))
+
+    dispatch(resetFilters())
   }, [])
 
   // useEffect(() => {
@@ -256,7 +265,9 @@ const MapCharts: React.FC = () => {
           <Select
             options={taxaOptions}
             value={selectedTaxa ?? 'all'}
-            // onChange={(t) => dispatch(setSelectedTaxa(t))}
+            onChange={(t) =>
+              dispatch(updateSelectedTaxa(t === 'all' ? null : t))
+            }
             placeholder="Select Taxa"
             className="w-full"
           />
