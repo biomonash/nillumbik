@@ -166,10 +166,15 @@ const {
   reset,
 } = mapSlice.actions
 
-export const selectTimeSeries = (state: RootState) => state.map.timeseries
-
-export const selectSpecies = (state: RootState) => state.map.selectedSpecies
-
 export const selectMode = (state: RootState) => state.map.mode
+export const selectBlock = (state: RootState) => state.map.selectedBlock
+export const selectSite = (state: RootState) => state.map.selectedSite
+export const selectCurrentRegion = (state: RootState) =>
+  state.map.mode === 'site'
+    ? state.map.selectedSite
+    : String(state.map.selectedBlock)
+export const selectTaxa = (state: RootState) => state.map.selectedTaxa
+export const selectSpecies = (state: RootState) => state.map.selectedSpecies
+export const selectTimeSeries = (state: RootState) => state.map.timeseries
 
 export default mapSlice.reducer
