@@ -83,7 +83,7 @@ export default function MapView() {
   }, [coords, geoData])
 
   const isDesktop = windowWidth >= 768
-  const leftSidebarVisible = !!selectedZone
+  const leftSidebarVisible = true
   const rightSidebarWidth = 350
   const leftSidebarWidth = 320
   const navWidth = 80
@@ -139,7 +139,10 @@ export default function MapView() {
         style={{
           position: 'fixed',
           bottom: isDesktop ? '30px' : '80px',
-          left: (isDesktop && leftSidebarVisible) ? (navWidth + leftSidebarWidth + 20) : '90px',
+          left:
+            isDesktop && leftSidebarVisible
+              ? navWidth + leftSidebarWidth + 20
+              : '90px',
           zIndex: 40,
           padding: '8px 16px',
           color: 'darkgreen',
@@ -168,7 +171,7 @@ export default function MapView() {
             border: '2px solid darkgreen',
             transition: 'bottom 0.3s ease',
             whiteSpace: 'nowrap',
-            fontSize: isDesktop ? '14px' : '12px'
+            fontSize: isDesktop ? '14px' : '12px',
           }}
         >
           {currentSite
@@ -189,7 +192,7 @@ export default function MapView() {
             padding: '8px',
             borderRadius: '4px',
             transition: 'right 0.3s ease',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
           }}
         >
           {error}
