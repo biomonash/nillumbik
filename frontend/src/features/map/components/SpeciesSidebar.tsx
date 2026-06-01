@@ -84,16 +84,12 @@ export default function SpeciesSidebar({ onClose }: SpeciesSidebarProps) {
           gap: '16px',
         }}
       >
-        {/*{loading && <p style={{ color: '#6b7280' }}>Loading species...</p>}
-         */}
-        {/*{error && <p style={{ color: 'red' }}>{error}</p>}
-         */}
-        {/*{!loading && !error && species.length === 0 && (
-          <p style={{ color: '#6b7280' }}>No species found.</p>
-        )}
-*/}
         {observedSpecies.map((s) => (
-          <SpeciesCard key={s.id} species={s} />
+          <SpeciesCard
+            key={s.id}
+            species={s}
+            observationCount={s.observationCount}
+          />
         ))}
       </div>
     </div>

@@ -806,7 +806,7 @@ const docTemplate = `{
                 "native": {
                     "type": "boolean"
                 },
-                "observation_count": {
+                "observationCount": {
                     "type": "integer"
                 },
                 "reportable": {

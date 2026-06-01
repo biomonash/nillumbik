@@ -1,12 +1,16 @@
 import { Card, CardContent } from '../Card'
 import Badge from '../Badge'
-import { type Species } from '../../../types'
+import { type ObservedSpecies } from '../../../types'
 
 interface SpeciesCardProps {
-  species: Species
+  species: ObservedSpecies
+  observationCount?: number
 }
 
-export default function SpeciesCard({ species }: SpeciesCardProps) {
+export default function SpeciesCard({
+  species,
+  observationCount,
+}: SpeciesCardProps) {
   return (
     <Card className="overflow-hidden">
       {/* Species Photo */}
@@ -49,6 +53,13 @@ export default function SpeciesCard({ species }: SpeciesCardProps) {
             </Badge>
           )}
         </div>
+        {observationCount && (
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-semibold text-sm text-gray-900">
+              {`${observationCount}`} observations
+            </span>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

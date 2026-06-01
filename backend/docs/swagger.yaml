@@ -144,7 +144,7 @@ definitions:
         type: boolean
       native:
         type: boolean
-      observation_count:
+      observationCount:
         type: integer
       reportable:
         type: boolean
