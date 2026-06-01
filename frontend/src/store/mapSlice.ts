@@ -5,9 +5,27 @@ import {
   getObservationsTimeseries,
   type TimeseriesPoint,
 } from '../apis/stats.api'
+import { getSiteList } from '../apis/sites.api'
+import { getSpeciesList } from '../apis/species.api'
+
+export type Site = {
+  code: string
+  name: string
+  block: number
+}
+
+export type Species = {
+  scientificName: string
+  commonName: string
+  taxa: string
+}
 
 interface MapState {
   mode: 'block' | 'site'
+  blocks: number[]
+  sites: Site[]
+  taxas: string[]
+  species: Species[]
   selectedBlock: number | null
   selectedSite: string | null
   selectedTaxa: string | null
@@ -21,6 +39,10 @@ interface MapState {
 
 const initialState: MapState = {
   mode: 'site',
+  blocks: [],
+  sites: [],
+  taxas: [],
+  species: [],
   selectedSite: null,
   selectedBlock: null,
   selectedTaxa: null,
@@ -42,7 +64,6 @@ const mapSlice = createSlice({
       state.selectedSite = null
     },
     setSelectedSite(state, action: PayloadAction<string | null>) {
-      state.selectedBlock = null
       state.selectedSite = action.payload
     },
     setSelectedBlock(state, action: PayloadAction<string | null>) {
@@ -54,7 +75,6 @@ const mapSlice = createSlice({
       state.selectedSpecies = null
     },
     setSelectedSpecies(state, action: PayloadAction<string | null>) {
-      state.selectedTaxa = null
       state.selectedSpecies = action.payload
     },
     setTimeseries(
@@ -79,6 +99,16 @@ const mapSlice = createSlice({
       state.countByTaxa = countByTaxa
     },
 
+    setSites(state, action: PayloadAction<Site[]>) {
+      state.sites = [...action.payload]
+      state.blocks = Array.from(new Set(action.payload.map((s) => s.block)))
+    },
+
+    setSpecies(state, action: PayloadAction<Species[]>) {
+      state.species = action.payload
+      state.taxas = Array.from(new Set(action.payload.map((s) => s.taxa)))
+    },
+
     reset(state) {
       state.selectedSite = null
       state.selectedBlock = null
@@ -87,6 +117,19 @@ const mapSlice = createSlice({
     },
   },
 })
+
+const {
+  setMode,
+  setSites,
+  setSpecies,
+  setSelectedSite,
+  setSelectedBlock,
+  setSelectedTaxa,
+  setSelectedSpecies,
+  setStats,
+  setTimeseries,
+  reset,
+} = mapSlice.actions
 
 const DEFAULT_FROM = new Date('2020-01-01')
 
@@ -126,6 +169,14 @@ function updateQuery() {
   }
 }
 
+export function init() {
+  return (dispatch: AppDispatch) => {
+    getSiteList().then((sites) => dispatch(setSites(sites)))
+    getSpeciesList().then((species) => dispatch(setSpecies(species)))
+    dispatch(updateQuery())
+  }
+}
+
 export function updateMode(mode: 'site' | 'block') {
   return (dispatch: AppDispatch) => {
     dispatch(setMode(mode))
@@ -154,6 +205,13 @@ export function updateSelectedTaxa(taxa: string | null) {
   }
 }
 
+export function updateSelectedSpecies(species: string | null) {
+  return (dispatch: AppDispatch) => {
+    dispatch(setSelectedSpecies(species === 'all' ? null : species))
+    dispatch(updateQuery())
+  }
+}
+
 export function resetFilters() {
   return (dispatch: AppDispatch) => {
     dispatch(reset())
@@ -167,17 +225,6 @@ export function resetFilters() {
 //     dispatch(updateQuery())
 //   }
 // }
-
-const {
-  setMode,
-  setSelectedSite,
-  setSelectedBlock,
-  setSelectedTaxa,
-  setSelectedSpecies,
-  setStats,
-  setTimeseries,
-  reset,
-} = mapSlice.actions
 
 export const selectMode = (state: RootState) => state.map.mode
 export const selectBlock = (state: RootState) => state.map.selectedBlock

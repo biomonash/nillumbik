@@ -7,15 +7,7 @@ import {
   CardContent,
 } from '../../../components/ui/Card'
 import Select from '../../../components/ui/Select'
-import {
-  getAllSpecies,
-  getObservationBlocks,
-  type GetObservationBlocksResponse,
-  type GetObservationStatsResponse,
-  type Species,
-  type ChartInput,
-  type GetObservationSitesResponse,
-} from '../../../apis/mapCharts.api'
+import { type ChartInput } from '../../../apis/mapCharts.api'
 import { SpeciesLineChart } from './charts/SpeciesLineChart'
 import { NativeBarChart } from './charts/NativeBarChart'
 import { useSelector } from 'react-redux'
@@ -28,6 +20,12 @@ import {
   selectMode,
   selectTaxa,
   updateSelectedTaxa,
+  init,
+  type Site,
+  type Species,
+  selectBlock,
+  selectSite,
+  updateSelectedSpecies,
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 
@@ -37,19 +35,20 @@ function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 }
 
-function extractSortedBlocks(data: GetObservationBlocksResponse): ChartInput[] {
-  const sorted = [...data.blocks]
-    .sort((a, b) => a.block - b.block)
-    .map((b) => ({ value: String(b.block), label: `Block ${b.block}` }))
+function extractSortedBlocks(data: number[]): ChartInput[] {
+  const sorted = data.map((b) => ({ value: String(b), label: `Block ${b}` }))
   return [{ value: 'all', label: 'All Blocks' }, ...sorted]
 }
 
-function extractSortedSites(data: GetObservationSitesResponse): ChartInput[] {
-  const sorted = [...data.sites]
-    .sort((a, b) => a.siteCode.localeCompare(b.siteCode))
+function extractSortedSites(
+  data: Site[],
+  selectedBlock: number | null,
+): ChartInput[] {
+  const sorted = data
+    .filter((site) => (selectedBlock ? site.block === selectedBlock : true))
     .map((site) => ({
-      value: site.siteCode,
-      label: `Site ${site.siteCode}`,
+      value: site.code,
+      label: `Site ${site.name}`,
     }))
 
   return [{ value: 'all', label: 'All Sites' }, ...sorted]
@@ -82,13 +81,9 @@ function extractSpeciesOptions(
 const MapCharts: React.FC = () => {
   const dispatch = useAppDispatch()
 
-  const mode = useAppSelector(selectMode)
   // read all filter state from redux
-  const selectedBlock = useSelector(
-    (state: RootState) => state.map.selectedBlock,
-  )
-  const selectedSite =
-    useSelector((state: RootState) => state.map.selectedSite) ?? 'all'
+  const selectedBlock = useSelector(selectBlock)
+  const selectedSite = useSelector(selectSite)
   const selectedTaxa = useSelector(selectTaxa)
   const selectedSpecies = useSelector(selectSpecies)
   const stats = useSelector((state: RootState) => ({
@@ -97,33 +92,20 @@ const MapCharts: React.FC = () => {
     nonNativeCount: state.map.nonNativeSpeciesCount,
   }))
   // state
-  const [blockOptions, setBlockOptions] = useState<ChartInput[]>([])
-  const [siteOptions, setSiteOptions] = useState<ChartInput[]>([])
-  // const countByTaxa = useAppSelector(selectCountByTaxa)
-  // const taxaOptions = useMemo(
-  //   () => extractTaxaOptions(countByTaxa),
-  //   [countByTaxa],
-  // )
-  // const [taxaOptions, setTaxaOptions] = useState<ChartInput[]>([])
-  const [allSpecies, setAllSpecies] = useState<Species[]>([])
-  // const [stats, setStats] = useState({
-  //   total: 0,
-  //   nativeCount: 0,
-  //   nonNativeCount: 0,
-  // })
+  const blockOptions = useAppSelector((state) =>
+    extractSortedBlocks(state.map.blocks),
+  )
+  const siteOptions = useAppSelector((state) =>
+    extractSortedSites(state.map.sites, state.map.selectedBlock),
+  )
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [showToast, setShowToast] = useState(false)
   // refs
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null)
 
   const { total, nativeCount, nonNativeCount } = stats
-  const speciesOptions = useMemo(
-    () =>
-      extractSpeciesOptions(
-        allSpecies,
-        selectedTaxa !== 'all' ? selectedTaxa : null,
-      ),
-    [allSpecies, selectedTaxa],
+  const speciesOptions = useAppSelector((state) =>
+    extractSpeciesOptions(state.map.species, state.map.selectedTaxa),
   )
 
   const copy = useCallback(() => {
@@ -137,15 +119,7 @@ const MapCharts: React.FC = () => {
 
   // load initial data
   useEffect(() => {
-    getObservationBlocks({ from: DEFAULT_FROM })
-      .then((data) => setBlockOptions(extractSortedBlocks(data)))
-      .catch((err) => console.error('Failed to fetch zones:', err))
-
-    getAllSpecies()
-      .then(setAllSpecies)
-      .catch((err) => console.error('Failed to fetch species:', err))
-
-    dispatch(resetFilters())
+    dispatch(init())
   }, [])
 
   // useEffect(() => {
@@ -168,33 +142,6 @@ const MapCharts: React.FC = () => {
   //     .then((data) => setTaxaOptions(extractTaxaOptions(data)))
   //     .catch((err) => console.error('Failed to fetch taxa:', err))
   // }, [selectedZone, selectedSite])
-
-  // useEffect(() => {
-  //   dispatch(updateQuery())
-  // }, [])
-
-  // useEffect(() => {
-  //   let cancelled = false
-
-  //   Promise.all([getObservationBlocks(params), getObservationStats(params)])
-  //     .then(([blocksData, statsData]) => {
-  //       if (cancelled) return // ignore result if params changed
-  //       const total = params.siteCode
-  //         ? statsData.observationCount
-  //         : blocksData.blocks.reduce((sum, b) => sum + b.observationCount, 0)
-  //       setStats({
-  //         total,
-  //         nativeCount: statsData.nativeSpeciesCount,
-  //         nonNativeCount: statsData.speciesCount - statsData.nativeSpeciesCount,
-  //       })
-  //     })
-  //     .catch((err) => {
-  //       if (!cancelled) console.error('Failed to fetch stats:', err)
-  //     })
-  //   return () => {
-  //     cancelled = true
-  //   }
-  // }, [params])
 
   useEffect(() => {
     return () => {
@@ -227,34 +174,35 @@ const MapCharts: React.FC = () => {
 
       {/* Select Filters */}
       <div className="flex flex-col gap-3">
-        {mode === 'block' ? (
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
-              Block
-            </span>
-            <Select
-              options={blockOptions}
-              value={selectedBlock ? String(selectedBlock) : 'all'}
-              onChange={(z) => dispatch(updateSelectedBlock(z))}
-              placeholder="Select Block"
-              className="w-full"
-            />
-          </div>
-        ) : (
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
-              Site
-            </span>
-            <Select
-              options={siteOptions}
-              value={selectedSite}
-              onChange={(s) => dispatch(updateSelectedSite(s))}
-              disabled={selectedBlock === null}
-              placeholder="Select Site"
-              className="w-full"
-            />
-          </div>
-        )}
+        <div className="flex flex-col">
+          <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
+            Block
+          </span>
+          <Select
+            options={blockOptions}
+            value={selectedBlock ? String(selectedBlock) : 'all'}
+            onChange={(z) =>
+              dispatch(updateSelectedBlock(z === 'all' ? null : z))
+            }
+            placeholder="Select Block"
+            className="w-full"
+          />
+        </div>
+        <div className="flex flex-col">
+          <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
+            Site
+          </span>
+          <Select
+            options={siteOptions}
+            value={selectedSite ?? 'all'}
+            onChange={(s) =>
+              dispatch(updateSelectedSite(s === 'all' ? null : s))
+            }
+            // disabled={selectedBlock === null}
+            placeholder="Select Site"
+            className="w-full"
+          />
+        </div>
         <div className="flex flex-col">
           <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
             Taxa{' '}
@@ -282,9 +230,10 @@ const MapCharts: React.FC = () => {
           <Select
             options={speciesOptions}
             value={selectedSpecies ?? 'all'}
-            // onChange={(s) => dispatch(setSelectedSpecies(s))}
+            onChange={(s) =>
+              dispatch(updateSelectedSpecies(s === 'all' ? null : s))
+            }
             placeholder="Select Species"
-            disabled={selectedTaxa === null}
             className="w-full"
           />
         </div>
