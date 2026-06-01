@@ -16,19 +16,19 @@ import {
   type Species,
   type ChartInput,
   type GetObservationSitesResponse,
-  getObservationSites,
 } from '../../../apis/mapCharts.api'
 import { SpeciesLineChart } from './charts/SpeciesLineChart'
 import { NativeBarChart } from './charts/NativeBarChart'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import type { RootState } from '../../../store/store'
 import {
-  setSelectedZone,
-  setSelectedSite,
   setSelectedTaxa,
   setSelectedSpecies,
   resetFilters,
+  updateSelectedBlock,
+  updateSelectedSite,
 } from '../../../store/mapSlice'
+import { useAppDispatch } from '../../../hooks/redux'
 
 const DEFAULT_FROM = new Date('2020-01-01')
 // Extraction Functions
@@ -78,26 +78,33 @@ function extractSpeciesOptions(
 }
 
 const MapCharts: React.FC = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   // read all filter state from redux
-  const selectedZone = useSelector((state: RootState) => state.map.selectedZone)
+  const selectedBlock = useSelector(
+    (state: RootState) => state.map.selectedBlock,
+  )
   const selectedSite =
     useSelector((state: RootState) => state.map.selectedSite) ?? 'all'
   const selectedTaxa = useSelector((state: RootState) => state.map.selectedTaxa)
   const selectedSpecies = useSelector(
     (state: RootState) => state.map.selectedSpecies,
   )
+  const stats = useSelector((state: RootState) => ({
+    total: state.map.totalObservations,
+    nativeCount: state.map.nativeSpeciesCount,
+    nonNativeCount: state.map.nonNativeSpeciesCount,
+  }))
   // state
   const [zoneOptions, setZoneOptions] = useState<ChartInput[]>([])
   const [siteOptions, setSiteOptions] = useState<ChartInput[]>([])
   const [taxaOptions, setTaxaOptions] = useState<ChartInput[]>([])
   const [allSpecies, setAllSpecies] = useState<Species[]>([])
-  const [stats, setStats] = useState({
-    total: 0,
-    nativeCount: 0,
-    nonNativeCount: 0,
-  })
+  // const [stats, setStats] = useState({
+  //   total: 0,
+  //   nativeCount: 0,
+  //   nonNativeCount: 0,
+  // })
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [showToast, setShowToast] = useState(false)
   // refs
@@ -113,16 +120,16 @@ const MapCharts: React.FC = () => {
     [allSpecies, selectedTaxa],
   )
   // useMemo() : Memorizes params to avoid recalculating on every render
-  const params = useMemo(
-    () => ({
-      from: DEFAULT_FROM,
-      block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
-      siteCode: selectedSite !== 'all' ? selectedSite : undefined,
-      taxa: selectedTaxa !== 'all' ? selectedTaxa : undefined,
-      commonName: selectedSpecies !== '' ? selectedSpecies : undefined,
-    }),
-    [selectedZone, selectedSite, selectedTaxa, selectedSpecies],
-  )
+  // const params = useMemo(
+  //   () => ({
+  //     from: DEFAULT_FROM,
+  //     block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
+  //     siteCode: selectedSite !== 'all' ? selectedSite : undefined,
+  //     taxa: selectedTaxa !== 'all' ? selectedTaxa : undefined,
+  //     commonName: selectedSpecies !== '' ? selectedSpecies : undefined,
+  //   }),
+  //   [selectedZone, selectedSite, selectedTaxa, selectedSpecies],
+  // )
 
   const copy = useCallback(() => {
     if (!navigator.clipboard) return
@@ -144,49 +151,53 @@ const MapCharts: React.FC = () => {
       .catch((err) => console.error('Failed to fetch species:', err))
   }, [])
 
-  useEffect(() => {
-    setSiteOptions([])
-    getObservationSites({
-      from: DEFAULT_FROM,
-      block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
-    })
-      .then((data) => setSiteOptions(extractSortedSites(data)))
-      .catch((err) => console.error('Failed to fetch sites:', err))
-  }, [selectedZone])
+  // useEffect(() => {
+  //   setSiteOptions([])
+  //   getObservationSites({
+  //     from: DEFAULT_FROM,
+  //     block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
+  //   })
+  //     .then((data) => setSiteOptions(extractSortedSites(data)))
+  //     .catch((err) => console.error('Failed to fetch sites:', err))
+  // }, [selectedZone])
 
-  useEffect(() => {
-    setTaxaOptions([])
-    getObservationStats({
-      from: DEFAULT_FROM,
-      block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
-      siteCode: selectedSite !== 'all' ? selectedSite : undefined,
-    })
-      .then((data) => setTaxaOptions(extractTaxaOptions(data)))
-      .catch((err) => console.error('Failed to fetch taxa:', err))
-  }, [selectedZone, selectedSite])
+  // useEffect(() => {
+  //   setTaxaOptions([])
+  //   getObservationStats({
+  //     from: DEFAULT_FROM,
+  //     block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
+  //     siteCode: selectedSite !== 'all' ? selectedSite : undefined,
+  //   })
+  //     .then((data) => setTaxaOptions(extractTaxaOptions(data)))
+  //     .catch((err) => console.error('Failed to fetch taxa:', err))
+  // }, [selectedZone, selectedSite])
 
-  useEffect(() => {
-    let cancelled = false
+  // useEffect(() => {
+  //   dispatch(updateQuery())
+  // }, [])
 
-    Promise.all([getObservationBlocks(params), getObservationStats(params)])
-      .then(([blocksData, statsData]) => {
-        if (cancelled) return // ignore result if params changed
-        const total = params.siteCode
-          ? statsData.observationCount
-          : blocksData.blocks.reduce((sum, b) => sum + b.observationCount, 0)
-        setStats({
-          total,
-          nativeCount: statsData.nativeSpeciesCount,
-          nonNativeCount: statsData.speciesCount - statsData.nativeSpeciesCount,
-        })
-      })
-      .catch((err) => {
-        if (!cancelled) console.error('Failed to fetch stats:', err)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [params])
+  // useEffect(() => {
+  //   let cancelled = false
+
+  //   Promise.all([getObservationBlocks(params), getObservationStats(params)])
+  //     .then(([blocksData, statsData]) => {
+  //       if (cancelled) return // ignore result if params changed
+  //       const total = params.siteCode
+  //         ? statsData.observationCount
+  //         : blocksData.blocks.reduce((sum, b) => sum + b.observationCount, 0)
+  //       setStats({
+  //         total,
+  //         nativeCount: statsData.nativeSpeciesCount,
+  //         nonNativeCount: statsData.speciesCount - statsData.nativeSpeciesCount,
+  //       })
+  //     })
+  //     .catch((err) => {
+  //       if (!cancelled) console.error('Failed to fetch stats:', err)
+  //     })
+  //   return () => {
+  //     cancelled = true
+  //   }
+  // }, [params])
 
   useEffect(() => {
     return () => {
@@ -225,8 +236,8 @@ const MapCharts: React.FC = () => {
           </span>
           <Select
             options={zoneOptions}
-            value={selectedZone}
-            onChange={(z) => dispatch(setSelectedZone(z))}
+            value={selectedBlock ? String(selectedBlock) : 'all'}
+            onChange={(z) => dispatch(updateSelectedBlock(z))}
             placeholder="Select Zone"
             className="w-full"
           />
@@ -238,8 +249,8 @@ const MapCharts: React.FC = () => {
           <Select
             options={siteOptions}
             value={selectedSite}
-            onChange={(s) => dispatch(setSelectedSite(s))}
-            disabled={selectedZone === 'all'}
+            onChange={(s) => dispatch(updateSelectedSite(s))}
+            disabled={selectedBlock === null}
             placeholder="Select Site"
             className="w-full"
           />
@@ -253,7 +264,7 @@ const MapCharts: React.FC = () => {
           </span>
           <Select
             options={taxaOptions}
-            value={selectedTaxa}
+            value={selectedTaxa ?? 'all'}
             onChange={(t) => dispatch(setSelectedTaxa(t))}
             placeholder="Select Taxa"
             className="w-full"
@@ -268,10 +279,10 @@ const MapCharts: React.FC = () => {
           </span>
           <Select
             options={speciesOptions}
-            value={selectedSpecies}
+            value={selectedSpecies ?? 'all'}
             onChange={(s) => dispatch(setSelectedSpecies(s))}
             placeholder="Select Species"
-            disabled={selectedTaxa === 'all'}
+            disabled={selectedTaxa === null}
             className="w-full"
           />
         </div>
@@ -292,7 +303,7 @@ const MapCharts: React.FC = () => {
       {/* Zone summary */}
       <div className="bg-white/50 rounded-xl p-3 flex flex-col gap-1">
         <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-          {selectedZone !== 'all' ? `Zone ${selectedZone}` : 'All Zones'}
+          {selectedBlock ? `Zone ${selectedBlock}` : 'All Zones'}
         </span>
         <div className="flex items-baseline gap-1">
           <span className="text-2xl font-bold text-black">
@@ -357,10 +368,10 @@ const MapCharts: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="px-2 pb-3">
-            <SpeciesLineChart
+            {/*<SpeciesLineChart
               filters={params}
               selectedSpecies={selectedSpecies}
-            />
+            />*/}
           </CardContent>
         </Card>
       </div>
