@@ -17,6 +17,7 @@ import (
 type ObservedSpeciesRequest struct {
 	SiteCode *string `form:"siteCode"`
 	Block    *int32  `form:"block"`
+	Taxa     *string `form:"taxa"`
 	models.TimePeriodRequest
 }
 
@@ -123,6 +124,7 @@ func (u *Controller) GetSpeciesByCommonName(c *gin.Context) {
 //	@Tags			species
 //	@Param			siteCode	query	string	false	"Site code"
 //	@Param			block		query	int		false	"Block number"
+//	@Param			taxa		query	string	false	"Taxa"
 //	@Param			from		query	string	false	"Start timestamp (RFC3339 format)"
 //	@Param			to			query	string	false	"End timestamp (RFC3339 format)"
 //	@Accept			json
@@ -139,12 +141,19 @@ func (u *Controller) GetObservedSpecies(c *gin.Context) {
 
 	log.Println(req)
 
+	taxa := db.NullTaxa{}
+	if req.Taxa != nil {
+		taxa.Taxa = db.Taxa(*req.Taxa)
+		taxa.Valid = true
+	}
+
 	//Call DB query
 	rows, err := u.q.ListObservedSpecies(c.Request.Context(), db.ListObservedSpeciesParams{
 		From:     req.From.ToPGTime(),
 		To:       req.To.ToPGTime(),
 		SiteCode: req.SiteCode, // empty string means no filtering
 		Block:    req.Block,
+		Taxa:     taxa,
 	})
 	if err != nil {
 		c.Error(fmt.Errorf("failed to list observed species: %w", err))
