@@ -18,10 +18,12 @@ import type {
 import SpeciesSidebar from './SpeciesSidebar'
 import { SPECIES } from '../data/species'
 import {
+  selectMode,
+  updateMode,
   updateSelectedBlock,
   updateSelectedSite,
 } from '../../../store/mapSlice'
-import { useAppDispatch } from '../../../hooks/redux'
+import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
@@ -46,21 +48,22 @@ function FlyToUser({
 
 export default function MapView() {
   const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
-  const [viewType, setViewType] = useState('zones')
+  const mode = useAppSelector(selectMode)
+  const dispatch = useAppDispatch()
+  // const [viewType, setViewType] = useState('zones')
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
   const [selectedZone, setSelectedZone] = useState<string | null>(null)
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
-  const dispatch = useAppDispatch()
 
   useEffect(() => {
     const file =
-      viewType === 'zones' ? '/nillumbik_30zones.geojson' : '/blocks.geojson'
+      mode === 'site' ? '/nillumbik_30zones.geojson' : '/blocks.geojson'
     setGeoData(null)
     fetch(file)
       .then((res) => res.json())
       .then((data) => setGeoData(data))
-  }, [viewType])
+  }, [mode])
 
   useEffect(() => {
     if (coords && geoData) {
@@ -90,30 +93,30 @@ export default function MapView() {
         }}
       >
         <button
-          onClick={() => setViewType('zones')}
+          onClick={() => dispatch(updateMode('site'))}
           style={{
             padding: '6px 12px',
             borderRadius: '6px',
             border: '1px solid #ccc',
-            background: viewType === 'zones' ? 'green' : 'white',
-            color: viewType === 'zones' ? 'white' : 'black',
+            background: mode === 'site' ? 'green' : 'white',
+            color: mode === 'site' ? 'white' : 'black',
             cursor: 'pointer',
           }}
         >
-          30 Zones
+          30 Sites
         </button>
         <button
-          onClick={() => setViewType('blocks')}
+          onClick={() => dispatch(updateMode('block'))}
           style={{
             padding: '6px 12px',
             borderRadius: '6px',
             border: '1px solid #ccc',
-            background: viewType === 'blocks' ? 'green' : 'white',
-            color: viewType === 'blocks' ? 'white' : 'black',
+            background: mode === 'block' ? 'green' : 'white',
+            color: mode === 'block' ? 'white' : 'black',
             cursor: 'pointer',
           }}
         >
-          Blocks
+          5 Blocks
         </button>
       </div>
       <button
@@ -171,7 +174,7 @@ export default function MapView() {
         </div>
       )}
       <MapContainer
-        key={viewType}
+        key={mode}
         center={[-37.6, 145.2]}
         zoom={10}
         style={{
@@ -187,11 +190,11 @@ export default function MapView() {
         <FlyToUser coords={coords} />
         {geoData && (
           <GeoJSON
-            key={`${viewType}-${selectedZone}`}
+            key={`${mode}-${selectedZone}`}
             data={geoData}
             style={(feature) => {
               const id =
-                viewType === 'zones'
+                mode === 'site'
                   ? feature?.properties?.site
                   : String(feature?.properties?.block)
               const isSelected = selectedZone === `Zone ${id}`
@@ -209,7 +212,7 @@ export default function MapView() {
             }}
             onEachFeature={(feature, layer) => {
               const id =
-                viewType === 'zones'
+                mode === 'site'
                   ? feature.properties.site
                   : String(feature.properties.block)
               layer.on('mouseover', () => setHoveredZone(id))
@@ -221,7 +224,7 @@ export default function MapView() {
 
                 setSelectedZone(isAlreadySelected ? null : zoneName)
 
-                if (viewType === 'blocks') {
+                if (mode === 'block') {
                   dispatch(updateSelectedBlock(block))
                 } else {
                   dispatch(updateSelectedSite(isAlreadySelected ? null : id))
