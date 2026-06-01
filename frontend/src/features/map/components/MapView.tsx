@@ -17,11 +17,11 @@ import type {
 } from '../../../helpers/siteLocation'
 import SpeciesSidebar from './SpeciesSidebar'
 import { SPECIES } from '../data/species'
-import { useDispatch } from 'react-redux'
 import {
-  setSelectedSite,
-  setSelectedZone as setReduxZone,
+  updateSelectedBlock,
+  updateSelectedSite,
 } from '../../../store/mapSlice'
+import { useAppDispatch } from '../../../hooks/redux'
 
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
@@ -51,7 +51,7 @@ export default function MapView() {
   const [selectedZone, setSelectedZone] = useState<string | null>(null)
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
     const file =
@@ -222,11 +222,9 @@ export default function MapView() {
                 setSelectedZone(isAlreadySelected ? null : zoneName)
 
                 if (viewType === 'blocks') {
-                  dispatch(setSelectedSite(null))
-                  dispatch(setReduxZone(isAlreadySelected ? 'all' : block))
+                  dispatch(updateSelectedBlock(block))
                 } else {
-                  dispatch(setSelectedSite(isAlreadySelected ? null : id))
-                  dispatch(setReduxZone(isAlreadySelected ? 'all' : block))
+                  dispatch(updateSelectedSite(isAlreadySelected ? null : id))
                 }
               })
             }}
