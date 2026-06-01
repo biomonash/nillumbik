@@ -127,15 +127,12 @@ const {
   setObservedSpecies,
 } = mapSlice.actions
 
-const DEFAULT_FROM = new Date('2020-01-01')
-
 function updateQuery() {
   console.log('update qeury')
   return (dispatch: AppDispatch, getState: () => RootState) => {
     const { selectedBlock, selectedSite, selectedTaxa, selectedSpecies } =
       getState().map
     const params = {
-      from: DEFAULT_FROM,
       block: selectedBlock ?? undefined,
       siteCode: selectedSite ?? undefined,
       taxa: selectedTaxa ?? undefined,
