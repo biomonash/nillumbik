@@ -27,7 +27,7 @@ export type GetObservationSitesResponse = {
 }
 
 export type GetObservationStatsResponse = {
-  countByTaxa: Record<string, string> // keys = unique taxa names
+  countByTaxa: Record<string, number> // keys = unique taxa names
   nativeSpeciesCount: number
   observationCount: number
   speciesCount: number
@@ -62,20 +62,5 @@ export async function getObservationSites(
     '/stats/observations/sites',
     { params },
   )
-  return response.data
-}
-
-export async function getObservationStats(
-  params: Partial<ObservationStatsRequest> = {},
-): Promise<GetObservationStatsResponse> {
-  const response = await fetcher.get<GetObservationStatsResponse>(
-    '/stats/observations',
-    { params },
-  )
-  return response.data
-}
-
-export async function getAllSpecies(): Promise<Species[]> {
-  const response = await fetcher.get<Species[]>('/species')
   return response.data
 }

@@ -11,7 +11,7 @@ export type ObservationStatsRequest = {
 
 export type ObservationOverviewResponse = ObservationStats & {
   nativeSpeciesCount: number
-  countByTaxa: Record<string, string>
+  countByTaxa: Record<string, number>
 }
 
 export type ObservationTimeseriesResponse = {

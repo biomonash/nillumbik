@@ -9,7 +9,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "1-D-6",
+        "site": "1D6",
         "latitude": -37.67773,
         "longitude": 145.091362,
         "block": 1
@@ -66,7 +66,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "3-W-5",
+        "site": "3W5",
         "latitude": -37.709705,
         "longitude": 145.27621,
         "block": 3
@@ -144,7 +144,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "1-D-18",
+        "site": "1D18",
         "latitude": -37.63192,
         "longitude": 145.11659,
         "block": 1
@@ -177,7 +177,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "1-W-2",
+        "site": "1W2",
         "latitude": -37.6545,
         "longitude": 145.106602,
         "block": 1
@@ -211,7 +211,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "1-W-6",
+        "site": "1W6",
         "latitude": -37.636783,
         "longitude": 145.165205,
         "block": 1
@@ -237,7 +237,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "2-W-4",
+        "site": "2W4",
         "latitude": -37.603827,
         "longitude": 145.18093,
         "block": 2
@@ -266,7 +266,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "1-D-10",
+        "site": "1D10",
         "latitude": -37.651804,
         "longitude": 145.197128,
         "block": 1
@@ -296,7 +296,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "2-D-5",
+        "site": "2D5",
         "latitude": -37.54187,
         "longitude": 145.201827,
         "block": 2
@@ -327,7 +327,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "2-D-6",
+        "site": "2D6",
         "latitude": -37.616513,
         "longitude": 145.20388,
         "block": 2
@@ -352,7 +352,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "1-D-5",
+        "site": "1D5",
         "latitude": -37.644019,
         "longitude": 145.199278,
         "block": 1
@@ -376,7 +376,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "2-D-7",
+        "site": "2D7",
         "latitude": -37.625467,
         "longitude": 145.181616,
         "block": 2
@@ -400,7 +400,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "2-W-1",
+        "site": "2W1",
         "latitude": -37.62277,
         "longitude": 145.191319,
         "block": 2
@@ -423,7 +423,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "1-D-7",
+        "site": "1D7",
         "latitude": -37.638531,
         "longitude": 145.200734,
         "block": 1
@@ -447,7 +447,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "3-D-3",
+        "site": "3D3",
         "latitude": -37.688081,
         "longitude": 145.264931,
         "block": 3
@@ -481,7 +481,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "4-W-3",
+        "site": "4W3",
         "latitude": -37.574703,
         "longitude": 145.255171,
         "block": 4
@@ -508,7 +508,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "2-D-2",
+        "site": "2D2",
         "latitude": -37.599485,
         "longitude": 145.209164,
         "block": 2
@@ -531,7 +531,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "4-D-2",
+        "site": "4D2",
         "latitude": -37.528578,
         "longitude": 145.204079,
         "block": 4
@@ -560,7 +560,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "4-D-3",
+        "site": "4D3",
         "latitude": -37.523858,
         "longitude": 145.250256,
         "block": 4
@@ -591,7 +591,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "4-D-4",
+        "site": "4D4",
         "latitude": -37.515801,
         "longitude": 145.242447,
         "block": 4
@@ -621,7 +621,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "4-W-4",
+        "site": "4W4",
         "latitude": -37.501851,
         "longitude": 145.236908,
         "block": 4
@@ -650,7 +650,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "4-D-1",
+        "site": "4D1",
         "latitude": -37.500626,
         "longitude": 145.247684,
         "block": 4
@@ -697,7 +697,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "5-W-7",
+        "site": "5W7",
         "latitude": -37.549049,
         "longitude": 145.344711,
         "block": 5
@@ -734,7 +734,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "3-D-1",
+        "site": "3D1",
         "latitude": -37.688071,
         "longitude": 145.282967,
         "block": 3
@@ -762,7 +762,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "3-D-2",
+        "site": "3D2",
         "latitude": -37.694868,
         "longitude": 145.281622,
         "block": 3
@@ -792,7 +792,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "3-W-9",
+        "site": "3W9",
         "latitude": -37.699538,
         "longitude": 145.277802,
         "block": 3
@@ -827,7 +827,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "5-D-7",
+        "site": "5D7",
         "latitude": -37.624148,
         "longitude": 145.318499,
         "block": 5
@@ -854,7 +854,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "5-D-3",
+        "site": "5D3",
         "latitude": -37.625252,
         "longitude": 145.353426,
         "block": 5
@@ -890,7 +890,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "5-D-5",
+        "site": "5D5",
         "latitude": -37.609447,
         "longitude": 145.323793,
         "block": 5
@@ -914,7 +914,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "5-D-4",
+        "site": "5D4",
         "latitude": -37.558322,
         "longitude": 145.354146,
         "block": 5
@@ -939,7 +939,7 @@
     {
       "type": "Feature",
       "properties": {
-        "site": "5-W-5",
+        "site": "5W5",
         "latitude": -37.578009,
         "longitude": 145.350128,
         "block": 5
