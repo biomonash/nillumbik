@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import {
   Card,
   CardHeader,
@@ -17,7 +17,6 @@ import {
   updateSelectedBlock,
   updateSelectedSite,
   selectSpecies,
-  selectMode,
   selectTaxa,
   updateSelectedTaxa,
   init,
@@ -29,7 +28,6 @@ import {
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 
-const DEFAULT_FROM = new Date('2020-01-01')
 // Extraction Functions
 function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
@@ -120,28 +118,7 @@ const MapCharts: React.FC = () => {
   // load initial data
   useEffect(() => {
     dispatch(init())
-  }, [])
-
-  // useEffect(() => {
-  //   setSiteOptions([])
-  //   getObservationSites({
-  //     from: DEFAULT_FROM,
-  //     block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
-  //   })
-  //     .then((data) => setSiteOptions(extractSortedSites(data)))
-  //     .catch((err) => console.error('Failed to fetch sites:', err))
-  // }, [selectedZone])
-
-  // useEffect(() => {
-  //   setTaxaOptions([])
-  //   getObservationStats({
-  //     from: DEFAULT_FROM,
-  //     block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
-  //     siteCode: selectedSite !== 'all' ? selectedSite : undefined,
-  //   })
-  //     .then((data) => setTaxaOptions(extractTaxaOptions(data)))
-  //     .catch((err) => console.error('Failed to fetch taxa:', err))
-  // }, [selectedZone, selectedSite])
+  }, [dispatch])
 
   useEffect(() => {
     return () => {

@@ -219,13 +219,6 @@ export function resetFilters() {
   }
 }
 
-// export function updateSelectedTaxa(site: string | null) {
-//   return (dispatch: AppDispatch) => {
-//     dispatch(setSelectedSite(site))
-//     dispatch(updateQuery())
-//   }
-// }
-
 export const selectMode = (state: RootState) => state.map.mode
 export const selectBlock = (state: RootState) => state.map.selectedBlock
 export const selectSite = (state: RootState) => state.map.selectedSite
