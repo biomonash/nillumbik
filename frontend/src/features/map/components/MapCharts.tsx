@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import {
   Card,
   CardHeader,
@@ -7,55 +7,57 @@ import {
   CardContent,
 } from '../../../components/ui/Card'
 import Select from '../../../components/ui/Select'
-import {
-  getAllSpecies,
-  getObservationBlocks,
-  getObservationStats,
-  type GetObservationBlocksResponse,
-  type GetObservationStatsResponse,
-  type Species,
-  type ChartInput,
-  type GetObservationSitesResponse,
-  getObservationSites,
-} from '../../../apis/mapCharts.api'
+import type { Site, Species } from '../../../types'
+import { type ChartInput } from '../../../apis/mapCharts.api'
 import { SpeciesLineChart } from './charts/SpeciesLineChart'
 import { NativeBarChart } from './charts/NativeBarChart'
-import { useSearchParams } from 'react-router'
+import { useSelector } from 'react-redux'
+import type { RootState } from '../../../store/store'
+import {
+  resetFilters,
+  updateSelectedBlock,
+  updateSelectedSite,
+  selectSpecies,
+  selectTaxa,
+  updateSelectedTaxa,
+  init,
+  selectBlock,
+  selectSite,
+  updateSelectedSpecies,
+} from '../../../store/mapSlice'
+import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 
-interface MapChartsProps {
-  selectedBlock: string
-}
-
-const DEFAULT_FROM = new Date('2020-01-01')
 // Extraction Functions
 function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 }
 
-function extractSortedZones(data: GetObservationBlocksResponse): ChartInput[] {
-  const sorted = [...data.blocks]
-    .sort((a, b) => a.block - b.block)
-    .map((b) => ({ value: String(b.block), label: `Zone ${b.block}` }))
-  return [{ value: 'all', label: 'All Zones' }, ...sorted]
+function extractSortedBlocks(data: number[]): ChartInput[] {
+  const sorted = data.map((b) => ({ value: String(b), label: `Block ${b}` }))
+  return [{ value: 'all', label: 'All Blocks' }, ...sorted]
 }
 
-function extractSortedSites(data: GetObservationSitesResponse): ChartInput[] {
-  const sorted = [...data.sites]
-    .sort((a, b) => a.siteCode.localeCompare(b.siteCode))
+function extractSortedSites(
+  data: Site[],
+  selectedBlock: number | null,
+): ChartInput[] {
+  const sorted = data
+    .filter((site) => (selectedBlock ? site.block === selectedBlock : true))
     .map((site) => ({
-      value: site.siteCode,
-      label: `Site ${site.siteCode}`,
+      value: site.code,
+      label: `Site ${site.name}`,
     }))
 
   return [{ value: 'all', label: 'All Sites' }, ...sorted]
 }
 
-function extractTaxaOptions(data: GetObservationStatsResponse): ChartInput[] {
-  const taxa = Object.keys(data.countByTaxa)
-    .sort()
-    .map((t) => ({ value: t, label: capitalize(t) }))
-  return [{ value: 'all', label: 'All Taxa' }, ...taxa]
-}
+const taxaOptions = [
+  { value: 'all', label: 'All Taxa' },
+  ...['bird', 'mammal', 'reptile'].map((t) => ({
+    value: t,
+    label: capitalize(t),
+  })),
+]
 
 function extractSpeciesOptions(
   allSpecies: Species[],
@@ -73,25 +75,26 @@ function extractSpeciesOptions(
   ]
 }
 
-const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
-  // States
-  const [searchParams, setSearchParams] = useSearchParams()
+const MapCharts: React.FC = () => {
+  const dispatch = useAppDispatch()
 
-  // derived from url
-  const selectedZone = searchParams.get('zone') ?? 'all'
-  const selectedSite = searchParams.get('site') ?? 'all'
-  const selectedTaxa = searchParams.get('taxa') ?? 'all'
-  const selectedSpecies = searchParams.get('species') ?? ''
+  // read all filter state from redux
+  const selectedBlock = useSelector(selectBlock)
+  const selectedSite = useSelector(selectSite)
+  const selectedTaxa = useSelector(selectTaxa)
+  const selectedSpecies = useSelector(selectSpecies)
+  const stats = useSelector((state: RootState) => ({
+    total: state.map.totalObservations,
+    nativeCount: state.map.nativeSpeciesCount,
+    nonNativeCount: state.map.nonNativeSpeciesCount,
+  }))
   // state
-  const [zoneOptions, setZoneOptions] = useState<ChartInput[]>([])
-  const [siteOptions, setSiteOptions] = useState<ChartInput[]>([])
-  const [taxaOptions, setTaxaOptions] = useState<ChartInput[]>([])
-  const [allSpecies, setAllSpecies] = useState<Species[]>([])
-  const [stats, setStats] = useState({
-    total: 0,
-    nativeCount: 0,
-    nonNativeCount: 0,
-  })
+  const blockOptions = useAppSelector((state) =>
+    extractSortedBlocks(state.map.blocks),
+  )
+  const siteOptions = useAppSelector((state) =>
+    extractSortedSites(state.map.sites, state.map.selectedBlock),
+  )
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [showToast, setShowToast] = useState(false)
   // refs
@@ -103,43 +106,8 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
   }, [drawerOpen])
 
   const { total, nativeCount, nonNativeCount } = stats
-  const speciesOptions = useMemo(
-    () =>
-      extractSpeciesOptions(
-        allSpecies,
-        selectedTaxa !== 'all' ? selectedTaxa : null,
-      ),
-    [allSpecies, selectedTaxa],
-  )
-  // useMemo() : Memorizes params to avoid recalculating on every render
-  const params = useMemo(
-    () => ({
-      from: DEFAULT_FROM,
-      block:
-        selectedZone !== 'all'
-          ? Number(selectedZone)
-          : selectedBlock !== ''
-            ? Number(selectedBlock)
-            : undefined,
-      siteCode: selectedSite !== 'all' ? selectedSite : undefined,
-      taxa: selectedTaxa !== 'all' ? selectedTaxa : undefined,
-      commonName: selectedSpecies !== '' ? selectedSpecies : undefined,
-    }),
-    [selectedZone, selectedSite, selectedBlock, selectedTaxa, selectedSpecies],
-  )
-  const handleReset = useCallback(() => setSearchParams({}), [setSearchParams])
-  const setParam = useCallback(
-    (updates: Record<string, string>, empties: Record<string, string> = {}) => {
-      setSearchParams((prev) => {
-        Object.entries(updates).forEach(([k, v]) => {
-          const empty = empties[k] ?? 'all'
-          if (v === empty) prev.delete(k)
-          else prev.set(k, v)
-        })
-        return prev
-      })
-    },
-    [setSearchParams],
+  const speciesOptions = useAppSelector((state) =>
+    extractSpeciesOptions(state.map.species, state.map.selectedTaxa),
   )
 
   const copy = useCallback(() => {
@@ -151,51 +119,10 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
     })
   }, [])
 
+  // load initial data
   useEffect(() => {
-    getObservationBlocks({ from: DEFAULT_FROM })
-      .then((data) => setZoneOptions(extractSortedZones(data)))
-      .catch((err) => console.error('Failed to fetch zones:', err))
-
-    getAllSpecies()
-      .then(setAllSpecies)
-      .catch((err) => console.error('Failed to fetch species:', err))
-  }, [])
-
-  useEffect(() => {
-    setSiteOptions([])
-    getObservationSites({
-      from: DEFAULT_FROM,
-      block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
-    })
-      .then((data) => setSiteOptions(extractSortedSites(data)))
-      .catch((err) => console.error('Failed to fetch sites:', err))
-  }, [selectedZone])
-
-  useEffect(() => {
-    setTaxaOptions([])
-    getObservationStats({
-      from: DEFAULT_FROM,
-      block: selectedZone !== 'all' ? Number(selectedZone) : undefined,
-      siteCode: selectedSite !== 'all' ? selectedSite : undefined,
-    })
-      .then((data) => setTaxaOptions(extractTaxaOptions(data)))
-      .catch((err) => console.error('Failed to fetch taxa:', err))
-  }, [selectedZone, selectedSite])
-
-  useEffect(() => {
-    Promise.all([getObservationBlocks(params), getObservationStats(params)])
-      .then(([blocksData, statsData]) => {
-        const total = params.siteCode
-          ? statsData.observationCount
-          : blocksData.blocks.reduce((sum, b) => sum + b.observationCount, 0)
-        setStats({
-          total,
-          nativeCount: statsData.nativeSpeciesCount,
-          nonNativeCount: statsData.speciesCount - statsData.nativeSpeciesCount,
-        })
-      })
-      .catch((err) => console.error('Failed to fetch stats:', err))
-  }, [params])
+    dispatch(init())
+  }, [dispatch])
 
   useEffect(() => {
     return () => {
@@ -218,7 +145,7 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
             Copy Link
           </button>
           <button
-            onClick={handleReset}
+            onClick={() => dispatch(resetFilters())}
             className="border-2 border-[var(--button)] bg-[var(--button)] font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:bg-[var(--button-hover)] hover:scale-105 hover:shadow-lg"
           >
             Reset Filters
@@ -230,26 +157,29 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
       <div className="flex flex-col gap-3">
         <div className="flex flex-col">
           <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
-            Zone
+            Block
           </span>
           <Select
-            options={zoneOptions}
-            value={selectedZone}
-            onChange={(z) => setParam({ zone: z, site: 'all' })}
-            placeholder="Select Zone"
+            options={blockOptions}
+            value={selectedBlock ? String(selectedBlock) : 'all'}
+            onChange={(z) =>
+              dispatch(updateSelectedBlock(z === 'all' ? null : z))
+            }
+            placeholder="Select Block"
             className="w-full"
           />
         </div>
         <div className="flex flex-col">
-          <p className="text-primary">{selectedBlock}</p>
           <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
             Site
           </span>
           <Select
             options={siteOptions}
-            value={selectedSite}
-            onChange={(s) => setParam({ site: s })}
-            disabled={selectedZone === 'all'}
+            value={selectedSite ?? 'all'}
+            onChange={(s) =>
+              dispatch(updateSelectedSite(s === 'all' ? null : s))
+            }
+            // disabled={selectedBlock === null}
             placeholder="Select Site"
             className="w-full"
           />
@@ -263,9 +193,9 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
           </span>
           <Select
             options={taxaOptions}
-            value={selectedTaxa}
+            value={selectedTaxa ?? 'all'}
             onChange={(t) =>
-              setParam({ taxa: t, species: '' }, { species: '' })
+              dispatch(updateSelectedTaxa(t === 'all' ? null : t))
             }
             placeholder="Select Taxa"
             className="w-full"
@@ -280,10 +210,11 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
           </span>
           <Select
             options={speciesOptions}
-            value={selectedSpecies}
-            onChange={(s) => setParam({ species: s }, { species: '' })}
+            value={selectedSpecies ?? 'all'}
+            onChange={(s) =>
+              dispatch(updateSelectedSpecies(s === 'all' ? null : s))
+            }
             placeholder="Select Species"
-            disabled={selectedTaxa === 'all'}
             className="w-full"
           />
         </div>
@@ -304,7 +235,7 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
       {/* Zone summary */}
       <div className="bg-white/50 rounded-xl p-3 flex flex-col gap-1">
         <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-          {selectedZone !== 'all' ? `Zone ${selectedZone}` : 'All Zones'}
+          {selectedBlock ? `Zone ${selectedBlock}` : 'All Zones'}
         </span>
         <div className="flex items-baseline gap-1">
           <span className="text-2xl font-bold text-black">
@@ -369,10 +300,7 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
             </CardDescription>
           </CardHeader>
           <CardContent className="px-2 pb-3">
-            <SpeciesLineChart
-              filters={params}
-              selectedSpecies={selectedSpecies}
-            />
+            <SpeciesLineChart />
           </CardContent>
         </Card>
       </div>
@@ -389,7 +317,7 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
         </div>
       )}
       {/* Desktop sidebar */}
-      <div className="hidden md:flex fixed right-0 top-0 h-screen w-[350px] bg-[var(--muted-foreground2)] z-50 flex-col shadow-xl">
+      <div className="hidden lg:flex fixed right-0 top-0 h-screen w-[350px] bg-[var(--muted-foreground2)] z-50 flex-col shadow-xl">
         <div className="flex-1 overflow-y-auto p-2 pt-14 flex flex-col gap-4">
           {content}
         </div>
@@ -397,7 +325,7 @@ const MapCharts: React.FC<MapChartsProps> = ({ selectedBlock }) => {
 
       {/* Mobile bottom drawer */}
       <div
-        className={`md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--muted-foreground2)] rounded-t-2xl shadow-xl transition-transform duration-300 ease-in-out ${drawerOpen ? 'translate-y-0' : 'translate-y-[calc(100%-56px)]'}`}
+        className={`lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--muted-foreground2)] rounded-t-2xl shadow-xl transition-transform duration-300 ease-in-out ${drawerOpen ? 'translate-y-0' : 'translate-y-[calc(100%-56px)]'}`}
       >
         {/* Handle bar */}
         <div

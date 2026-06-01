@@ -16,11 +16,14 @@ import type {
   SiteProperties,
 } from '../../../helpers/siteLocation'
 import SpeciesSidebar from './SpeciesSidebar'
-import { SPECIES } from '../data/species'
-
-interface MapViewProps {
-  onZoneSelect: (block: string) => void
-}
+import {
+  selectCurrentRegion,
+  selectMode,
+  updateMode,
+  updateSelectedBlock,
+  updateSelectedSite,
+} from '../../../store/mapSlice'
+import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
@@ -36,18 +39,18 @@ function FlyToUser({
 }) {
   const map = useMap()
   useEffect(() => {
-    if (coords) {
-      map.flyTo([coords.latitude, coords.longitude], 14)
-    }
+    if (coords) map.flyTo([coords.latitude, coords.longitude], 14)
   }, [coords, map])
   return null
 }
 
-export default function MapView({ onZoneSelect }: MapViewProps) {
+export default function MapView() {
   const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
-  const [viewType, setViewType] = useState('zones')
+  const mode = useAppSelector(selectMode)
+  const dispatch = useAppDispatch()
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
-  const [selectedZone, setSelectedZone] = useState<string | null>(null)
+  const currentRegion = useAppSelector(selectCurrentRegion)
+  // const [selectedZone, setSelectedZone] = useState<string | null>(null)
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
 
@@ -61,12 +64,12 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
 
   useEffect(() => {
     const file =
-      viewType === 'zones' ? '/nillumbik_30zones.geojson' : '/blocks.geojson'
+      mode === 'site' ? '/nillumbik_30zones.geojson' : '/blocks.geojson'
     setGeoData(null)
     fetch(file)
       .then((res) => res.json())
       .then((data) => setGeoData(data))
-  }, [viewType])
+  }, [mode])
 
   useEffect(() => {
     if (coords && geoData) {
@@ -103,30 +106,30 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
         }}
       >
         <button
-          onClick={() => setViewType('zones')}
+          onClick={() => dispatch(updateMode('site'))}
           style={{
             padding: '6px 12px',
             borderRadius: '6px',
             border: '1px solid #ccc',
-            background: viewType === 'zones' ? 'green' : 'white',
-            color: viewType === 'zones' ? 'white' : 'black',
+            background: mode === 'site' ? 'green' : 'white',
+            color: mode === 'site' ? 'white' : 'black',
             cursor: 'pointer',
           }}
         >
-          30 Zones
+          30 Sites
         </button>
         <button
-          onClick={() => setViewType('blocks')}
+          onClick={() => dispatch(updateMode('block'))}
           style={{
             padding: '6px 12px',
             borderRadius: '6px',
             border: '1px solid #ccc',
-            background: viewType === 'blocks' ? 'green' : 'white',
-            color: viewType === 'blocks' ? 'white' : 'black',
+            background: mode === 'block' ? 'green' : 'white',
+            color: mode === 'block' ? 'white' : 'black',
             cursor: 'pointer',
           }}
         >
-          Blocks
+          5 Blocks
         </button>
       </div>
 
@@ -194,7 +197,7 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
       )}
 
       <MapContainer
-        key={viewType}
+        key={mode}
         center={[-37.6, 145.2]}
         zoom={10}
         style={{
@@ -210,12 +213,15 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
         <FlyToUser coords={coords} />
         {geoData && (
           <GeoJSON
-            key={`${viewType}-${selectedZone}`}
+            key={`${mode}-${currentRegion}`}
             data={geoData}
             style={(feature) => {
-              const site = feature?.properties?.site
-              const isSelected = selectedZone === `Zone ${site}`
-              const isHovered = hoveredZone === site
+              const id =
+                mode === 'site'
+                  ? feature?.properties?.site
+                  : String(feature?.properties?.block)
+              const isSelected = currentRegion === id
+              const isHovered = hoveredZone === id
               return {
                 color: isSelected ? '#b45309' : 'green',
                 fillColor: isSelected
@@ -228,13 +234,21 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
               }
             }}
             onEachFeature={(feature, layer) => {
-              const site = feature.properties.site
-              layer.on('mouseover', () => setHoveredZone(site))
+              const id =
+                mode === 'site'
+                  ? feature.properties.site
+                  : String(feature.properties.block)
+              layer.on('mouseover', () => setHoveredZone(id))
               layer.on('mouseout', () => setHoveredZone(null))
               layer.on('click', () => {
-                const zoneName = `Zone ${feature.properties.site}`
-                setSelectedZone((prev) => (prev === zoneName ? null : zoneName))
-                onZoneSelect(String(feature.properties.block))
+                const block = String(feature.properties.block)
+                const isAlreadySelected = currentRegion === id
+
+                if (mode === 'block') {
+                  dispatch(updateSelectedBlock(block))
+                } else {
+                  dispatch(updateSelectedSite(isAlreadySelected ? null : id))
+                }
               })
             }}
           />
@@ -248,13 +262,7 @@ export default function MapView({ onZoneSelect }: MapViewProps) {
           </Marker>
         )}
       </MapContainer>
-      {selectedZone && (
-        <SpeciesSidebar
-          zoneName={selectedZone}
-          species={SPECIES}
-          onClose={() => setSelectedZone(null)}
-        />
-      )}
+      <SpeciesSidebar onClose={() => {}} />
     </div>
   )
 }

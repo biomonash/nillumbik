@@ -1,17 +1,17 @@
-import { type Species } from '../data/species'
 import SpeciesCard from '../../../components/ui/SpeciesCard'
+import { useAppSelector } from '../../../hooks/redux'
+import {
+  selectCurrentRegion,
+  selectObservedSpecies,
+} from '../../../store/mapSlice'
 
 interface SpeciesSidebarProps {
-  zoneName: string
-  species: Species[]
   onClose: () => void
 }
 
-export default function SpeciesSidebar({
-  zoneName,
-  species,
-  onClose,
-}: SpeciesSidebarProps) {
+export default function SpeciesSidebar({ onClose }: SpeciesSidebarProps) {
+  const observedSpecies = useAppSelector(selectObservedSpecies)
+  const currentRegion = useAppSelector(selectCurrentRegion)
   return (
     <div
       style={{
@@ -48,17 +48,17 @@ export default function SpeciesSidebar({
               color: 'black',
             }}
           >
-            {zoneName}
+            {currentRegion ?? 'All'}
           </h2>
           <p
             style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}
           >
-            Wildlife species recorded in this zone
+            Wildlife species recorded here
           </p>
           <p
             style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}
           >
-            {species.length} Species Found
+            {observedSpecies.length} Species Found
           </p>
         </div>
         <button
@@ -84,8 +84,12 @@ export default function SpeciesSidebar({
           gap: '16px',
         }}
       >
-        {species.map((s) => (
-          <SpeciesCard key={s.id} species={s} />
+        {observedSpecies.map((s) => (
+          <SpeciesCard
+            key={s.id}
+            species={s}
+            observationCount={s.observationCount}
+          />
         ))}
       </div>
     </div>

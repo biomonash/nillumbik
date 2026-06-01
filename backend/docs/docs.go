@@ -234,6 +234,18 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "description": "Block number",
+                        "name": "block",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Taxa",
+                        "name": "taxa",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "Start timestamp (RFC3339 format)",
                         "name": "from",
@@ -782,17 +794,29 @@ const docTemplate = `{
         "species.ObservedSpecies": {
             "type": "object",
             "properties": {
-                "common_name": {
+                "commonName": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "observation_count": {
+                "indicator": {
+                    "type": "boolean"
+                },
+                "native": {
+                    "type": "boolean"
+                },
+                "observationCount": {
                     "type": "integer"
                 },
-                "scientific_name": {
+                "reportable": {
+                    "type": "boolean"
+                },
+                "scientificName": {
                     "type": "string"
+                },
+                "taxa": {
+                    "$ref": "#/definitions/db.Taxa"
                 }
             }
         },
