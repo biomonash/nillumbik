@@ -24,7 +24,7 @@ type ObservedSpeciesRequest struct {
 // ObservedSpecies represents species with observation count
 type ObservedSpecies struct {
 	db.Species
-	ObservationCount int64 `json:"observation_count"`
+	ObservationCount int64 `json:"observationCount"`
 }
 
 // ObservedSpeciesResponse wraps the result with total count
