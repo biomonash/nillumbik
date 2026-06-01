@@ -1,12 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { ResponsiveLine } from '@nivo/line'
-import { getObservationsTimeseries } from '../../../../apis/stats.api'
-import type { ObservationStatsRequest } from '../../../../apis/stats.api'
-
-type Props = {
-  filters: Partial<ObservationStatsRequest>
-  selectedSpecies?: string
-}
+import { useAppSelector } from '../../../../hooks/redux'
+import { selectSpecies, selectTimeSeries } from '../../../../store/mapSlice'
 
 type LinePoint = {
   x: string
@@ -27,34 +22,33 @@ const chartTheme = {
   grid: { line: { stroke: 'rgba(0,0,0,0.1)' } },
 }
 
-export const SpeciesLineChart = ({ filters, selectedSpecies }: Props) => {
-  const [data, setData] = useState<LineSeries[]>([])
+export const SpeciesLineChart = () => {
+  // const [data, setData] = useState<LineSeries[]>([])
 
-  useEffect(() => {
-    getObservationsTimeseries(filters).then((res) => {
-      if (res && res.series) {
-        const formatted = Object.entries(res.series).map(([id, points]) => {
-          const typedPoints = points as {
-            timestamp: string
-            observationCount: number
-            speciesCount: number
-          }[]
+  const timeSeries = useAppSelector(selectTimeSeries)
+  const selectedSpecies = useAppSelector(selectSpecies)
 
-          return {
-            id,
-            data: typedPoints.map((p) => ({
-              x: new Date(p.timestamp).getFullYear().toString(),
-              y:
-                selectedSpecies && selectedSpecies !== ''
-                  ? p.observationCount
-                  : p.speciesCount,
-            })),
-          }
-        })
-        setData(formatted)
+  const data = useMemo((): LineSeries[] => {
+    const formatted = Object.entries(timeSeries).map(([id, points]) => {
+      const typedPoints = points as {
+        timestamp: string
+        observationCount: number
+        speciesCount: number
+      }[]
+
+      return {
+        id,
+        data: typedPoints.map((p) => ({
+          x: new Date(p.timestamp).getFullYear().toString(),
+          y:
+            selectedSpecies && selectedSpecies !== ''
+              ? p.observationCount
+              : p.speciesCount,
+        })),
       }
     })
-  }, [filters, selectedSpecies])
+    return formatted
+  }, [timeSeries, selectedSpecies])
 
   return (
     <div className="h-[300px]">
