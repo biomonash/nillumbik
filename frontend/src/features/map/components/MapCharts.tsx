@@ -7,6 +7,7 @@ import {
   CardContent,
 } from '../../../components/ui/Card'
 import Select from '../../../components/ui/Select'
+import type { Site, Species } from '../../../types'
 import { type ChartInput } from '../../../apis/mapCharts.api'
 import { SpeciesLineChart } from './charts/SpeciesLineChart'
 import { NativeBarChart } from './charts/NativeBarChart'
@@ -20,8 +21,6 @@ import {
   selectTaxa,
   updateSelectedTaxa,
   init,
-  type Site,
-  type Species,
   selectBlock,
   selectSite,
   updateSelectedSpecies,
