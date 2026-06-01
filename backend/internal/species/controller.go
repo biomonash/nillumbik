@@ -22,11 +22,8 @@ type ObservedSpeciesRequest struct {
 
 // ObservedSpecies represents species with observation count
 type ObservedSpecies struct {
-	ID               int64  `json:"id"`
-	ScientificName   string `json:"scientific_name"`
-	CommonName       string `json:"common_name"`
-	ObservationCount int64  `json:"observation_count"`
-	Native           bool   `json:"native"`
+	db.Species
+	ObservationCount int64 `json:"observation_count"`
 }
 
 // ObservedSpeciesResponse wraps the result with total count
@@ -158,11 +155,16 @@ func (u *Controller) GetObservedSpecies(c *gin.Context) {
 	result := make([]ObservedSpecies, 0, len(rows))
 	for _, r := range rows {
 		result = append(result, ObservedSpecies{
-			ID:               r.ID,
-			ScientificName:   r.ScientificName,
-			CommonName:       r.CommonName,
+			Species: db.Species{
+				ID:             r.ID,
+				ScientificName: r.ScientificName,
+				CommonName:     r.CommonName,
+				Taxa:           r.Taxa,
+				Native:         r.Native,
+				Indicator:      r.Indicator,
+				Reportable:     r.Reportable,
+			},
 			ObservationCount: r.ObservationCount,
-			Native:           r.Native,
 		})
 	}
 

@@ -32,14 +32,15 @@ async function getSpeciesById(id: number): Promise<Species> {
 }
 
 export async function getSpeciesDetailBySite(
-  siteCode: string,
+  siteCode?: string,
+  block?: number,
 ): Promise<Species[]> {
   // fetch species are observed at this site
   const observed = await fetcher.get<{
     species: RawObservedSpecies[]
     total: number
   }>('/species/observed', {
-    params: { siteCode, from: new Date('2020-01-01') },
+    params: { siteCode, block },
   })
   const details = await Promise.all(
     observed.data.species.map((s) => getSpeciesById(s.id)),
@@ -48,38 +49,38 @@ export async function getSpeciesDetailBySite(
   return details
 }
 
-export async function getSpeciesDetailByBlock(
-  block: number,
-): Promise<Species[]> {
-  const sitesData = await getObservationSites({ block })
+// export async function getSpeciesDetailByBlock(
+//   block: number,
+// ): Promise<Species[]> {
+//   const sitesData = await getObservationSites({ block })
 
-  const observedResults = await Promise.all(
-    sitesData.sites.map((site) =>
-      fetcher.get<{
-        species: RawObservedSpecies[]
-        total: number
-      }>('/species/observed', {
-        params: { siteCode: site.siteCode, from: new Date('2020-01-01') },
-      }),
-    ),
-  )
+//   const observedResults = await Promise.all(
+//     sitesData.sites.map((site) =>
+//       fetcher.get<{
+//         species: RawObservedSpecies[]
+//         total: number
+//       }>('/species/observed', {
+//         params: { siteCode: site.siteCode, from: new Date('2020-01-01') },
+//       }),
+//     ),
+//   )
 
-  const uniqueSpeciesIds = [
-    ...new Set(
-      observedResults.flatMap((result) =>
-        result.data.species.map((species) => species.id),
-      ),
-    ),
-  ]
-  console.log('Unique species IDs:', uniqueSpeciesIds.length)
+//   const uniqueSpeciesIds = [
+//     ...new Set(
+//       observedResults.flatMap((result) =>
+//         result.data.species.map((species) => species.id),
+//       ),
+//     ),
+//   ]
+//   console.log('Unique species IDs:', uniqueSpeciesIds.length)
 
-  const details = await Promise.all(
-    uniqueSpeciesIds.map((id) => getSpeciesById(id)),
-  )
-  console.log('Final details count:', details.length)
+//   const details = await Promise.all(
+//     uniqueSpeciesIds.map((id) => getSpeciesById(id)),
+//   )
+//   console.log('Final details count:', details.length)
 
-  return [...new Map(details.map((species) => [species.id, species])).values()]
-}
+//   return [...new Map(details.map((species) => [species.id, species])).values()]
+// }
 
 /**
  * Extra Documentation for tedious parts, blocks
