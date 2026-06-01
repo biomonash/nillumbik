@@ -13,3 +13,7 @@ export type Species = {
   taxa: string
   image?: string // placeholder for now
 }
+
+export type ObservedSpecies = Species & {
+  observationCount: number
+}
