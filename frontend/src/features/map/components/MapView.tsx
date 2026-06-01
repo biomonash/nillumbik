@@ -18,6 +18,7 @@ import type {
 import SpeciesSidebar from './SpeciesSidebar'
 import { SPECIES } from '../data/species'
 import {
+  selectCurrentRegion,
   selectMode,
   updateMode,
   updateSelectedBlock,
@@ -50,9 +51,9 @@ export default function MapView() {
   const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
   const mode = useAppSelector(selectMode)
   const dispatch = useAppDispatch()
-  // const [viewType, setViewType] = useState('zones')
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
-  const [selectedZone, setSelectedZone] = useState<string | null>(null)
+  const currentRegion = useAppSelector(selectCurrentRegion)
+  // const [selectedZone, setSelectedZone] = useState<string | null>(null)
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
 
@@ -190,14 +191,14 @@ export default function MapView() {
         <FlyToUser coords={coords} />
         {geoData && (
           <GeoJSON
-            key={`${mode}-${selectedZone}`}
+            key={`${mode}-${currentRegion}`}
             data={geoData}
             style={(feature) => {
               const id =
                 mode === 'site'
                   ? feature?.properties?.site
                   : String(feature?.properties?.block)
-              const isSelected = selectedZone === `Zone ${id}`
+              const isSelected = currentRegion === id
               const isHovered = hoveredZone === id
               return {
                 color: isSelected ? '#b45309' : 'green',
@@ -218,11 +219,8 @@ export default function MapView() {
               layer.on('mouseover', () => setHoveredZone(id))
               layer.on('mouseout', () => setHoveredZone(null))
               layer.on('click', () => {
-                const zoneName = `Zone ${id}`
                 const block = String(feature.properties.block)
-                const isAlreadySelected = selectedZone === zoneName
-
-                setSelectedZone(isAlreadySelected ? null : zoneName)
+                const isAlreadySelected = currentRegion === id
 
                 if (mode === 'block') {
                   dispatch(updateSelectedBlock(block))
@@ -242,13 +240,13 @@ export default function MapView() {
           </Marker>
         )}
       </MapContainer>
-      {selectedZone && (
+      {/*{selectedZone && (
         <SpeciesSidebar
           zoneName={selectedZone}
           species={SPECIES}
           onClose={() => setSelectedZone(null)}
         />
-      )}
+      )}*/}
     </div>
   )
 }

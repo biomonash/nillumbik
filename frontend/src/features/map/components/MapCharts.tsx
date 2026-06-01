@@ -25,8 +25,10 @@ import {
   updateSelectedBlock,
   updateSelectedSite,
   selectSpecies,
+  selectMode,
+  selectTaxa,
 } from '../../../store/mapSlice'
-import { useAppDispatch } from '../../../hooks/redux'
+import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 
 const DEFAULT_FROM = new Date('2020-01-01')
 // Extraction Functions
@@ -34,11 +36,11 @@ function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 }
 
-function extractSortedZones(data: GetObservationBlocksResponse): ChartInput[] {
+function extractSortedBlocks(data: GetObservationBlocksResponse): ChartInput[] {
   const sorted = [...data.blocks]
     .sort((a, b) => a.block - b.block)
-    .map((b) => ({ value: String(b.block), label: `Zone ${b.block}` }))
-  return [{ value: 'all', label: 'All Zones' }, ...sorted]
+    .map((b) => ({ value: String(b.block), label: `Block ${b.block}` }))
+  return [{ value: 'all', label: 'All Blocks' }, ...sorted]
 }
 
 function extractSortedSites(data: GetObservationSitesResponse): ChartInput[] {
@@ -78,13 +80,14 @@ function extractSpeciesOptions(
 const MapCharts: React.FC = () => {
   const dispatch = useAppDispatch()
 
+  const mode = useAppSelector(selectMode)
   // read all filter state from redux
   const selectedBlock = useSelector(
     (state: RootState) => state.map.selectedBlock,
   )
   const selectedSite =
     useSelector((state: RootState) => state.map.selectedSite) ?? 'all'
-  const selectedTaxa = useSelector((state: RootState) => state.map.selectedTaxa)
+  const selectedTaxa = useSelector(selectTaxa)
   const selectedSpecies = useSelector(selectSpecies)
   const stats = useSelector((state: RootState) => ({
     total: state.map.totalObservations,
@@ -92,7 +95,7 @@ const MapCharts: React.FC = () => {
     nonNativeCount: state.map.nonNativeSpeciesCount,
   }))
   // state
-  const [zoneOptions, setZoneOptions] = useState<ChartInput[]>([])
+  const [blockOptions, setBlockOptions] = useState<ChartInput[]>([])
   const [siteOptions, setSiteOptions] = useState<ChartInput[]>([])
   const [taxaOptions, setTaxaOptions] = useState<ChartInput[]>([])
   const [allSpecies, setAllSpecies] = useState<Species[]>([])
@@ -128,7 +131,7 @@ const MapCharts: React.FC = () => {
   // load initial data
   useEffect(() => {
     getObservationBlocks({ from: DEFAULT_FROM })
-      .then((data) => setZoneOptions(extractSortedZones(data)))
+      .then((data) => setBlockOptions(extractSortedBlocks(data)))
       .catch((err) => console.error('Failed to fetch zones:', err))
 
     getAllSpecies()
@@ -215,31 +218,34 @@ const MapCharts: React.FC = () => {
 
       {/* Select Filters */}
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col">
-          <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
-            Zone
-          </span>
-          <Select
-            options={zoneOptions}
-            value={selectedBlock ? String(selectedBlock) : 'all'}
-            onChange={(z) => dispatch(updateSelectedBlock(z))}
-            placeholder="Select Zone"
-            className="w-full"
-          />
-        </div>
-        <div className="flex flex-col">
-          <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
-            Site
-          </span>
-          <Select
-            options={siteOptions}
-            value={selectedSite}
-            onChange={(s) => dispatch(updateSelectedSite(s))}
-            disabled={selectedBlock === null}
-            placeholder="Select Site"
-            className="w-full"
-          />
-        </div>
+        {mode === 'block' ? (
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
+              Block
+            </span>
+            <Select
+              options={blockOptions}
+              value={selectedBlock ? String(selectedBlock) : 'all'}
+              onChange={(z) => dispatch(updateSelectedBlock(z))}
+              placeholder="Select Block"
+              className="w-full"
+            />
+          </div>
+        ) : (
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
+              Site
+            </span>
+            <Select
+              options={siteOptions}
+              value={selectedSite}
+              onChange={(s) => dispatch(updateSelectedSite(s))}
+              disabled={selectedBlock === null}
+              placeholder="Select Site"
+              className="w-full"
+            />
+          </div>
+        )}
         <div className="flex flex-col">
           <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
             Taxa{' '}
