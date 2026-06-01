@@ -160,6 +160,10 @@ JOIN
         $4::integer IS NULL
         OR block = $4::integer
       )
+    AND (
+        $5::taxa IS NULL
+        OR taxa = $5::taxa
+      )
   GROUP BY species_id
 ) as observed
 ON sp.id = species_id
@@ -171,6 +175,7 @@ type ListObservedSpeciesParams struct {
 	To       pgtype.Timestamp `json:"to"`
 	SiteCode *string          `json:"siteCode"`
 	Block    *int32           `json:"block"`
+	Taxa     NullTaxa         `json:"taxa"`
 }
 
 type ListObservedSpeciesRow struct {
@@ -193,6 +198,7 @@ func (q *Queries) ListObservedSpecies(ctx context.Context, arg ListObservedSpeci
 		arg.To,
 		arg.SiteCode,
 		arg.Block,
+		arg.Taxa,
 	)
 	if err != nil {
 		return nil, err

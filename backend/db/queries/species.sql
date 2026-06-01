@@ -75,6 +75,10 @@ JOIN
         sqlc.narg('block')::integer IS NULL
         OR block = sqlc.narg('block')::integer
       )
+    AND (
+        sqlc.narg('taxa')::taxa IS NULL
+        OR taxa = sqlc.narg('taxa')::taxa
+      )
   GROUP BY species_id
 ) as observed
 ON sp.id = species_id

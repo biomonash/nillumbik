@@ -136,16 +136,22 @@ definitions:
     type: object
   species.ObservedSpecies:
     properties:
-      common_name:
+      commonName:
         type: string
       id:
         type: integer
+      indicator:
+        type: boolean
       native:
         type: boolean
       observation_count:
         type: integer
-      scientific_name:
+      reportable:
+        type: boolean
+      scientificName:
         type: string
+      taxa:
+        $ref: '#/definitions/db.Taxa'
     type: object
   species.ObservedSpeciesResponse:
     properties:
@@ -409,6 +415,10 @@ paths:
         in: query
         name: block
         type: integer
+      - description: Taxa
+        in: query
+        name: taxa
+        type: string
       - description: Start timestamp (RFC3339 format)
         in: query
         name: from
