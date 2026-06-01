@@ -24,7 +24,7 @@ import {
   updateSelectedSite,
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
-import { SPECIES } from '../data/species'
+import type { Species } from '../../../types'
 
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
@@ -53,10 +53,6 @@ export default function MapView() {
   const currentRegion = useAppSelector(selectCurrentRegion)
   // const [selectedZone, setSelectedZone] = useState<string | null>(null)
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
-  const [selectedSiteCode, setSelectedSiteCode] = useState<string | null>(null)
-  const [selectedBlockCode, setSelectedBlockCode] = useState<string | null>(
-    null,
-  )
   const [species, setSpecies] = useState<Species[]>([])
   const [speciesLoading, setSpeciesLoading] = useState(false)
   const [speciesError, setSpeciesError] = useState<string | null>(null)
@@ -82,38 +78,38 @@ export default function MapView() {
     }
   }, [coords, geoData])
 
-  useEffect(() => {
-    if (!selectedSiteCode && !selectedBlockCode) return
+  // useEffect(() => {
+  //   if (!selectedSiteCode && !selectedBlockCode) return
 
-    let cancelled = false
+  //   let cancelled = false
 
-    setSpeciesLoading(true)
-    setSpeciesError(null)
-    setSpecies([])
+  //   setSpeciesLoading(true)
+  //   setSpeciesError(null)
+  //   setSpecies([])
 
-    const request =
-      selectedSiteCode !== null
-        ? getSpeciesDetailBySite(selectedSiteCode)
-        : getSpeciesDetailByBlock(Number(selectedBlockCode))
+  //   const request =
+  //     selectedSiteCode !== null
+  //       ? getSpeciesDetailBySite(selectedSiteCode)
+  //       : getSpeciesDetailByBlock(Number(selectedBlockCode))
 
-    request
-      .then((data) => {
-        if (!cancelled) {
-          setSpecies(data)
-          setSpeciesLoading(false)
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setSpeciesError(err.message)
-          setSpeciesLoading(false)
-        }
-      })
+  //   request
+  //     .then((data) => {
+  //       if (!cancelled) {
+  //         setSpecies(data)
+  //         setSpeciesLoading(false)
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       if (!cancelled) {
+  //         setSpeciesError(err.message)
+  //         setSpeciesLoading(false)
+  //       }
+  //     })
 
-    return () => {
-      cancelled = true
-    }
-  }, [selectedSiteCode, selectedBlockCode])
+  //   return () => {
+  //     cancelled = true
+  //   }
+  // }, [selectedSiteCode, selectedBlockCode])
 
   return (
     <div style={{ position: 'relative' }}>
@@ -261,7 +257,7 @@ export default function MapView() {
           </Marker>
         )}
       </MapContainer>
-      <SpeciesSidebar zoneName={'Zone'} species={SPECIES} onClose={() => {}} />
+      {/*<SpeciesSidebar zoneName={'Zone'} species={[]} onClose={() => {}} />*/}
     </div>
   )
 }

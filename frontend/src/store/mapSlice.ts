@@ -7,18 +7,7 @@ import {
 } from '../apis/stats.api'
 import { getSiteList } from '../apis/sites.api'
 import { getSpeciesList } from '../apis/species.api'
-
-export type Site = {
-  code: string
-  name: string
-  block: number
-}
-
-export type Species = {
-  scientificName: string
-  commonName: string
-  taxa: string
-}
+import type { Site, Species } from '../types'
 
 interface MapState {
   mode: 'block' | 'site'

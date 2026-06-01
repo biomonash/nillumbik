@@ -1,5 +1,5 @@
 import SpeciesCard from '../../../components/ui/SpeciesCard'
-import { type Species } from '../../../apis/speciesList.api'
+import { type Species } from '../../../types'
 
 interface SpeciesSidebarProps {
   zoneName: string

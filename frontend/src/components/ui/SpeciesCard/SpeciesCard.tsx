@@ -1,6 +1,6 @@
 import { Card, CardContent } from '../Card'
 import Badge from '../Badge'
-import { type Species } from '../../../apis/speciesList.api'
+import { type Species } from '../../../types'
 
 interface SpeciesCardProps {
   species: Species

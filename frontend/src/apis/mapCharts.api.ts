@@ -33,16 +33,6 @@ export type GetObservationStatsResponse = {
   speciesCount: number
 }
 
-export type Species = {
-  commonName: string
-  id: number
-  indicator: boolean
-  native: boolean
-  reportable: boolean
-  scientificName: string
-  taxa: string
-}
-
 export type ChartInput = { value: string; label: string }
 
 export async function getObservationBlocks(
