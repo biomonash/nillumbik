@@ -16,7 +16,6 @@ import type {
   SiteProperties,
 } from '../../../helpers/siteLocation'
 import SpeciesSidebar from './SpeciesSidebar'
-import { SPECIES } from '../data/species'
 import {
   selectCurrentRegion,
   selectMode,
@@ -25,6 +24,7 @@ import {
   updateSelectedSite,
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
+import { SPECIES } from '../data/species'
 
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
@@ -240,13 +240,7 @@ export default function MapView() {
           </Marker>
         )}
       </MapContainer>
-      {/*{selectedZone && (
-        <SpeciesSidebar
-          zoneName={selectedZone}
-          species={SPECIES}
-          onClose={() => setSelectedZone(null)}
-        />
-      )}*/}
+      <SpeciesSidebar zoneName={'Zone'} species={SPECIES} onClose={() => {}} />
     </div>
   )
 }
