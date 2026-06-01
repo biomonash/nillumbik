@@ -1,6 +1,10 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import type { AppDispatch, RootState } from './store'
 import { getObservationStats } from '../apis/mapCharts.api'
+import {
+  getObservationsTimeseries,
+  type TimeseriesPoint,
+} from '../apis/stats.api'
 
 interface MapState {
   selectedBlock: number | null
@@ -10,6 +14,7 @@ interface MapState {
   totalObservations: number
   nativeSpeciesCount: number
   nonNativeSpeciesCount: number
+  timeseries: Record<string, TimeseriesPoint[]>
 }
 
 const initialState: MapState = {
@@ -20,6 +25,7 @@ const initialState: MapState = {
   totalObservations: 0,
   nativeSpeciesCount: 0,
   nonNativeSpeciesCount: 0,
+  timeseries: {},
 }
 
 const mapSlice = createSlice({
@@ -40,6 +46,12 @@ const mapSlice = createSlice({
     },
     setSelectedSpecies(state, action: PayloadAction<string | null>) {
       state.selectedSpecies = action.payload
+    },
+    setTimeseries(
+      state,
+      action: PayloadAction<Record<string, TimeseriesPoint[]>>,
+    ) {
+      state.timeseries = action.payload
     },
     setStats(
       state,
@@ -95,6 +107,9 @@ function updateQuery() {
       .catch((err) => {
         console.error('Failed to fetch stats:', err)
       })
+    getObservationsTimeseries(params).then((res) => {
+      dispatch(setTimeseries(res.series))
+    })
   }
 }
 
@@ -124,7 +139,12 @@ export const {
   setSelectedTaxa,
   setSelectedSpecies,
   setStats,
+  setTimeseries,
   resetFilters,
 } = mapSlice.actions
+
+export const selectTimeSeries = (state: RootState) => state.map.timeseries
+
+export const selectSpecies = (state: RootState) => state.map.selectedSpecies
 
 export default mapSlice.reducer

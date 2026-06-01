@@ -27,6 +27,7 @@ import {
   resetFilters,
   updateSelectedBlock,
   updateSelectedSite,
+  selectSpecies,
 } from '../../../store/mapSlice'
 import { useAppDispatch } from '../../../hooks/redux'
 
@@ -87,9 +88,7 @@ const MapCharts: React.FC = () => {
   const selectedSite =
     useSelector((state: RootState) => state.map.selectedSite) ?? 'all'
   const selectedTaxa = useSelector((state: RootState) => state.map.selectedTaxa)
-  const selectedSpecies = useSelector(
-    (state: RootState) => state.map.selectedSpecies,
-  )
+  const selectedSpecies = useSelector(selectSpecies)
   const stats = useSelector((state: RootState) => ({
     total: state.map.totalObservations,
     nativeCount: state.map.nativeSpeciesCount,
@@ -368,10 +367,7 @@ const MapCharts: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="px-2 pb-3">
-            {/*<SpeciesLineChart
-              filters={params}
-              selectedSpecies={selectedSpecies}
-            />*/}
+            <SpeciesLineChart />
           </CardContent>
         </Card>
       </div>
