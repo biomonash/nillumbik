@@ -140,6 +140,8 @@ definitions:
         type: string
       id:
         type: integer
+      native:
+        type: boolean
       observation_count:
         type: integer
       scientific_name:
@@ -403,6 +405,10 @@ paths:
         in: query
         name: siteCode
         type: string
+      - description: Block number
+        in: query
+        name: block
+        type: integer
       - description: Start timestamp (RFC3339 format)
         in: query
         name: from

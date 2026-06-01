@@ -52,6 +52,7 @@ SELECT
     sp.id,
     sp.scientific_name,
     sp.common_name,
+    sp.native,
     COUNT(o.id) AS observation_count
 FROM observations o
 JOIN species sp ON o.species_id = sp.id
@@ -63,5 +64,9 @@ WHERE
       sqlc.narg('site_code')::text IS NULL
       OR s.code = sqlc.narg('site_code')::text
     )
-GROUP BY sp.id, sp.scientific_name, sp.common_name
+  AND (
+      sqlc.narg('block')::integer IS NULL
+      OR s.block = sqlc.narg('block')::integer
+    )
+GROUP BY sp.id, sp.scientific_name, sp.common_name, sp.native
 ORDER BY observation_count DESC;
