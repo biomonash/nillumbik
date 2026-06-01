@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import type { AppDispatch, RootState } from './store'
-import { getObservationStats } from '../apis/mapCharts.api'
 import {
+  getObservationsOverview,
   getObservationsTimeseries,
   type TimeseriesPoint,
 } from '../apis/stats.api'
@@ -15,6 +15,7 @@ interface MapState {
   totalObservations: number
   nativeSpeciesCount: number
   nonNativeSpeciesCount: number
+  countByTaxa: Record<string, number>
   timeseries: Record<string, TimeseriesPoint[]>
 }
 
@@ -27,6 +28,7 @@ const initialState: MapState = {
   totalObservations: 0,
   nativeSpeciesCount: 0,
   nonNativeSpeciesCount: 0,
+  countByTaxa: {},
   timeseries: {},
 }
 
@@ -49,9 +51,10 @@ const mapSlice = createSlice({
     },
     setSelectedTaxa(state, action: PayloadAction<string | null>) {
       state.selectedTaxa = action.payload
-      state.selectedSpecies = ''
+      state.selectedSpecies = null
     },
     setSelectedSpecies(state, action: PayloadAction<string | null>) {
+      state.selectedTaxa = null
       state.selectedSpecies = action.payload
     },
     setTimeseries(
@@ -66,12 +69,14 @@ const mapSlice = createSlice({
         total: number
         nativeCount: number
         nonNativeCount: number
+        countByTaxa: Record<string, number>
       }>,
     ) {
-      const { total, nativeCount, nonNativeCount } = action.payload
+      const { total, nativeCount, nonNativeCount, countByTaxa } = action.payload
       state.totalObservations = total
       state.nativeSpeciesCount = nativeCount
       state.nonNativeSpeciesCount = nonNativeCount
+      state.countByTaxa = countByTaxa
     },
 
     reset(state) {
@@ -99,7 +104,7 @@ function updateQuery() {
     }
     console.log('update query: ', params)
 
-    getObservationStats(params)
+    getObservationsOverview(params)
       .then((statsData) => {
         const total = statsData.observationCount
         dispatch(
@@ -108,6 +113,7 @@ function updateQuery() {
             nativeCount: statsData.nativeSpeciesCount,
             nonNativeCount:
               statsData.speciesCount - statsData.nativeSpeciesCount,
+            countByTaxa: statsData.countByTaxa,
           }),
         )
       })
@@ -137,6 +143,13 @@ export function updateSelectedSite(site: string | null) {
 export function updateSelectedBlock(block: string | null) {
   return (dispatch: AppDispatch) => {
     dispatch(setSelectedBlock(block))
+    dispatch(updateQuery())
+  }
+}
+
+export function updateSelectedTaxa(taxa: string | null) {
+  return (dispatch: AppDispatch) => {
+    dispatch(setSelectedTaxa(taxa === 'all' ? null : taxa))
     dispatch(updateQuery())
   }
 }
@@ -175,6 +188,7 @@ export const selectCurrentRegion = (state: RootState) =>
     : String(state.map.selectedBlock)
 export const selectTaxa = (state: RootState) => state.map.selectedTaxa
 export const selectSpecies = (state: RootState) => state.map.selectedSpecies
+export const selectCountByTaxa = (state: RootState) => state.map.countByTaxa
 export const selectTimeSeries = (state: RootState) => state.map.timeseries
 
 export default mapSlice.reducer
