@@ -9,16 +9,20 @@ import { getSiteList } from '../apis/sites.api'
 import { getObservedSpecies, getSpeciesList } from '../apis/species.api'
 import type { ObservedSpecies, Site, Species } from '../types'
 
+export type MapQuery = Partial<{
+  block: number
+  site: string
+  taxa: string
+  species: string
+}>
+
 interface MapState {
   mode: 'block' | 'site'
   blocks: number[]
   sites: Site[]
   taxas: string[]
   species: Species[]
-  selectedBlock: number | null
-  selectedSite: string | null
-  selectedTaxa: string | null
-  selectedSpecies: string | null
+  query: MapQuery
   totalObservations: number
   nativeSpeciesCount: number
   nonNativeSpeciesCount: number
@@ -33,10 +37,7 @@ const initialState: MapState = {
   sites: [],
   taxas: [],
   species: [],
-  selectedSite: null,
-  selectedBlock: null,
-  selectedTaxa: null,
-  selectedSpecies: null,
+  query: {},
   totalObservations: 0,
   nativeSpeciesCount: 0,
   nonNativeSpeciesCount: 0,
@@ -51,22 +52,25 @@ const mapSlice = createSlice({
   reducers: {
     setMode(state, action: PayloadAction<'block' | 'site'>) {
       state.mode = action.payload
-      state.selectedBlock = null
-      state.selectedSite = null
+      state.query.block = undefined
+      state.query.site = undefined
+    },
+    setQuery(state, action: PayloadAction<MapQuery>) {
+      state.query = action.payload
     },
     setSelectedSite(state, action: PayloadAction<string | null>) {
-      state.selectedSite = action.payload
+      state.query.site = action.payload ?? undefined
     },
     setSelectedBlock(state, action: PayloadAction<string | null>) {
-      state.selectedBlock = Number(action.payload)
-      state.selectedSite = null
+      state.query.block = action.payload ? Number(action.payload) : undefined
+      state.query.site = undefined
     },
     setSelectedTaxa(state, action: PayloadAction<string | null>) {
-      state.selectedTaxa = action.payload
-      state.selectedSpecies = null
+      state.query.taxa = action.payload ?? undefined
+      state.query.species = undefined
     },
     setSelectedSpecies(state, action: PayloadAction<string | null>) {
-      state.selectedSpecies = action.payload
+      state.query.species = action.payload ?? undefined
     },
     setTimeseries(
       state,
@@ -101,10 +105,7 @@ const mapSlice = createSlice({
     },
 
     reset(state) {
-      state.selectedSite = null
-      state.selectedBlock = null
-      state.selectedTaxa = null
-      state.selectedSpecies = null
+      state.query = {}
     },
 
     setObservedSpecies(state, action: PayloadAction<ObservedSpecies[]>) {
@@ -115,6 +116,7 @@ const mapSlice = createSlice({
 
 const {
   setMode,
+  setQuery,
   setSites,
   setSpecies,
   setSelectedSite,
@@ -130,13 +132,12 @@ const {
 function updateQuery() {
   console.log('update qeury')
   return (dispatch: AppDispatch, getState: () => RootState) => {
-    const { selectedBlock, selectedSite, selectedTaxa, selectedSpecies } =
-      getState().map
+    const { block, site, taxa, species } = getState().map.query
     const params = {
-      block: selectedBlock ?? undefined,
-      siteCode: selectedSite ?? undefined,
-      taxa: selectedTaxa ?? undefined,
-      commonName: selectedSpecies ?? undefined,
+      block,
+      siteCode: site,
+      taxa,
+      commonName: species,
     }
     console.log('update query: ', params)
 
@@ -166,8 +167,9 @@ function updateQuery() {
   }
 }
 
-export function init() {
+export function init(query: MapQuery) {
   return (dispatch: AppDispatch) => {
+    dispatch(setQuery(query))
     getSiteList().then((sites) => dispatch(setSites(sites)))
     getSpeciesList().then((species) => dispatch(setSpecies(species)))
     dispatch(updateQuery())
@@ -217,14 +219,15 @@ export function resetFilters() {
 }
 
 export const selectMode = (state: RootState) => state.map.mode
-export const selectBlock = (state: RootState) => state.map.selectedBlock
-export const selectSite = (state: RootState) => state.map.selectedSite
+export const selectQuery = (state: RootState) => state.map.query
+export const selectBlock = (state: RootState) => state.map.query.block
+export const selectSite = (state: RootState) => state.map.query.site
 export const selectCurrentRegion = (state: RootState) =>
   state.map.mode === 'site'
-    ? state.map.selectedSite
-    : String(state.map.selectedBlock)
-export const selectTaxa = (state: RootState) => state.map.selectedTaxa
-export const selectSpecies = (state: RootState) => state.map.selectedSpecies
+    ? state.map.query.site
+    : String(state.map.query.block)
+export const selectTaxa = (state: RootState) => state.map.query.taxa
+export const selectSpecies = (state: RootState) => state.map.query.species
 export const selectCountByTaxa = (state: RootState) => state.map.countByTaxa
 export const selectTimeSeries = (state: RootState) => state.map.timeseries
 export const selectObservedSpecies = (state: RootState) =>

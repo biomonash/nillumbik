@@ -20,7 +20,6 @@ import {
   selectSpecies,
   selectTaxa,
   updateSelectedTaxa,
-  init,
   selectBlock,
   selectSite,
   updateSelectedSpecies,
@@ -39,7 +38,7 @@ function extractSortedBlocks(data: number[]): ChartInput[] {
 
 function extractSortedSites(
   data: Site[],
-  selectedBlock: number | null,
+  selectedBlock?: number,
 ): ChartInput[] {
   const sorted = data
     .filter((site) => (selectedBlock ? site.block === selectedBlock : true))
@@ -61,7 +60,7 @@ const taxaOptions = [
 
 function extractSpeciesOptions(
   allSpecies: Species[],
-  selectedTaxa: string | null,
+  selectedTaxa?: string,
 ): ChartInput[] {
   const filtered = selectedTaxa
     ? allSpecies.filter(
@@ -93,7 +92,7 @@ const MapCharts: React.FC = () => {
     extractSortedBlocks(state.map.blocks),
   )
   const siteOptions = useAppSelector((state) =>
-    extractSortedSites(state.map.sites, state.map.selectedBlock),
+    extractSortedSites(state.map.sites, state.map.query.block),
   )
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [showToast, setShowToast] = useState(false)
@@ -107,7 +106,7 @@ const MapCharts: React.FC = () => {
 
   const { total, nativeCount, nonNativeCount } = stats
   const speciesOptions = useAppSelector((state) =>
-    extractSpeciesOptions(state.map.species, state.map.selectedTaxa),
+    extractSpeciesOptions(state.map.species, state.map.query.taxa),
   )
 
   const copy = useCallback(() => {
@@ -118,11 +117,6 @@ const MapCharts: React.FC = () => {
       timerRef.current = setTimeout(() => setShowToast(false), 2000)
     })
   }, [])
-
-  // load initial data
-  useEffect(() => {
-    dispatch(init())
-  }, [dispatch])
 
   useEffect(() => {
     return () => {
