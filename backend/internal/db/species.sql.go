@@ -134,26 +134,35 @@ func (q *Queries) GetSpeciesByScientificName(ctx context.Context, lower string) 
 
 const listObservedSpecies = `-- name: ListObservedSpecies :many
 SELECT
-    sp.id,
-    sp.scientific_name,
-    sp.common_name,
-    sp.native,
-    COUNT(o.id) AS observation_count
-FROM observations o
-JOIN species sp ON o.species_id = sp.id
-JOIN sites s ON o.site_id = s.id
-WHERE
-  ($1::timestamp IS NULL OR o.timestamp >= $1::timestamp)
-  AND ($2::timestamp IS NULL OR o.timestamp <= $2::timestamp)
-  AND (
-      $3::text IS NULL
-      OR s.code = $3::text
-    )
-  AND (
-      $4::integer IS NULL
-      OR s.block = $4::integer
-    )
-GROUP BY sp.id, sp.scientific_name, sp.common_name, sp.native
+  sp.id,
+  sp.scientific_name,
+  sp.common_name,
+  sp.native,
+  sp.taxa,
+  sp.indicator,
+  sp.reportable,
+  observation_count
+FROM species sp
+JOIN
+(
+  SELECT
+      species_id,
+      COUNT(id) AS observation_count
+  FROM observations_with_details
+  WHERE
+    ($1::timestamp IS NULL OR timestamp >= $1::timestamp)
+    AND ($2::timestamp IS NULL OR timestamp <= $2::timestamp)
+    AND (
+        $3::text IS NULL
+        OR site_code = $3::text
+      )
+    AND (
+        $4::integer IS NULL
+        OR block = $4::integer
+      )
+  GROUP BY species_id
+) as observed
+ON sp.id = species_id
 ORDER BY observation_count DESC
 `
 
@@ -169,6 +178,9 @@ type ListObservedSpeciesRow struct {
 	ScientificName   string `json:"scientificName"`
 	CommonName       string `json:"commonName"`
 	Native           bool   `json:"native"`
+	Taxa             Taxa   `json:"taxa"`
+	Indicator        bool   `json:"indicator"`
+	Reportable       bool   `json:"reportable"`
 	ObservationCount int64  `json:"observationCount"`
 }
 
@@ -194,6 +206,9 @@ func (q *Queries) ListObservedSpecies(ctx context.Context, arg ListObservedSpeci
 			&i.ScientificName,
 			&i.CommonName,
 			&i.Native,
+			&i.Taxa,
+			&i.Indicator,
+			&i.Reportable,
 			&i.ObservationCount,
 		); err != nil {
 			return nil, err

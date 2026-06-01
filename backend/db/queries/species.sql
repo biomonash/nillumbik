@@ -49,24 +49,33 @@ ORDER BY scientific_name;
 -- If site_code is NULL, results include all sites.
 -- Returns species details along with observation count.
 SELECT
-    sp.id,
-    sp.scientific_name,
-    sp.common_name,
-    sp.native,
-    COUNT(o.id) AS observation_count
-FROM observations o
-JOIN species sp ON o.species_id = sp.id
-JOIN sites s ON o.site_id = s.id
-WHERE
-  (sqlc.narg('from')::timestamp IS NULL OR o.timestamp >= sqlc.narg('from')::timestamp)
-  AND (sqlc.narg('to')::timestamp IS NULL OR o.timestamp <= sqlc.narg('to')::timestamp)
-  AND (
-      sqlc.narg('site_code')::text IS NULL
-      OR s.code = sqlc.narg('site_code')::text
-    )
-  AND (
-      sqlc.narg('block')::integer IS NULL
-      OR s.block = sqlc.narg('block')::integer
-    )
-GROUP BY sp.id, sp.scientific_name, sp.common_name, sp.native
+  sp.id,
+  sp.scientific_name,
+  sp.common_name,
+  sp.native,
+  sp.taxa,
+  sp.indicator,
+  sp.reportable,
+  observation_count
+FROM species sp
+JOIN
+(
+  SELECT
+      species_id,
+      COUNT(id) AS observation_count
+  FROM observations_with_details
+  WHERE
+    (sqlc.narg('from')::timestamp IS NULL OR timestamp >= sqlc.narg('from')::timestamp)
+    AND (sqlc.narg('to')::timestamp IS NULL OR timestamp <= sqlc.narg('to')::timestamp)
+    AND (
+        sqlc.narg('site_code')::text IS NULL
+        OR site_code = sqlc.narg('site_code')::text
+      )
+    AND (
+        sqlc.narg('block')::integer IS NULL
+        OR block = sqlc.narg('block')::integer
+      )
+  GROUP BY species_id
+) as observed
+ON sp.id = species_id
 ORDER BY observation_count DESC;
