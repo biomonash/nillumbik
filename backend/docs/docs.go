@@ -690,6 +690,12 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "indicator": {
                     "type": "boolean"
                 },
@@ -799,6 +805,12 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "indicator": {
                     "type": "boolean"

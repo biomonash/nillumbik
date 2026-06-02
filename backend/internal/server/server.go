@@ -57,6 +57,7 @@ func New(querier db.Querier) *Server {
 	stats.Register(api, stats.NewController(querier))
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.Static("/images/species", "../static/species_images")
 
 	return &Server{
 		router: r,
