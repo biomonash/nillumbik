@@ -10,12 +10,6 @@ import (
 	"github.com/biomonash/nillumbik/internal/db"
 )
 
-type SpeciesEntry struct {
-	ID         int64
-	CommonName string
-	Files      []string
-}
-
 func ImportSpeciesImages(ctx context.Context, q *db.Queries, dir string) error {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
@@ -28,13 +22,9 @@ func ImportSpeciesImages(ctx context.Context, q *db.Queries, dir string) error {
 		return fmt.Errorf("Failed to load species list: %w", err)
 	}
 
-	speciesMap := make(map[string]SpeciesEntry)
+	speciesMap := make(map[string]db.Species)
 	for _, s := range species {
-		speciesMap[toKey(s.CommonName)] = SpeciesEntry{
-			ID:         s.ID,
-			CommonName: s.CommonName,
-			Files:      []string{},
-		}
+		speciesMap[toKey(s.CommonName)] = s
 	}
 
 	for _, entry := range entries {
@@ -54,7 +44,7 @@ func ImportSpeciesImages(ctx context.Context, q *db.Queries, dir string) error {
 		commonName := strings.Trim(matches[1], " ")
 		k := toKey(commonName)
 		if s, ok := speciesMap[k]; ok {
-			s.Files = append(s.Files, filename)
+			s.Images = append(s.Images, filename)
 			speciesMap[k] = s
 		} else {
 			fmt.Printf("Cannot find correspond species: %s\n", commonName)
@@ -62,8 +52,23 @@ func ImportSpeciesImages(ctx context.Context, q *db.Queries, dir string) error {
 	}
 
 	for _, s := range speciesMap {
-		if len(s.Files) == 0 {
+		if len(s.Images) == 0 {
 			fmt.Printf("No file given: %s\n", s.CommonName)
+			continue
+		}
+
+		_, err := q.UpdateSpecies(ctx, db.UpdateSpeciesParams{
+			ID:             s.ID,
+			CommonName:     s.CommonName,
+			ScientificName: s.ScientificName,
+			Taxa:           s.Taxa,
+			Native:         s.Native,
+			Indicator:      s.Indicator,
+			Reportable:     s.Reportable,
+			Images:         s.Images,
+		})
+		if err != nil {
+			return fmt.Errorf("Failed to update %s: %w", s.CommonName, err)
 		}
 	}
 	return nil
