@@ -55,6 +55,7 @@ export default function MapView() {
   const { coords, loading, error, locate } = useUserLocation()
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+ const [showSidebar, setShowSidebar] = useState(true)
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth)
@@ -252,6 +253,7 @@ export default function MapView() {
                 } else {
                   dispatch(updateSelectedSite(isAlreadySelected ? null : id))
                 }
+                setShowSidebar(true)
               })
             }}
           />
@@ -265,7 +267,41 @@ export default function MapView() {
           </Marker>
         )}
       </MapContainer>
-      <SpeciesSidebar onClose={() => {}} />
+      {showSidebar && <SpeciesSidebar onClose={() => setShowSidebar(false)} />}
+    </div>
+  )
+}
+
+
+function DesktopSidebar({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="hidden lg:flex fixed right-0 top-0 h-screen w-[350px] bg-[var(--muted-foreground2)] z-50 flex-col shadow-xl">
+      <div className="flex-1 overflow-y-auto p-2 pt-14 flex flex-col gap-4">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+
+function MobileDrawer({ children }: { children: React.ReactNode }) {
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  return (
+    <div
+      className={`lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--muted-foreground2)] rounded-t-2xl shadow-xl transition-transform duration-300 ease-in-out ${
+        drawerOpen ? 'translate-y-0' : 'translate-y-[calc(100%-56px)]'
+      }`}
+    >
+      <div
+        className="flex justify-between items-center px-4 h-14 cursor-pointer"
+        onClick={() => setDrawerOpen(!drawerOpen)}
+      >
+        <span className="font-semibold text-black text-sm">Zone Filter 🔎</span>
+        <i className={`text-gray-600 text-xs mr-5 ${drawerOpen ? 'fa fa-angle-down' : 'fa fa-angle-up'}`} />
+      </div>
+      <div className="max-h-[65vh] overflow-y-auto px-4 pb-8 flex flex-col gap-4">
+        {children}
+      </div>
     </div>
   )
 }
