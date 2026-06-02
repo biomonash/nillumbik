@@ -14,11 +14,13 @@ export default function SpeciesCard({
   return (
     <Card className="overflow-hidden">
       {/* Species Photo */}
-      <img
-        src={species.image ?? 'https://placehold.co/600x400?text=Species+photo'} //placeholder
-        alt={species.commonName}
-        className="w-full h-48 object-cover"
-      />
+      {species.images.map((filename) => (
+        <img
+          src={`http://localhost:8000/images/species/${filename}`}
+          alt={species.commonName}
+          className="w-full object-cover mb-2"
+        />
+      ))}
       <CardContent className="p-4">
         {/* Common Name and Native/Non-native Badge*/}
         <div className="flex items-center justify-between gap-2 mb-3 mt-4">
