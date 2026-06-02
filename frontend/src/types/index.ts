@@ -11,7 +11,7 @@ export type Species = {
   native: boolean
   indicator: boolean
   taxa: string
-  image?: string // placeholder for now
+  images: string[]
 }
 
 export type ObservedSpecies = Species & {
