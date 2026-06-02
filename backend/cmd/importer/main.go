@@ -47,7 +47,7 @@ func main() {
 	// Determine CSV path (environment variable fallback or default relative path)
 	csvPath := os.Getenv("CSV_PATH")
 	if csvPath == "" {
-		csvPath = "./data/nillumbik.csv"
+		csvPath = "../static/nillumbik.csv"
 	}
 
 	// Check that CSV file exists

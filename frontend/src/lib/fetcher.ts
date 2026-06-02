@@ -1,8 +1,9 @@
 import axios, { type AxiosResponse } from 'axios'
+import { API_BASE_URL } from '../constants/api'
 
 // Create Axios instance
 const fetcher = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
+  baseURL: `${API_BASE_URL}/api`,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
