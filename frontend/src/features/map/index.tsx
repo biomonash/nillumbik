@@ -1,5 +1,4 @@
 import MapView from './components/MapView'
-import MapCharts from './components/MapCharts'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { init, selectQuery, type MapQuery } from '../../store/mapSlice'
 import { useEffect, useState } from 'react'
