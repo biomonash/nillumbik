@@ -53,15 +53,8 @@ export default function MapPage() {
   }, [query, loaded])
 
   return (
-    <div style={{ position: 'relative' }}>
-      <MapCharts />
-      {/* Background Map */}
+    <div className="w-screen h-screen overflow-hidden fixed">
       <MapView />
-
-      {/* Overlay UI (later) */}
-      <div style={{ position: 'relative', zIndex: 10 }}>
-        <h1>Map Page</h1>
-      </div>
     </div>
   )
 }
