@@ -24,6 +24,7 @@ func ImportSpeciesImages(ctx context.Context, q *db.Queries, dir string) error {
 
 	speciesMap := make(map[string]db.Species)
 	for _, s := range species {
+		s.Images = []string{}
 		speciesMap[toKey(s.CommonName)] = s
 	}
 
