@@ -31,7 +31,7 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
 }
 
 const mockdata = [
-  { icon: <i className="fa-solid fa-house"></i>, label: 'Home', path: '/' },
+  //{ icon: <i className="fa-solid fa-house"></i>, label: 'Home', path: '/' },
   {
     icon: <i className="fa-regular fa-window-maximize"></i>,
     label: 'Dashboard',
@@ -42,16 +42,16 @@ const mockdata = [
     label: 'Map',
     path: '/map',
   },
-  {
-    icon: <i className="fa-solid fa-chart-simple"></i>,
-    label: 'Graph',
-    path: '/graph',
-  },
-  {
-    icon: <i className="fa-solid fa-gear"></i>,
-    label: 'Settings',
-    path: '/settings',
-  },
+  // {
+  //   icon: <i className="fa-solid fa-chart-simple"></i>,
+  //   label: 'Graph',
+  //   path: '/graph',
+  // },
+  // {
+  //   icon: <i className="fa-solid fa-gear"></i>,
+  //   label: 'Settings',
+  //   path: '/settings',
+  // },
 ]
 
 const Sidebar: React.FC = (): JSX.Element => {
