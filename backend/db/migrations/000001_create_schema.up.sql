@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS species (
     native BOOLEAN NOT NULL,
     taxa taxa NOT NULL,
     indicator BOOLEAN NOT NULL,
-    reportable BOOLEAN NOT NULL
+    reportable BOOLEAN NOT NULL,
+    images text[] NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS observations (

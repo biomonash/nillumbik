@@ -298,11 +298,12 @@ type Site struct {
 }
 
 type Species struct {
-	ID             int64  `json:"id"`
-	ScientificName string `json:"scientificName"`
-	CommonName     string `json:"commonName"`
-	Native         bool   `json:"native"`
-	Taxa           Taxa   `json:"taxa"`
-	Indicator      bool   `json:"indicator"`
-	Reportable     bool   `json:"reportable"`
+	ID             int64    `json:"id"`
+	ScientificName string   `json:"scientificName"`
+	CommonName     string   `json:"commonName"`
+	Native         bool     `json:"native"`
+	Taxa           Taxa     `json:"taxa"`
+	Indicator      bool     `json:"indicator"`
+	Reportable     bool     `json:"reportable"`
+	Images         []string `json:"images"`
 }
