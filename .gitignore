@@ -2,7 +2,6 @@ tmp
 nillumbik
 node_modules
 docker/db
-*.csv
 data
 garage_data
 
