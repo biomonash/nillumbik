@@ -9,7 +9,7 @@ const DashboardLayout = lazy(() => import('../layouts/DashboardLayout'))
 const AdminLayout = lazy(() => import('../layouts/AdminLayout'))
 
 // Pages
-const Home = lazy(() => import('../pages/Home'))
+//const Home = lazy(() => import('../pages/Home'))
 const About = lazy(() => import('../pages/About'))
 const Instruction = lazy(() => import('../pages/Instruction'))
 const Dashboard = lazy(() => import('../pages/Dashboard'))
