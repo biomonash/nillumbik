@@ -113,7 +113,7 @@ function MobileDrawer({
       </div>
 
       {/* Content */}
-      <div className="max-h-[65vh] overflow-y-auto px-4 pb-8 ">
+      <div className="max-h-[65vh] overflow-y-auto px-4 pb-8">
         {activeTab === 'species' ? <SpeciesSidebar /> : <MapCharts />}
       </div>
     </div>
@@ -344,7 +344,7 @@ export default function MapView() {
       </MapContainer>
 
       {isDesktop && (
-        <div className="fixed left-[80px] top-0 h-screen w-[320px] bg-white z-50 flex flex-col shadow-xl">
+        <div className="fixed left-[80px] top-14 h-screen w-[320px] bg-white z-50 flex flex-col shadow-xl">
           <div className="flex-1 overflow-y-auto">
             <SpeciesSidebar />
           </div>
