@@ -1,6 +1,7 @@
 import { Card, CardContent } from '../Card'
 import Badge from '../Badge'
 import { type ObservedSpecies } from '../../../types'
+import { API_BASE_URL } from '../../../constants/api'
 
 interface SpeciesCardProps {
   species: ObservedSpecies
@@ -16,7 +17,7 @@ export default function SpeciesCard({
       {/* Species Photo */}
       {species.images.map((filename) => (
         <img
-          src={`http://localhost:8000/images/species/${filename}`}
+          src={`${API_BASE_URL}/images/species/${filename}`}
           alt={species.commonName}
           className="w-full object-cover mb-2"
         />

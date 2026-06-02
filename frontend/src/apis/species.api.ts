@@ -9,19 +9,9 @@ export async function getSpeciesList(): Promise<Species[]> {
 
 // fetch full detail for a single species
 export async function getSpeciesById(id: number): Promise<Species> {
-  const response = await fetcher.get<{
-    id: number
-    commonName: string
-    scientificName: string
-    native: boolean
-    indicator: boolean
-    taxa: string
-  }>(`/species/${id}`)
+  const response = await fetcher.get<Species>(`/species/${id}`)
 
-  return {
-    ...response.data,
-    image: undefined, // change to real URL when available
-  }
+  return response.data
 }
 
 export async function getObservedSpecies(

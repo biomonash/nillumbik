@@ -16,7 +16,7 @@ GO_IMPORTER=cmd/importer/main.go
 GO_IMG_IMPORTER=cmd/imgimporter/main.go
 DOCKER_COMPOSE_FILE=docker/compose.yml
 # POSTGRESQL_URL=postgres://biom:supersecretpassword@localhost:5432/nillumbik?sslmode=disable
-API_BASE_URL=/api
+API_BASE_URL=
 
 # Colors for output
 GREEN=\033[0;32m
@@ -69,7 +69,7 @@ install-backend: ## Install Go dependencies
 .PHONY: build-backend
 build-backend: ## Build the Go backend
 	@printf "$(GREEN)Building Go backend...$(NC)\n"
-	@cd $(BACKEND_DIR) && go build -o ../$(BINARY_NAME) $(GO_MAIN)
+	@cd $(BACKEND_DIR) && go build -o $(BINARY_NAME) $(GO_MAIN)
 
 .PHONY: run-backend
 run-backend: ## Run the Go backend directly
