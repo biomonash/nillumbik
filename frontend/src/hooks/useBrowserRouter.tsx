@@ -28,7 +28,7 @@ const useBrowserRouter = () => {
       children: [
         {
           index: true,
-          Component: Home,
+          Component: Dashboard,
         },
         {
           path: routes.ABOUT,

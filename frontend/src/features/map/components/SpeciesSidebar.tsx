@@ -13,7 +13,7 @@ export default function SpeciesSidebar() {
     <div className="flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-gray-200 bg-white">
-        <h2 className="pt-4 md:pt-12 fw-bold text-[16px] m-0 text-black">
+        <h2 className="pt-4 fw-bold text-[16px] m-0 text-black">
           {currentRegion ?? 'All'}
         </h2>
 
@@ -26,7 +26,7 @@ export default function SpeciesSidebar() {
       </div>
 
       {/* Species Cards */}
-      <div className="text-[16px] flex p-16 flex-col gap-4">
+      <div className="text-[16px] m-2 flex flex-col gap-4">
         {observedSpecies.map((s) => (
           <SpeciesCard
             key={s.id}
