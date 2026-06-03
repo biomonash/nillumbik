@@ -31,6 +31,7 @@ func parseSpecies(i int, row []string) (species db.CreateSpeciesParams, err erro
 		Taxa:           taxaEnum,
 		Indicator:      indicator,
 		Reportable:     reportable,
+		Images:         []string{},
 	}
 	return
 }

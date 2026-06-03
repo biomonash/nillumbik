@@ -683,6 +683,12 @@
                 "id": {
                     "type": "integer"
                 },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "indicator": {
                     "type": "boolean"
                 },
@@ -792,6 +798,12 @@
                 },
                 "id": {
                     "type": "integer"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "indicator": {
                     "type": "boolean"

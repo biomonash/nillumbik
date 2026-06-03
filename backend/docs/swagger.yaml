@@ -66,6 +66,10 @@ definitions:
         type: string
       id:
         type: integer
+      images:
+        items:
+          type: string
+        type: array
       indicator:
         type: boolean
       native:
@@ -140,6 +144,10 @@ definitions:
         type: string
       id:
         type: integer
+      images:
+        items:
+          type: string
+        type: array
       indicator:
         type: boolean
       native:
