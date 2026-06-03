@@ -1,5 +1,4 @@
 import MapView from './components/MapView'
-import MapCharts from './components/MapCharts'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { init, selectQuery, type MapQuery } from '../../store/mapSlice'
 import { useEffect, useState } from 'react'
@@ -53,15 +52,8 @@ export default function MapPage() {
   }, [query, loaded])
 
   return (
-    <div style={{ position: 'relative' }}>
-      <MapCharts />
-      {/* Background Map */}
+    <div className="w-screen h-screen overflow-hidden fixed">
       <MapView />
-
-      {/* Overlay UI (later) */}
-      <div style={{ position: 'relative', zIndex: 10 }}>
-        <h1>Map Page</h1>
-      </div>
     </div>
   )
 }

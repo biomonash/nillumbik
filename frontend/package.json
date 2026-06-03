@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "VITE_API_BASE_URL=https://nillumbik.wancat.cc/api vite",
+    "dev": "VITE_API_BASE_URL=https://nillumbik.wancat.cc vite",
     "dev:local": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
