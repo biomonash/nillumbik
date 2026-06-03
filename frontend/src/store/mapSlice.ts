@@ -222,10 +222,12 @@ export const selectMode = (state: RootState) => state.map.mode
 export const selectQuery = (state: RootState) => state.map.query
 export const selectBlock = (state: RootState) => state.map.query.block
 export const selectSite = (state: RootState) => state.map.query.site
-export const selectCurrentRegion = (state: RootState) =>
+export const selectCurrentRegion = (state: RootState): string | undefined =>
   state.map.mode === 'site'
     ? state.map.query.site
-    : String(state.map.query.block)
+    : state.map.query.block
+      ? String(state.map.query.block)
+      : undefined
 export const selectTaxa = (state: RootState) => state.map.query.taxa
 export const selectSpecies = (state: RootState) => state.map.query.species
 export const selectCountByTaxa = (state: RootState) => state.map.countByTaxa
