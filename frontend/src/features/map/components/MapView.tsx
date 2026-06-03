@@ -16,6 +16,7 @@ import type {
   SiteProperties,
 } from '../../../helpers/siteLocation'
 import SpeciesSidebar from './SpeciesSidebar'
+import MapCharts from './MapCharts'
 import {
   selectCurrentRegion,
   selectMode,
@@ -24,6 +25,10 @@ import {
   updateSelectedSite,
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
+
+const NAV_WIDTH = 80
+const LEFT_SIDEBAR_WIDTH = 320
+const RIGHT_SIDEBAR_WIDTH = 350
 
 const locationPin = divIcon({
   html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
@@ -44,17 +49,92 @@ function FlyToUser({
   return null
 }
 
+interface MobileDrawerProps {
+  drawerOpen: boolean
+  setDrawerOpen: (open: boolean) => void
+  activeTab: 'species' | 'filters'
+  setActiveTab: (tab: 'species' | 'filters') => void
+}
+
+function MobileDrawer({
+  drawerOpen,
+  setDrawerOpen,
+  activeTab,
+  setActiveTab,
+}: MobileDrawerProps) {
+  const handleTabClick = (tab: 'species' | 'filters') => {
+    if (!drawerOpen) setDrawerOpen(true)
+    setActiveTab(tab)
+  }
+
+  return (
+    <div
+      className={`
+        fixed bottom-0 left-0 right-0 z-50
+        bg-[var(--muted-foreground2)] rounded-t-2xl shadow-xl
+        transition-transform duration-300 ease-in-out
+        ${drawerOpen ? 'translate-y-0' : 'translate-y-[calc(100%-56px)]'}
+      `}
+    >
+      <div className="flex items-center my-1 p-5 h-14 gap-2 select-none">
+        <button
+          onClick={() => handleTabClick('filters')}
+          className={`
+            flex-1 py-1.5 rounded-full text-xs font-semibold border-2 transition-all duration-200
+            ${
+              activeTab === 'filters'
+                ? 'bg-green-700 border-green-700 text-white'
+                : 'bg-transparent border-green-700 text-[var(--button)]'
+            }
+          `}
+        >
+          Zone Filter
+        </button>
+        <button
+          onClick={() => handleTabClick('species')}
+          className={`
+            flex-1 py-1.5 rounded-full text-xs font-semibold border-2 transition-all duration-200
+            ${
+              activeTab === 'species'
+                ? 'bg-green-700  border-green-700 text-white'
+                : 'bg-transparent border-green-700 text-[var(--button)]'
+            }
+          `}
+        >
+          Species
+        </button>
+
+        <i
+          onClick={() => setDrawerOpen(!drawerOpen)}
+          className={`text-gray-600 text-xs fa cursor-pointer px-1 ${
+            drawerOpen ? 'fa-angle-down' : 'fa-angle-up'
+          }`}
+        />
+      </div>
+
+      {/* Content */}
+      <div className="max-h-[65vh] overflow-y-auto px-4 pb-8">
+        {activeTab === 'species' ? <SpeciesSidebar /> : <MapCharts />}
+      </div>
+    </div>
+  )
+}
+
 export default function MapView() {
   const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
   const mode = useAppSelector(selectMode)
   const dispatch = useAppDispatch()
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
   const currentRegion = useAppSelector(selectCurrentRegion)
-  // const [selectedZone, setSelectedZone] = useState<string | null>(null)
   const [hoveredZone, setHoveredZone] = useState<string | null>(null)
   const { coords, loading, error, locate } = useUserLocation()
-
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
+  // Lifted drawer state so map zone clicks can open/switch the drawer
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<'species' | 'filters'>('species')
+
+  const isDesktop = windowWidth >= 1024
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth)
@@ -82,19 +162,13 @@ export default function MapView() {
     }
   }, [coords, geoData])
 
-  const isDesktop = windowWidth >= 768
-  const leftSidebarVisible = true
-  const rightSidebarWidth = 350
-  const leftSidebarWidth = 320
-  const navWidth = 80
-
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
       <div
         style={{
           position: 'fixed',
           top: 80,
-          right: isDesktop ? rightSidebarWidth + 20 : 20,
+          right: isDesktop ? RIGHT_SIDEBAR_WIDTH + 20 : 20,
           zIndex: 40,
           background: 'white',
           padding: '8px',
@@ -133,16 +207,14 @@ export default function MapView() {
         </button>
       </div>
 
+      {/* ── Find My Location button ── */}
       <button
         onClick={locate}
         disabled={loading}
         style={{
           position: 'fixed',
           bottom: isDesktop ? '30px' : '80px',
-          left:
-            isDesktop && leftSidebarVisible
-              ? navWidth + leftSidebarWidth + 20
-              : '90px',
+          left: isDesktop ? NAV_WIDTH + LEFT_SIDEBAR_WIDTH + 20 : '90px',
           zIndex: 40,
           padding: '8px 16px',
           color: 'darkgreen',
@@ -156,6 +228,7 @@ export default function MapView() {
         {loading ? 'Locating...' : 'Find My Location'}
       </button>
 
+      {/* ── Location status banner ── */}
       {coords && (
         <div
           style={{
@@ -185,7 +258,7 @@ export default function MapView() {
           style={{
             position: 'fixed',
             top: '140px',
-            right: isDesktop ? rightSidebarWidth + 20 : 20,
+            right: isDesktop ? RIGHT_SIDEBAR_WIDTH + 20 : 20,
             zIndex: 40,
             color: 'red',
             backgroundColor: 'white',
@@ -246,11 +319,15 @@ export default function MapView() {
               layer.on('click', () => {
                 const block = String(feature.properties.block)
                 const isAlreadySelected = currentRegion === id
-
                 if (mode === 'block') {
                   dispatch(updateSelectedBlock(block))
                 } else {
                   dispatch(updateSelectedSite(isAlreadySelected ? null : id))
+                }
+                // On mobile: open drawer and switch to species tab
+                if (!isDesktop) {
+                  setActiveTab('species')
+                  setDrawerOpen(true)
                 }
               })
             }}
@@ -265,7 +342,31 @@ export default function MapView() {
           </Marker>
         )}
       </MapContainer>
-      <SpeciesSidebar onClose={() => {}} />
+
+      {isDesktop && (
+        <div className="fixed left-[80px] top-14 h-screen w-[320px] bg-white z-50 flex flex-col shadow-xl">
+          <div className="flex-1 overflow-y-auto">
+            <SpeciesSidebar />
+          </div>
+        </div>
+      )}
+
+      {isDesktop && (
+        <div className="fixed right-0 top-0 h-screen w-[350px] bg-[var(--muted-foreground2)] z-50 flex flex-col shadow-xl">
+          <div className="flex-1 overflow-y-auto p-2 pt-14">
+            <MapCharts />
+          </div>
+        </div>
+      )}
+
+      {!isDesktop && (
+        <MobileDrawer
+          drawerOpen={drawerOpen}
+          setDrawerOpen={setDrawerOpen}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+      )}
     </div>
   )
 }

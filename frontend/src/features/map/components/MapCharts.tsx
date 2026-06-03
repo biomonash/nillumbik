@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import {
   Card,
   CardHeader,
@@ -26,7 +26,6 @@ import {
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 
-// Extraction Functions
 function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 }
@@ -42,11 +41,7 @@ function extractSortedSites(
 ): ChartInput[] {
   const sorted = data
     .filter((site) => (selectedBlock ? site.block === selectedBlock : true))
-    .map((site) => ({
-      value: site.code,
-      label: `Site ${site.name}`,
-    }))
-
+    .map((site) => ({ value: site.code, label: `Site ${site.name}` }))
   return [{ value: 'all', label: 'All Sites' }, ...sorted]
 }
 
@@ -77,7 +72,6 @@ function extractSpeciesOptions(
 const MapCharts: React.FC = () => {
   const dispatch = useAppDispatch()
 
-  // read all filter state from redux
   const selectedBlock = useSelector(selectBlock)
   const selectedSite = useSelector(selectSite)
   const selectedTaxa = useSelector(selectTaxa)
@@ -87,27 +81,21 @@ const MapCharts: React.FC = () => {
     nativeCount: state.map.nativeSpeciesCount,
     nonNativeCount: state.map.nonNativeSpeciesCount,
   }))
-  // state
+
   const blockOptions = useAppSelector((state) =>
     extractSortedBlocks(state.map.blocks),
   )
   const siteOptions = useAppSelector((state) =>
     extractSortedSites(state.map.sites, state.map.query.block),
   )
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [showToast, setShowToast] = useState(false)
-  // refs
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(null)
-
-  useEffect(() => {
-    const height = drawerOpen ? '65vh' : '56px'
-    document.documentElement.style.setProperty('--drawer-height', height)
-  }, [drawerOpen])
-
-  const { total, nativeCount, nonNativeCount } = stats
   const speciesOptions = useAppSelector((state) =>
     extractSpeciesOptions(state.map.species, state.map.query.taxa),
   )
+
+  const [showToast, setShowToast] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(null)
+
+  const { total, nativeCount, nonNativeCount } = stats
 
   const copy = useCallback(() => {
     if (!navigator.clipboard) return
@@ -123,9 +111,17 @@ const MapCharts: React.FC = () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
   }, [])
-  // Shared content used in both desktop and mobile
-  const content = (
-    <>
+
+  return (
+    <div className="bg-[var(--muted-foreground2)] flex flex-col gap-3">
+      {showToast && (
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none flex items-center gap-2 bg-white text-gray-800 text-xs font-medium px-4 py-2.5 rounded-xl shadow-xl border border-gray-100">
+          <span className="text-green-500 text-sm">
+            ✓ Link copied to clipboard
+          </span>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex relative justify-between items-center">
         <h1 className="text-black text-lg font-semibold tracking-tight">
@@ -134,13 +130,13 @@ const MapCharts: React.FC = () => {
         <div className="flex items-center gap-1.5 my-2">
           <button
             onClick={copy}
-            className="border-2 border-[var(--button)] text-[var(--button)] font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:scale-105 hover:bg-[var(--button-hover)] hover:text-white hover:shadow-md"
+            className="border-2 border-green-700 text-green-700 font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:scale-105 hover:bg-[var(--button-hover)] hover:text-white hover:shadow-md"
           >
             Copy Link
           </button>
           <button
             onClick={() => dispatch(resetFilters())}
-            className="border-2 border-[var(--button)] bg-[var(--button)] font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:bg-[var(--button-hover)] hover:scale-105 hover:shadow-lg"
+            className="border-2 border-green-700 bg-green-700 font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:bg-[var(--button-hover)] hover:scale-105 hover:shadow-lg"
           >
             Reset Filters
           </button>
@@ -173,7 +169,6 @@ const MapCharts: React.FC = () => {
             onChange={(s) =>
               dispatch(updateSelectedSite(s === 'all' ? null : s))
             }
-            // disabled={selectedBlock === null}
             placeholder="Select Site"
             className="w-full"
           />
@@ -219,7 +214,9 @@ const MapCharts: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-600">Species Type:</span>
           <span
-            className={`px-3 py-1 rounded-full text-white text-xs font-semibold ${nativeCount > 0 ? 'bg-green-500' : 'bg-red-500'}`}
+            className={`px-3 py-1 rounded-full text-white text-xs font-semibold ${
+              nativeCount > 0 ? 'bg-green-500' : 'bg-red-500'
+            }`}
           >
             {nativeCount > 0 ? '🌿 Native' : '⚠️ Non-Native'}
           </span>
@@ -239,7 +236,7 @@ const MapCharts: React.FC = () => {
         </div>
       </div>
 
-      {/* Distribution — hidden when species selected */}
+      {/* Distribution */}
       {!selectedSpecies && (
         <div>
           <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2 block">
@@ -298,52 +295,7 @@ const MapCharts: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-    </>
-  )
-
-  return (
-    <>
-      {showToast && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none flex items-center gap-2 bg-white text-gray-800 text-xs font-medium px-4 py-2.5 rounded-xl shadow-xl border border-gray-100">
-          <span className="text-green-500 text-sm">
-            ✓ Link copied to clipboard
-          </span>
-        </div>
-      )}
-      {/* Desktop sidebar */}
-      <div className="hidden lg:flex fixed right-0 top-0 h-screen w-[350px] bg-[var(--muted-foreground2)] z-50 flex-col shadow-xl">
-        <div className="flex-1 overflow-y-auto p-2 pt-14 flex flex-col gap-4">
-          {content}
-        </div>
-      </div>
-
-      {/* Mobile bottom drawer */}
-      <div
-        className={`lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--muted-foreground2)] rounded-t-2xl shadow-xl transition-transform duration-300 ease-in-out ${drawerOpen ? 'translate-y-0' : 'translate-y-[calc(100%-56px)]'}`}
-      >
-        {/* Handle bar */}
-        <div
-          className="flex justify-between items-center px-4 h-14 cursor-pointer"
-          onClick={() => setDrawerOpen(!drawerOpen)}
-        >
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-black text-sm">
-              Zone Filter 🔎
-            </span>
-            <span className="text-gray-400 text-xs">·</span>
-            <span className="text-gray-500 text-xs">
-              {total.toLocaleString()} detections
-            </span>
-          </div>
-          <i
-            className={`text-gray-600 text-xs mr-5 ${drawerOpen ? 'fa fa-angle-down' : 'fa fa-angle-up'}`}
-          />
-        </div>
-        <div className="max-h-[65vh] overflow-y-auto px-4 pb-8 flex flex-col gap-4">
-          {content}
-        </div>
-      </div>
-    </>
+    </div>
   )
 }
 

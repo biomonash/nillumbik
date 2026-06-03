@@ -5,85 +5,28 @@ import {
   selectObservedSpecies,
 } from '../../../store/mapSlice'
 
-interface SpeciesSidebarProps {
-  onClose: () => void
-}
-
-export default function SpeciesSidebar({ onClose }: SpeciesSidebarProps) {
+export default function SpeciesSidebar() {
   const observedSpecies = useAppSelector(selectObservedSpecies)
   const currentRegion = useAppSelector(selectCurrentRegion)
+
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: '80px',
-        width: '320px',
-        height: '100vh',
-        backgroundColor: 'white',
-        zIndex: 1000,
-        overflowY: 'auto',
-      }}
-    >
+    <div className="flex flex-col">
       {/* Header */}
-      <div
-        style={{
-          padding: '16px',
-          borderBottom: '1px solid #e5e7eb',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-          backgroundColor: 'white',
-        }}
-      >
-        <div>
-          <h2
-            style={{
-              fontWeight: 'bold',
-              fontSize: '16px',
-              margin: 0,
-              color: 'black',
-            }}
-          >
-            {currentRegion ?? 'All'}
-          </h2>
-          <p
-            style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}
-          >
-            Wildlife species recorded here
-          </p>
-          <p
-            style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}
-          >
-            {observedSpecies.length} Species Found
-          </p>
-        </div>
-        <button
-          onClick={onClose}
-          style={{
-            background: 'none',
-            border: 'none',
-            fontSize: '18px',
-            cursor: 'pointer',
-            color: '#6b7280',
-          }}
-        >
-          x
-        </button>
+      <div className="p-4 border-b border-gray-200 bg-white">
+        <h2 className="pt-4 fw-bold text-[16px] m-0 text-black">
+          {currentRegion ?? 'All'}
+        </h2>
+
+        <p className="text-xs text-gray-500 mt-1 m-0">
+          Wildlife species recorded here
+        </p>
+        <p className="text-xs text-gray-500 mt-1 m-0">
+          {observedSpecies.length} Species Found
+        </p>
       </div>
 
       {/* Species Cards */}
-      <div
-        style={{
-          padding: '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-        }}
-      >
+      <div className="text-[16px] m-2 flex flex-col gap-4">
         {observedSpecies.map((s) => (
           <SpeciesCard
             key={s.id}
