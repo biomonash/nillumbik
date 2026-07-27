@@ -5,7 +5,6 @@ import { createBrowserRouter } from 'react-router'
 
 //? LAZY LOADING PAGES & LAYOUTS
 // Layouts
-const MainLayout = lazy(() => import('../layouts/MainLayout'))
 const DashboardLayout = lazy(() => import('../layouts/DashboardLayout'))
 const AdminLayout = lazy(() => import('../layouts/AdminLayout'))
 
