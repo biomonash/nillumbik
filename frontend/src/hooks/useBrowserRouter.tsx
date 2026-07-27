@@ -1,6 +1,7 @@
 import { lazy } from 'react'
-import { createBrowserRouter } from 'react-router'
 import routes from '../constants/route'
+import { Navigate } from 'react-router'
+import { createBrowserRouter } from 'react-router'
 
 //? LAZY LOADING PAGES & LAYOUTS
 // Layouts
@@ -24,7 +25,7 @@ const useBrowserRouter = () => {
   const router = createBrowserRouter([
     {
       path: routes.HOME,
-      Component: MainLayout,
+      Component: () => (<Navigate to={routes.DASHBOARD} replace />),
       children: [
         {
           index: true,
@@ -80,7 +81,9 @@ const useBrowserRouter = () => {
       path: '*',
       Component: Error,
     },
-  ])
+  ], {
+    basename: import.meta.env["BASE_URL"]
+  })
   return router
 }
 

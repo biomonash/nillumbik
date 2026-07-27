@@ -144,9 +144,9 @@ export default function MapView() {
 
   useEffect(() => {
     const file =
-      mode === 'site' ? '/nillumbik_30zones.geojson' : '/blocks.geojson'
+      mode === 'site' ? 'nillumbik_30zones.geojson' : 'blocks.geojson'
     setGeoData(null)
-    fetch(file)
+    fetch(`${import.meta.env["BASE_URL"]}/${file}`)
       .then((res) => res.json())
       .then((data) => setGeoData(data))
   }, [mode])

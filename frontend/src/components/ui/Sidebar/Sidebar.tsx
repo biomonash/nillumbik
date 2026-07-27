@@ -1,5 +1,6 @@
 import React, { type JSX } from 'react'
 import { useNavigate, useLocation } from 'react-router'
+import route from '../../../constants/route'
 
 interface NavbarLinkProps {
   icon: JSX.Element
@@ -35,12 +36,12 @@ const mockdata = [
   {
     icon: <i className="fa-regular fa-window-maximize"></i>,
     label: 'Dashboard',
-    path: '/dashboard',
+    path: route.DASHBOARD,
   },
   {
     icon: <i className="fa-solid fa-map-location-dot"></i>,
     label: 'Map',
-    path: '/map',
+    path: route.MAP,
   },
   // {
   //   icon: <i className="fa-solid fa-chart-simple"></i>,
