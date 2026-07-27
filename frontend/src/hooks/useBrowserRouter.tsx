@@ -1,10 +1,10 @@
 import { lazy } from 'react'
-import { createBrowserRouter } from 'react-router'
 import routes from '../constants/route'
+import { Navigate } from 'react-router'
+import { createBrowserRouter } from 'react-router'
 
 //? LAZY LOADING PAGES & LAYOUTS
 // Layouts
-const MainLayout = lazy(() => import('../layouts/MainLayout'))
 const DashboardLayout = lazy(() => import('../layouts/DashboardLayout'))
 const AdminLayout = lazy(() => import('../layouts/AdminLayout'))
 
@@ -21,66 +21,71 @@ const Admin = lazy(() => import('../pages/Admin'))
 const Error = lazy(() => import('../pages/Error'))
 
 const useBrowserRouter = () => {
-  const router = createBrowserRouter([
+  const router = createBrowserRouter(
+    [
+      {
+        path: routes.HOME,
+        Component: () => <Navigate to={routes.DASHBOARD} replace />,
+        children: [
+          {
+            index: true,
+            Component: Dashboard,
+          },
+          {
+            path: routes.ABOUT,
+            Component: About,
+          },
+          {
+            path: routes.INSTRUCTION,
+            Component: Instruction,
+          },
+        ],
+      },
+      {
+        path: '',
+        Component: DashboardLayout,
+        children: [
+          {
+            path: routes.DASHBOARD,
+            Component: Dashboard,
+          },
+          {
+            path: routes.GALLERY,
+            Component: Gallery,
+          },
+          {
+            path: routes.MAP,
+            Component: Map,
+          },
+          {
+            path: routes.GRAPH,
+            Component: Graph,
+          },
+          {
+            path: routes.SETTINGS,
+            Component: Settings,
+          },
+        ],
+      },
+      {
+        path: routes.ADMIN,
+        Component: AdminLayout,
+        children: [
+          {
+            index: true,
+            Component: Admin,
+          },
+        ],
+      },
+      {
+        path: '*',
+        Component: Error,
+      },
+    ],
     {
-      path: routes.HOME,
-      Component: MainLayout,
-      children: [
-        {
-          index: true,
-          Component: Dashboard,
-        },
-        {
-          path: routes.ABOUT,
-          Component: About,
-        },
-        {
-          path: routes.INSTRUCTION,
-          Component: Instruction,
-        },
-      ],
+      basename: import.meta.env['BASE_URL'],
     },
-    {
-      path: '',
-      Component: DashboardLayout,
-      children: [
-        {
-          path: routes.DASHBOARD,
-          Component: Dashboard,
-        },
-        {
-          path: routes.GALLERY,
-          Component: Gallery,
-        },
-        {
-          path: routes.MAP,
-          Component: Map,
-        },
-        {
-          path: routes.GRAPH,
-          Component: Graph,
-        },
-        {
-          path: routes.SETTINGS,
-          Component: Settings,
-        },
-      ],
-    },
-    {
-      path: routes.ADMIN,
-      Component: AdminLayout,
-      children: [
-        {
-          index: true,
-          Component: Admin,
-        },
-      ],
-    },
-    {
-      path: '*',
-      Component: Error,
-    },
-  ])
+  )
   return router
 }
 
