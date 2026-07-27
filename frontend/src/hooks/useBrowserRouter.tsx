@@ -21,68 +21,71 @@ const Admin = lazy(() => import('../pages/Admin'))
 const Error = lazy(() => import('../pages/Error'))
 
 const useBrowserRouter = () => {
-  const router = createBrowserRouter([
+  const router = createBrowserRouter(
+    [
+      {
+        path: routes.HOME,
+        Component: () => <Navigate to={routes.DASHBOARD} replace />,
+        children: [
+          {
+            index: true,
+            Component: Dashboard,
+          },
+          {
+            path: routes.ABOUT,
+            Component: About,
+          },
+          {
+            path: routes.INSTRUCTION,
+            Component: Instruction,
+          },
+        ],
+      },
+      {
+        path: '',
+        Component: DashboardLayout,
+        children: [
+          {
+            path: routes.DASHBOARD,
+            Component: Dashboard,
+          },
+          {
+            path: routes.GALLERY,
+            Component: Gallery,
+          },
+          {
+            path: routes.MAP,
+            Component: Map,
+          },
+          {
+            path: routes.GRAPH,
+            Component: Graph,
+          },
+          {
+            path: routes.SETTINGS,
+            Component: Settings,
+          },
+        ],
+      },
+      {
+        path: routes.ADMIN,
+        Component: AdminLayout,
+        children: [
+          {
+            index: true,
+            Component: Admin,
+          },
+        ],
+      },
+      {
+        path: '*',
+        Component: Error,
+      },
+    ],
     {
-      path: routes.HOME,
-      Component: () => (<Navigate to={routes.DASHBOARD} replace />),
-      children: [
-        {
-          index: true,
-          Component: Dashboard,
-        },
-        {
-          path: routes.ABOUT,
-          Component: About,
-        },
-        {
-          path: routes.INSTRUCTION,
-          Component: Instruction,
-        },
-      ],
+      basename: import.meta.env['BASE_URL'],
     },
-    {
-      path: '',
-      Component: DashboardLayout,
-      children: [
-        {
-          path: routes.DASHBOARD,
-          Component: Dashboard,
-        },
-        {
-          path: routes.GALLERY,
-          Component: Gallery,
-        },
-        {
-          path: routes.MAP,
-          Component: Map,
-        },
-        {
-          path: routes.GRAPH,
-          Component: Graph,
-        },
-        {
-          path: routes.SETTINGS,
-          Component: Settings,
-        },
-      ],
-    },
-    {
-      path: routes.ADMIN,
-      Component: AdminLayout,
-      children: [
-        {
-          index: true,
-          Component: Admin,
-        },
-      ],
-    },
-    {
-      path: '*',
-      Component: Error,
-    },
-  ], {
-    basename: import.meta.env["BASE_URL"]
-  })
+  )
   return router
 }
 
