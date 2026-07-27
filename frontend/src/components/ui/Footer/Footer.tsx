@@ -1,4 +1,5 @@
 import React, { type JSX } from 'react'
+import links from '../../../constants/links'
 
 const Footer: React.FC = (): JSX.Element => {
   return (
@@ -6,13 +7,22 @@ const Footer: React.FC = (): JSX.Element => {
       <div className="max-w-screen-xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center gap-4">
         {/* Copyright */}
         <p className="text-sm text-muted-foreground">
-          © BiOM 2025. All rights reserved.
+          © BiOM 2026. All rights reserved.
         </p>
 
         {/* Social icons */}
         <div className="flex items-center gap-1">
           <a
-            href="https://github.com"
+            href={links.WEBSITE}
+            target="_blank"
+            rel="noreferrer"
+            className="w-9 h-9 flex items-center justify-center rounded-md text-muted-foreground hover:text-white hover:bg-white/10 transition-all duration-200"
+            aria-label="BiOM Website"
+          >
+            <i className="fa-solid fa-globe text-base" />
+          </a>
+          <a
+            href={links.GITHUB}
             target="_blank"
             rel="noreferrer"
             className="w-9 h-9 flex items-center justify-center rounded-md text-muted-foreground hover:text-white hover:bg-white/10 transition-all duration-200"
@@ -21,22 +31,30 @@ const Footer: React.FC = (): JSX.Element => {
             <i className="fa-brands fa-github text-base" />
           </a>
           <a
-            href="https://youtube.com"
+            href={links.INSTAGRAM}
             target="_blank"
             rel="noreferrer"
             className="w-9 h-9 flex items-center justify-center rounded-md text-muted-foreground hover:text-white hover:bg-white/10 transition-all duration-200"
-            aria-label="YouTube"
+            aria-label="Instagram"
           >
-            <i className="fa-brands fa-youtube text-base" />
+            <i className="fa-brands fa-instagram text-base" />
           </a>
           <a
-            href="https://www.linkedin.com/company/biological-observation-monash/posts/?feedView=all"
+            href={links.LINKEDIN}
             target="_blank"
             rel="noreferrer"
             className="w-9 h-9 flex items-center justify-center rounded-md text-muted-foreground hover:text-white hover:bg-white/10 transition-all duration-200"
             aria-label="LinkedIn"
           >
             <i className="fa-brands fa-linkedin text-base" />
+          </a>
+          <a
+            href={links.EMAIL}
+            rel="noreferrer"
+            className="w-9 h-9 flex items-center justify-center rounded-md text-muted-foreground hover:text-white hover:bg-white/10 transition-all duration-200"
+            aria-label="Email"
+          >
+            <i className="fa-solid fa-envelope text-base" />
           </a>
         </div>
       </div>
