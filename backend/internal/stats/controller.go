@@ -1,7 +1,7 @@
 package stats
 
 import (
-	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/forestportal/internal/db"
 )
 
 type Controller struct {

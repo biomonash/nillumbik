@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/forestportal/internal/db"
 )
 
 func parseSite(i int, row []string) (site db.CreateSiteParams, err error) {

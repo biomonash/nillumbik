@@ -1,8 +1,8 @@
 package stats
 
 import (
-	"github.com/biomonash/nillumbik/internal/db"
-	"github.com/biomonash/nillumbik/internal/models"
+	"github.com/biomonash/forestportal/internal/db"
+	"github.com/biomonash/forestportal/internal/models"
 )
 
 type ObservationStatsInput struct {

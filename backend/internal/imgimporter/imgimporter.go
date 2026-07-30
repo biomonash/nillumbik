@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/forestportal/internal/db"
 )
 
 func ImportSpeciesImages(ctx context.Context, q *db.Queries, dir string) error {
