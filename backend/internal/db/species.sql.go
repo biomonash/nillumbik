@@ -160,12 +160,12 @@ JOIN
     ($1::timestamp IS NULL OR timestamp >= $1::timestamp)
     AND ($2::timestamp IS NULL OR timestamp <= $2::timestamp)
     AND (
-        $3::text IS NULL
-        OR site_code = $3::text
+        $3::text[] IS NULL
+        OR site_code = ANY($3)
       )
     AND (
-        $4::integer IS NULL
-        OR block = $4::integer
+        $4::integer[] IS NULL
+        OR block = ANY($4)
       )
     AND (
         $5::taxa IS NULL
@@ -178,11 +178,11 @@ ORDER BY observation_count DESC
 `
 
 type ListObservedSpeciesParams struct {
-	From     pgtype.Timestamp `json:"from"`
-	To       pgtype.Timestamp `json:"to"`
-	SiteCode *string          `json:"siteCode"`
-	Block    *int32           `json:"block"`
-	Taxa     NullTaxa         `json:"taxa"`
+	From      pgtype.Timestamp `json:"from"`
+	To        pgtype.Timestamp `json:"to"`
+	SiteCodes []string         `json:"siteCodes"`
+	Blocks    []int32          `json:"blocks"`
+	Taxa      NullTaxa         `json:"taxa"`
 }
 
 type ListObservedSpeciesRow struct {
@@ -204,8 +204,8 @@ func (q *Queries) ListObservedSpecies(ctx context.Context, arg ListObservedSpeci
 	rows, err := q.db.Query(ctx, listObservedSpecies,
 		arg.From,
 		arg.To,
-		arg.SiteCode,
-		arg.Block,
+		arg.SiteCodes,
+		arg.Blocks,
 		arg.Taxa,
 	)
 	if err != nil {

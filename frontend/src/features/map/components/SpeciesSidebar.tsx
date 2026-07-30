@@ -14,7 +14,7 @@ export default function SpeciesSidebar() {
       {/* Header */}
       <div className="p-4 border-b border-gray-200 bg-white">
         <h2 className="pt-4 fw-bold text-[16px] m-0 text-black">
-          {currentRegion ?? 'All'}
+          {currentRegion?.join(', ') ?? 'All'}
         </h2>
 
         <p className="text-xs text-gray-500 mt-1 m-0">
