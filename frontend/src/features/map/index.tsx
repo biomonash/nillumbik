@@ -9,12 +9,12 @@ function parseQuery(qs: string): MapQuery {
   const params = new URLSearchParams(qs)
   for (const [key, value] of params) {
     switch (key) {
-      case 'block':
-        query.blocks = Number(value)
+      case 'blocks':
+        query.blocks = value.split(',').map(Number)
         break
 
-      case 'site':
-        query.sites = value
+      case 'sites':
+        query.sites = value.split(',')
         break
 
       case 'taxa':
