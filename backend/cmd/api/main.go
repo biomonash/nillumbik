@@ -10,9 +10,9 @@ import (
 
 	// swagger embed files
 	// gin-swagger middleware
-	_ "github.com/biomonash/nillumbik/docs"
-	"github.com/biomonash/nillumbik/internal/db"
-	"github.com/biomonash/nillumbik/internal/server"
+	_ "github.com/biomonash/forestportal/docs"
+	"github.com/biomonash/forestportal/internal/db"
+	"github.com/biomonash/forestportal/internal/server"
 )
 
 func init() {

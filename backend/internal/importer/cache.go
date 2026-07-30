@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/forestportal/internal/db"
 )
 
 type ImporterCache struct {
