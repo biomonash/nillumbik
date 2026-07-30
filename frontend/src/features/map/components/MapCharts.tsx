@@ -37,10 +37,12 @@ function extractSortedBlocks(data: number[]): ChartInput[] {
 
 function extractSortedSites(
   data: Site[],
-  selectedBlock?: number,
+  selectedBlocks?: number[],
 ): ChartInput[] {
   const sorted = data
-    .filter((site) => (selectedBlock ? site.block === selectedBlock : true))
+    .filter((site) =>
+      selectedBlocks ? selectedBlocks.includes(site.block) : true,
+    )
     .map((site) => ({ value: site.code, label: `Site ${site.name}` }))
   return [{ value: 'all', label: 'All Sites' }, ...sorted]
 }
@@ -86,7 +88,7 @@ const MapCharts: React.FC = () => {
     extractSortedBlocks(state.map.blocks),
   )
   const siteOptions = useAppSelector((state) =>
-    extractSortedSites(state.map.sites, state.map.query.block),
+    extractSortedSites(state.map.sites, state.map.query.blocks),
   )
   const speciesOptions = useAppSelector((state) =>
     extractSpeciesOptions(state.map.species, state.map.query.taxa),
@@ -153,7 +155,7 @@ const MapCharts: React.FC = () => {
             options={blockOptions}
             value={selectedBlock ? String(selectedBlock) : 'all'}
             onChange={(z) =>
-              dispatch(updateSelectedBlock(z === 'all' ? null : z))
+              dispatch(updateSelectedBlock(z === 'all' ? [] : [z]))
             }
             placeholder="Select Block"
             className="w-full"
@@ -165,9 +167,9 @@ const MapCharts: React.FC = () => {
           </span>
           <Select
             options={siteOptions}
-            value={selectedSite ?? 'all'}
+            value={selectedSite?.join(', ') ?? 'all'}
             onChange={(s) =>
-              dispatch(updateSelectedSite(s === 'all' ? null : s))
+              dispatch(updateSelectedSite(s === 'all' ? [] : [s]))
             }
             placeholder="Select Site"
             className="w-full"

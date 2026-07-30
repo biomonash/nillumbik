@@ -10,8 +10,8 @@ import { getObservedSpecies, getSpeciesList } from '../apis/species.api'
 import type { ObservedSpecies, Site, Species } from '../types'
 
 export type MapQuery = Partial<{
-  block: number
-  site: string
+  blocks: number[]
+  sites: string[]
   taxa: string
   species: string
 }>
@@ -52,18 +52,20 @@ const mapSlice = createSlice({
   reducers: {
     setMode(state, action: PayloadAction<'block' | 'site'>) {
       state.mode = action.payload
-      state.query.block = undefined
-      state.query.site = undefined
+      state.query.blocks = undefined
+      state.query.sites = undefined
     },
     setQuery(state, action: PayloadAction<MapQuery>) {
       state.query = action.payload
     },
-    setSelectedSite(state, action: PayloadAction<string | null>) {
-      state.query.site = action.payload ?? undefined
+    setSelectedSite(state, action: PayloadAction<string[] | null>) {
+      state.query.sites = action.payload ?? undefined
     },
-    setSelectedBlock(state, action: PayloadAction<string | null>) {
-      state.query.block = action.payload ? Number(action.payload) : undefined
-      state.query.site = undefined
+    setSelectedBlock(state, action: PayloadAction<string[] | null>) {
+      state.query.blocks = action.payload
+        ? action.payload.map(Number)
+        : undefined
+      state.query.sites = undefined
     },
     setSelectedTaxa(state, action: PayloadAction<string | null>) {
       state.query.taxa = action.payload ?? undefined
@@ -132,7 +134,7 @@ const {
 function updateQuery() {
   console.log('update qeury')
   return (dispatch: AppDispatch, getState: () => RootState) => {
-    const { block, site, taxa, species } = getState().map.query
+    const { blocks: block, sites: site, taxa, species } = getState().map.query
     const params = {
       block,
       siteCode: site,
@@ -183,16 +185,17 @@ export function updateMode(mode: 'site' | 'block') {
   }
 }
 
-export function updateSelectedSite(site: string | null) {
+export function updateSelectedSite(sites: string[] | null) {
+  console.log('sites', sites)
   return (dispatch: AppDispatch) => {
-    dispatch(setSelectedSite(site))
+    dispatch(setSelectedSite(sites))
     dispatch(updateQuery())
   }
 }
 
-export function updateSelectedBlock(block: string | null) {
+export function updateSelectedBlock(blocks: string[] | null) {
   return (dispatch: AppDispatch) => {
-    dispatch(setSelectedBlock(block))
+    dispatch(setSelectedBlock(blocks))
     dispatch(updateQuery())
   }
 }
@@ -220,13 +223,13 @@ export function resetFilters() {
 
 export const selectMode = (state: RootState) => state.map.mode
 export const selectQuery = (state: RootState) => state.map.query
-export const selectBlock = (state: RootState) => state.map.query.block
-export const selectSite = (state: RootState) => state.map.query.site
+export const selectBlock = (state: RootState) => state.map.query.blocks
+export const selectSite = (state: RootState) => state.map.query.sites
 export const selectCurrentRegion = (state: RootState): string | undefined =>
   state.map.mode === 'site'
-    ? state.map.query.site
-    : state.map.query.block
-      ? String(state.map.query.block)
+    ? state.map.query.sites?.join(', ')
+    : state.map.query.blocks
+      ? String(state.map.query.blocks)
       : undefined
 export const selectTaxa = (state: RootState) => state.map.query.taxa
 export const selectSpecies = (state: RootState) => state.map.query.species

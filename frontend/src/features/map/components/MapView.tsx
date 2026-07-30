@@ -320,9 +320,9 @@ export default function MapView() {
                 const block = String(feature.properties.block)
                 const isAlreadySelected = currentRegion === id
                 if (mode === 'block') {
-                  dispatch(updateSelectedBlock(block))
+                  dispatch(updateSelectedBlock([block]))
                 } else {
-                  dispatch(updateSelectedSite(isAlreadySelected ? null : id))
+                  dispatch(updateSelectedSite(isAlreadySelected ? null : [id]))
                 }
                 // On mobile: open drawer and switch to species tab
                 if (!isDesktop) {
