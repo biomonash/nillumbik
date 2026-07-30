@@ -15,9 +15,9 @@ import (
 )
 
 type ObservedSpeciesRequest struct {
-	SiteCode *string `form:"siteCode"`
-	Block    *int32  `form:"block"`
-	Taxa     *string `form:"taxa"`
+	SiteCodes []string `form:"siteCode[]"`
+	Blocks    []int32  `form:"block[]"`
+	Taxa      *string  `form:"taxa"`
 	models.TimePeriodRequest
 }
 
@@ -122,11 +122,11 @@ func (u *Controller) GetSpeciesByCommonName(c *gin.Context) {
 //	@Summary		List observed species
 //	@Description	List species observed within a date range, optionally filtered by site
 //	@Tags			species
-//	@Param			siteCode	query	string	false	"Site code"
-//	@Param			block		query	int		false	"Block number"
-//	@Param			taxa		query	string	false	"Taxa"
-//	@Param			from		query	string	false	"Start timestamp (RFC3339 format)"
-//	@Param			to			query	string	false	"End timestamp (RFC3339 format)"
+//	@Param			siteCode	query	[]string	false	"Site code"		collectionFormat(multi)
+//	@Param			block		query	[]int		false	"Block number"	collectionFormat(multi)
+//	@Param			taxa		query	string		false	"Taxa"
+//	@Param			from		query	string		false	"Start timestamp (RFC3339 format)"
+//	@Param			to			query	string		false	"End timestamp (RFC3339 format)"
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{object}	ObservedSpeciesResponse
@@ -149,11 +149,11 @@ func (u *Controller) GetObservedSpecies(c *gin.Context) {
 
 	//Call DB query
 	rows, err := u.q.ListObservedSpecies(c.Request.Context(), db.ListObservedSpeciesParams{
-		From:     req.From.ToPGTime(),
-		To:       req.To.ToPGTime(),
-		SiteCode: req.SiteCode, // empty string means no filtering
-		Block:    req.Block,
-		Taxa:     taxa,
+		From:      req.From.ToPGTime(),
+		To:        req.To.ToPGTime(),
+		SiteCodes: req.SiteCodes, // empty string means no filtering
+		Blocks:    req.Blocks,
+		Taxa:      taxa,
 	})
 	if err != nil {
 		c.Error(fmt.Errorf("failed to list observed species: %w", err))

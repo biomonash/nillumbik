@@ -7,8 +7,8 @@ import (
 
 type ObservationStatsInput struct {
 	models.TimePeriodRequest
-	Block      *int32   `form:"block"`
-	SiteCode   *string  `form:"siteCode"`
+	Blocks     []int32  `form:"block[]"`
+	SiteCodes  []string `form:"siteCode[]"`
 	Taxa       *db.Taxa `form:"taxa"`
 	CommonName *string  `form:"commonName"`
 }

@@ -10,11 +10,11 @@ function parseQuery(qs: string): MapQuery {
   for (const [key, value] of params) {
     switch (key) {
       case 'block':
-        query.block = Number(value)
+        query.blocks = Number(value)
         break
 
       case 'site':
-        query.site = value
+        query.sites = value
         break
 
       case 'taxa':

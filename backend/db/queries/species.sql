@@ -69,12 +69,12 @@ JOIN
     (sqlc.narg('from')::timestamp IS NULL OR timestamp >= sqlc.narg('from')::timestamp)
     AND (sqlc.narg('to')::timestamp IS NULL OR timestamp <= sqlc.narg('to')::timestamp)
     AND (
-        sqlc.narg('site_code')::text IS NULL
-        OR site_code = sqlc.narg('site_code')::text
+        sqlc.narg('site_codes')::text[] IS NULL
+        OR site_code = ANY(sqlc.narg('site_codes'))
       )
     AND (
-        sqlc.narg('block')::integer IS NULL
-        OR block = sqlc.narg('block')::integer
+        sqlc.narg('blocks')::integer[] IS NULL
+        OR block = ANY(sqlc.narg('blocks'))
       )
     AND (
         sqlc.narg('taxa')::taxa IS NULL

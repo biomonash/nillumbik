@@ -415,14 +415,20 @@ paths:
       description: List species observed within a date range, optionally filtered
         by site
       parameters:
-      - description: Site code
+      - collectionFormat: multi
+        description: Site code
         in: query
+        items:
+          type: string
         name: siteCode
-        type: string
-      - description: Block number
+        type: array
+      - collectionFormat: multi
+        description: Block number
         in: query
+        items:
+          type: integer
         name: block
-        type: integer
+        type: array
       - description: Taxa
         in: query
         name: taxa
@@ -487,14 +493,20 @@ paths:
         in: query
         name: to
         type: string
-      - description: Filter by site block
+      - collectionFormat: multi
+        description: Filter by site block
         in: query
+        items:
+          type: integer
         name: block
-        type: integer
-      - description: Filter by site code
+        type: array
+      - collectionFormat: multi
+        description: Filter by site code
         in: query
+        items:
+          type: string
         name: siteCode
-        type: string
+        type: array
       - description: Filter by taxa
         in: query
         name: taxa
@@ -529,14 +541,20 @@ paths:
         in: query
         name: to
         type: string
-      - description: Filter by site block
+      - collectionFormat: multi
+        description: Filter by site block
         in: query
+        items:
+          type: integer
         name: block
-        type: integer
-      - description: Filter by site code
+        type: array
+      - collectionFormat: multi
+        description: Filter by site code
         in: query
+        items:
+          type: string
         name: siteCode
-        type: string
+        type: array
       - description: Filter by taxa
         in: query
         name: taxa
@@ -571,14 +589,20 @@ paths:
         in: query
         name: to
         type: string
-      - description: Filter by site block
+      - collectionFormat: multi
+        description: Filter by site block
         in: query
+        items:
+          type: integer
         name: block
-        type: integer
-      - description: Filter by site code
+        type: array
+      - collectionFormat: multi
+        description: Filter by site code
         in: query
+        items:
+          type: string
         name: siteCode
-        type: string
+        type: array
       - description: Filter by taxa
         in: query
         name: taxa
@@ -613,14 +637,20 @@ paths:
         in: query
         name: to
         type: string
-      - description: Filter by site block
+      - collectionFormat: multi
+        description: Filter by site block
         in: query
+        items:
+          type: integer
         name: block
-        type: integer
-      - description: Filter by site code
+        type: array
+      - collectionFormat: multi
+        description: Filter by site code
         in: query
+        items:
+          type: string
         name: siteCode
-        type: string
+        type: array
       - description: Filter by taxa
         in: query
         name: taxa
