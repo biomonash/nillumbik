@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/biomonash/nillumbik/internal/db"
+	"github.com/biomonash/forestportal/internal/db"
 )
 
 func parseObservation(i int, row []string, siteID, speciesID int64) (param db.CreateObservationsParams, err error) {

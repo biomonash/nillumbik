@@ -1,8 +1,8 @@
 package stats
 
 import (
-	"github.com/biomonash/nillumbik/internal/db"
-	"github.com/biomonash/nillumbik/internal/species"
+	"github.com/biomonash/forestportal/internal/db"
+	"github.com/biomonash/forestportal/internal/species"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
