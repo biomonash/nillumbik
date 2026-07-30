@@ -8,7 +8,7 @@ import {
 } from 'react-leaflet'
 import { useEffect, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
-import { divIcon } from 'leaflet'
+import { divIcon, type LeafletMouseEvent } from 'leaflet'
 import { useUserLocation } from '../../../hooks/useUserLocation'
 import { findSiteForLocation } from '../../../helpers/siteLocation'
 import type {
@@ -296,7 +296,7 @@ export default function MapView() {
                 mode === 'site'
                   ? feature?.properties?.site
                   : String(feature?.properties?.block)
-              const isSelected = currentRegion === id
+              const isSelected = currentRegion?.includes(id)
               const isHovered = hoveredZone === id
               return {
                 color: isSelected ? '#b45309' : 'green',
@@ -316,13 +316,21 @@ export default function MapView() {
                   : String(feature.properties.block)
               layer.on('mouseover', () => setHoveredZone(id))
               layer.on('mouseout', () => setHoveredZone(null))
-              layer.on('click', () => {
-                const block = String(feature.properties.block)
-                const isAlreadySelected = currentRegion === id
-                if (mode === 'block') {
-                  dispatch(updateSelectedBlock([block]))
+              layer.on('click', (e: LeafletMouseEvent) => {
+                const multiselect = e.originalEvent.shiftKey
+                const isAlreadySelected = currentRegion?.includes(id)
+                let newSelection = []
+                if (multiselect) {
+                  newSelection = isAlreadySelected
+                    ? (currentRegion?.filter((region) => region !== id) ?? [])
+                    : [...(currentRegion ?? []), id]
                 } else {
-                  dispatch(updateSelectedSite(isAlreadySelected ? null : [id]))
+                  newSelection = isAlreadySelected ? [] : [id]
+                }
+                if (mode === 'block') {
+                  dispatch(updateSelectedBlock(newSelection))
+                } else {
+                  dispatch(updateSelectedSite(newSelection))
                 }
                 // On mobile: open drawer and switch to species tab
                 if (!isDesktop) {
