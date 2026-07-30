@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/biomonash/nillumbik/internal/config"
+	"github.com/biomonash/forestportal/internal/config"
 )
 
 // --- Helpers ---

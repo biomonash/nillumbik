@@ -1,4 +1,4 @@
-module github.com/biomonash/nillumbik
+module github.com/biomonash/forestportal
 
 go 1.24.6
 

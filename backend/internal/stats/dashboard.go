@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/biomonash/nillumbik/internal/db"
-	"github.com/biomonash/nillumbik/internal/models"
-	"github.com/biomonash/nillumbik/internal/utils"
+	"github.com/biomonash/forestportal/internal/db"
+	"github.com/biomonash/forestportal/internal/models"
+	"github.com/biomonash/forestportal/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
