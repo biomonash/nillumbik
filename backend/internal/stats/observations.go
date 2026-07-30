@@ -2,6 +2,7 @@ package stats
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -37,14 +38,14 @@ type ObservationTimeSeriesResponse struct {
 //	@Tags			statistics
 //	@Accept			json
 //	@Produce		json
-//	@Param			from		query		string	False	"Search start from"	format(date-time)
-//	@Param			to			query		string	False	"Search end to"		format(date-time)
-//	@Param			block		query		integer	False	"Filter by site block"
-//	@Param			siteCode	query		string	False	"Filter by site code"
-//	@Param			taxa		query		string	False	"Filter by taxa"
-//	@Param			commonName	query		string	False	"Filter by species common_name"
+//	@Param			from		query		string		False	"Search start from"		format(date-time)
+//	@Param			to			query		string		False	"Search end to"			format(date-time)
+//	@Param			block		query		[]integer	False	"Filter by site block"	collectionFormat(multi)
+//	@Param			siteCode	query		[]string	False	"Filter by site code"	collectionFormat(multi)
+//	@Param			taxa		query		string		False	"Filter by taxa"
+//	@Param			commonName	query		string		False	"Filter by species common_name"
 //	@Success		200			{object}	ObservationOverviewResponse
-//	@Error			400 																																																																							{object}	gin.H
+//	@Error			400 																																																																																									{object}	gin.H
 //	@Router			/stats/observations [get]
 func (u *Controller) ObservationOverview(c *gin.Context) {
 	var req ObservationOverviewRequest
@@ -60,11 +61,13 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 
 	from, to, taxa, commonName := parseObservationStatsInput(req.ObservationStatsInput)
 
+	log.Println(req.SiteCodes)
+
 	paramsNative := db.CountSpeciesByNativeParams{
 		From:       from,
 		To:         to,
-		Block:      req.Block,
-		SiteCode:   req.SiteCode,
+		Blocks:     req.Blocks,
+		SiteCodes:  req.SiteCodes,
 		Taxa:       taxa,
 		CommonName: commonName,
 	}
@@ -85,8 +88,8 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 	params := db.ListSpeciesCountByTaxaParams{
 		From:       from,
 		To:         to,
-		Block:      req.Block,
-		SiteCode:   req.SiteCode,
+		Blocks:     req.Blocks,
+		SiteCodes:  req.SiteCodes,
 		Taxa:       taxa,
 		CommonName: commonName,
 	}
@@ -110,14 +113,14 @@ func (u *Controller) ObservationOverview(c *gin.Context) {
 //	@Tags			statistics
 //	@Accept			json
 //	@Produce		json
-//	@Param			from		query		string	False	"Search start from"	format(date-time)
-//	@Param			to			query		string	False	"Search end to"		format(date-time)
-//	@Param			block		query		integer	False	"Filter by site block"
-//	@Param			siteCode	query		string	False	"Filter by site code"
-//	@Param			taxa		query		string	False	"Filter by taxa"
-//	@Param			commonName	query		string	False	"Filter by species common name"
+//	@Param			from		query		string		False	"Search start from"		format(date-time)
+//	@Param			to			query		string		False	"Search end to"			format(date-time)
+//	@Param			block		query		[]integer	False	"Filter by site block"	collectionFormat(multi)
+//	@Param			siteCode	query		[]string	False	"Filter by site code"	collectionFormat(multi)
+//	@Param			taxa		query		string		False	"Filter by taxa"
+//	@Param			commonName	query		string		False	"Filter by species common name"
 //	@Success		200			{object}	ObservationTimeSeriesResponse
-//	@Error			400 																																																														{object}	gin.H
+//	@Error			400 																																																																																{object}	gin.H
 //	@Router			/stats/observations/timeseries [get]
 func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 	var req ObservationTimeSeriesRequest
@@ -133,8 +136,8 @@ func (u *Controller) ObservationTimeSeries(c *gin.Context) {
 	params := db.ObservationTimeSeriesGroupByNativeParams{
 		From:       from,
 		To:         to,
-		Block:      req.Block,
-		SiteCode:   req.SiteCode,
+		Blocks:     req.Blocks,
+		SiteCodes:  req.SiteCodes,
 		Taxa:       taxa,
 		CommonName: commonName,
 	}

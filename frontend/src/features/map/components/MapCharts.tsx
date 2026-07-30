@@ -25,6 +25,7 @@ import {
   updateSelectedSpecies,
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
+import Badge from '../../../components/ui/Badge'
 
 function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
@@ -37,10 +38,12 @@ function extractSortedBlocks(data: number[]): ChartInput[] {
 
 function extractSortedSites(
   data: Site[],
-  selectedBlock?: number,
+  selectedBlocks?: number[],
 ): ChartInput[] {
   const sorted = data
-    .filter((site) => (selectedBlock ? site.block === selectedBlock : true))
+    .filter((site) =>
+      selectedBlocks ? selectedBlocks.includes(site.block) : true,
+    )
     .map((site) => ({ value: site.code, label: `Site ${site.name}` }))
   return [{ value: 'all', label: 'All Sites' }, ...sorted]
 }
@@ -86,7 +89,7 @@ const MapCharts: React.FC = () => {
     extractSortedBlocks(state.map.blocks),
   )
   const siteOptions = useAppSelector((state) =>
-    extractSortedSites(state.map.sites, state.map.query.block),
+    extractSortedSites(state.map.sites, state.map.query.blocks),
   )
   const speciesOptions = useAppSelector((state) =>
     extractSpeciesOptions(state.map.species, state.map.query.taxa),
@@ -149,11 +152,38 @@ const MapCharts: React.FC = () => {
           <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
             Block
           </span>
+          {selectedBlock && selectedBlock.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+              {selectedBlock.map((block) => (
+                <Badge key={block} className="gap-1 pr-1.5 bg-sidebar">
+                  {block}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      dispatch(
+                        updateSelectedBlock(
+                          selectedBlock.filter((s) => s !== block).map(String),
+                        ),
+                      )
+                    }
+                    aria-label={`Remove ${block}`}
+                    className="flex items-center justify-center rounded-full hover:bg-black/10 w-3.5 h-3.5 leading-none"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
           <Select
             options={blockOptions}
             value={selectedBlock ? String(selectedBlock) : 'all'}
             onChange={(z) =>
-              dispatch(updateSelectedBlock(z === 'all' ? null : z))
+              dispatch(
+                updateSelectedBlock(
+                  z === 'all' ? [] : [...(selectedBlock ?? []).map(String), z],
+                ),
+              )
             }
             placeholder="Select Block"
             className="w-full"
@@ -163,11 +193,38 @@ const MapCharts: React.FC = () => {
           <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
             Site
           </span>
+          {selectedSite && selectedSite.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+              {selectedSite.map((site) => (
+                <Badge key={site} className="gap-1 pr-1.5 bg-sidebar">
+                  {site}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      dispatch(
+                        updateSelectedSite(
+                          selectedSite.filter((s) => s !== site),
+                        ),
+                      )
+                    }
+                    aria-label={`Remove ${site}`}
+                    className="flex items-center justify-center rounded-full hover:bg-black/10 w-3.5 h-3.5 leading-none"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
           <Select
             options={siteOptions}
-            value={selectedSite ?? 'all'}
+            value={selectedSite?.join(', ') ?? 'all'}
             onChange={(s) =>
-              dispatch(updateSelectedSite(s === 'all' ? null : s))
+              dispatch(
+                updateSelectedSite(
+                  s === 'all' ? [] : [...(selectedSite ?? []), s],
+                ),
+              )
             }
             placeholder="Select Site"
             className="w-full"

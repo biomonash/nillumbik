@@ -55,8 +55,8 @@ SELECT native AS is_native, COUNT(DISTINCT species_id) AS species_count, COUNT(*
 FROM observations_with_details
 WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
-  AND ($3::int IS NULL OR block = $3::int)
-  AND ($4::text IS NULL OR site_code = $4)
+  AND ($3::int[] IS NULL OR block = ANY($3))
+  AND ($4::text[] IS NULL OR site_code = ANY($4))
   AND ($5::taxa IS NULL OR taxa = $5::taxa)
   AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
 GROUP BY native
@@ -65,8 +65,8 @@ GROUP BY native
 type CountSpeciesByNativeParams struct {
 	From       pgtype.Timestamp `json:"from"`
 	To         pgtype.Timestamp `json:"to"`
-	Block      *int32           `json:"block"`
-	SiteCode   *string          `json:"siteCode"`
+	Blocks     []int32          `json:"blocks"`
+	SiteCodes  []string         `json:"siteCodes"`
 	Taxa       NullTaxa         `json:"taxa"`
 	CommonName *string          `json:"commonName"`
 }
@@ -81,8 +81,8 @@ func (q *Queries) CountSpeciesByNative(ctx context.Context, arg CountSpeciesByNa
 	rows, err := q.db.Query(ctx, countSpeciesByNative,
 		arg.From,
 		arg.To,
-		arg.Block,
-		arg.SiteCode,
+		arg.Blocks,
+		arg.SiteCodes,
 		arg.Taxa,
 		arg.CommonName,
 	)
@@ -109,8 +109,8 @@ SELECT taxa, COUNT(DISTINCT species_id) AS count
 FROM observations_with_details
 WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
-  AND ($3::int IS NULL OR block = $3::int)
-  AND ($4::text IS NULL OR site_code = $4)
+  AND ($3::int[] IS NULL OR block = ANY($3))
+  AND ($4::text[] IS NULL OR site_code = ANY($4))
   AND ($5::taxa IS NULL OR taxa = $5::taxa)
   AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
 GROUP BY taxa
@@ -119,8 +119,8 @@ GROUP BY taxa
 type ListSpeciesCountByTaxaParams struct {
 	From       pgtype.Timestamp `json:"from"`
 	To         pgtype.Timestamp `json:"to"`
-	Block      *int32           `json:"block"`
-	SiteCode   *string          `json:"siteCode"`
+	Blocks     []int32          `json:"blocks"`
+	SiteCodes  []string         `json:"siteCodes"`
 	Taxa       NullTaxa         `json:"taxa"`
 	CommonName *string          `json:"commonName"`
 }
@@ -134,8 +134,8 @@ func (q *Queries) ListSpeciesCountByTaxa(ctx context.Context, arg ListSpeciesCou
 	rows, err := q.db.Query(ctx, listSpeciesCountByTaxa,
 		arg.From,
 		arg.To,
-		arg.Block,
-		arg.SiteCode,
+		arg.Blocks,
+		arg.SiteCodes,
 		arg.Taxa,
 		arg.CommonName,
 	)
@@ -162,8 +162,8 @@ SELECT block, COUNT(DISTINCT species_id) AS species_count, COUNT(*) AS observati
 FROM observations_with_details
 WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
-  AND ($3::int IS NULL OR block = $3::int)
-  AND ($4::text IS NULL OR site_code = $4)
+  AND ($3::int[] IS NULL OR block = ANY($3))
+  AND ($4::text[] IS NULL OR site_code = ANY($4))
   AND ($5::taxa IS NULL OR taxa = $5::taxa)
   AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
 GROUP BY block
@@ -173,8 +173,8 @@ ORDER BY block
 type ObservationGroupByBlocksParams struct {
 	From       pgtype.Timestamp `json:"from"`
 	To         pgtype.Timestamp `json:"to"`
-	Block      *int32           `json:"block"`
-	SiteCode   *string          `json:"siteCode"`
+	Blocks     []int32          `json:"blocks"`
+	SiteCodes  []string         `json:"siteCodes"`
 	Taxa       NullTaxa         `json:"taxa"`
 	CommonName *string          `json:"commonName"`
 }
@@ -189,8 +189,8 @@ func (q *Queries) ObservationGroupByBlocks(ctx context.Context, arg ObservationG
 	rows, err := q.db.Query(ctx, observationGroupByBlocks,
 		arg.From,
 		arg.To,
-		arg.Block,
-		arg.SiteCode,
+		arg.Blocks,
+		arg.SiteCodes,
 		arg.Taxa,
 		arg.CommonName,
 	)
@@ -217,8 +217,8 @@ SELECT site_code, COUNT(DISTINCT species_id) AS species_count, COUNT(*) AS obser
 FROM observations_with_details
 WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
-  AND ($3::int IS NULL OR block = $3::int)
-  AND ($4::text IS NULL OR site_code = $4)
+  AND ($3::int[] IS NULL OR block = ANY($3)::int[])
+  AND ($4::text[] IS NULL OR site_code = ANY($4))
   AND ($5::taxa IS NULL OR taxa = $5::taxa)
   AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
 GROUP BY site_code
@@ -228,8 +228,8 @@ ORDER BY site_code
 type ObservationGroupBySitesParams struct {
 	From       pgtype.Timestamp `json:"from"`
 	To         pgtype.Timestamp `json:"to"`
-	Block      *int32           `json:"block"`
-	SiteCode   *string          `json:"siteCode"`
+	Blocks     []int32          `json:"blocks"`
+	SiteCodes  []string         `json:"siteCodes"`
 	Taxa       NullTaxa         `json:"taxa"`
 	CommonName *string          `json:"commonName"`
 }
@@ -244,8 +244,8 @@ func (q *Queries) ObservationGroupBySites(ctx context.Context, arg ObservationGr
 	rows, err := q.db.Query(ctx, observationGroupBySites,
 		arg.From,
 		arg.To,
-		arg.Block,
-		arg.SiteCode,
+		arg.Blocks,
+		arg.SiteCodes,
 		arg.Taxa,
 		arg.CommonName,
 	)
@@ -272,8 +272,8 @@ SELECT native as is_native, date_trunc('year', "timestamp")::timestamp AS year, 
 FROM observations_with_details
 WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
-  AND ($3::int IS NULL OR block = $3::int)
-  AND ($4::text IS NULL OR site_code = $4)
+  AND ($3::int[] IS NULL OR block = ANY($3))
+  AND ($4::text[] IS NULL OR site_code = ANY($4))
   AND ($5::taxa IS NULL OR taxa = $5::taxa)
   AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
 GROUP BY year, native
@@ -283,8 +283,8 @@ ORDER BY year
 type ObservationTimeSeriesGroupByNativeParams struct {
 	From       pgtype.Timestamp `json:"from"`
 	To         pgtype.Timestamp `json:"to"`
-	Block      *int32           `json:"block"`
-	SiteCode   *string          `json:"siteCode"`
+	Blocks     []int32          `json:"blocks"`
+	SiteCodes  []string         `json:"siteCodes"`
 	Taxa       NullTaxa         `json:"taxa"`
 	CommonName *string          `json:"commonName"`
 }
@@ -300,8 +300,8 @@ func (q *Queries) ObservationTimeSeriesGroupByNative(ctx context.Context, arg Ob
 	rows, err := q.db.Query(ctx, observationTimeSeriesGroupByNative,
 		arg.From,
 		arg.To,
-		arg.Block,
-		arg.SiteCode,
+		arg.Blocks,
+		arg.SiteCodes,
 		arg.Taxa,
 		arg.CommonName,
 	)
