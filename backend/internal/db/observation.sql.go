@@ -8,6 +8,8 @@ package db
 import (
 	"context"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const countObservations = `-- name: CountObservations :one
@@ -102,6 +104,125 @@ WHERE id = $1
 func (q *Queries) DeleteObservation(ctx context.Context, id int64) error {
 	_, err := q.db.Exec(ctx, deleteObservation, id)
 	return err
+}
+
+const exportObservations = `-- name: ExportObservations :many
+SELECT
+EXTRACT(YEAR FROM o."timestamp")::integer AS YEAR,
+si.code AS site,
+o."timestamp"::date AS date,
+o."timestamp"::time AS time,
+o.method,
+o.file,
+o.appearance_start,
+o.appearance_end,
+o.temperature,
+o.narrative,
+o.confidence,
+sp.scientific_name,
+sp.common_name,
+si.forest,
+sp.indicator,
+sp.native,
+si.tenure,
+sp.reportable,
+si.block,
+sp.taxa 
+FROM observations o 
+JOIN sites si ON o.site_id = si.id 
+JOIN species sp ON o.species_id = sp.id 
+WHERE (
+  ($1::timestamptz IS NULL OR o."timestamp" >= $1)
+  AND ($2::timestamptz IS NULL OR o."timestamp" <= $2)
+  AND ($3::integer[] IS NULL OR si.block = ANY($3))
+  AND ($4::text[] IS NULL OR si.code = ANY($4))
+  AND ($5::taxa IS NULL OR sp.taxa = $5)
+  AND ($6::text IS NULL OR sp.common_name = $6)
+  AND ($7::boolean IS NULL OR sp.native = $7)
+)
+ORDER BY o."timestamp"
+`
+
+type ExportObservationsParams struct {
+	Column1 pgtype.Timestamptz `json:"column1"`
+	Column2 pgtype.Timestamptz `json:"column2"`
+	Column3 []int32            `json:"column3"`
+	Column4 []string           `json:"column4"`
+	Column5 Taxa               `json:"column5"`
+	Column6 string             `json:"column6"`
+	Column7 bool               `json:"column7"`
+}
+
+type ExportObservationsRow struct {
+	Year            int32             `json:"year"`
+	Site            string            `json:"site"`
+	Date            pgtype.Date       `json:"date"`
+	Time            pgtype.Time       `json:"time"`
+	Method          ObservationMethod `json:"method"`
+	File            *string           `json:"file"`
+	AppearanceStart *int32            `json:"appearanceStart"`
+	AppearanceEnd   *int32            `json:"appearanceEnd"`
+	Temperature     *int32            `json:"temperature"`
+	Narrative       *string           `json:"narrative"`
+	Confidence      *float32          `json:"confidence"`
+	ScientificName  string            `json:"scientificName"`
+	CommonName      string            `json:"commonName"`
+	Forest          ForestType        `json:"forest"`
+	Indicator       bool              `json:"indicator"`
+	Native          bool              `json:"native"`
+	Tenure          TenureType        `json:"tenure"`
+	Reportable      bool              `json:"reportable"`
+	Block           int32             `json:"block"`
+	Taxa            Taxa              `json:"taxa"`
+}
+
+func (q *Queries) ExportObservations(ctx context.Context, arg ExportObservationsParams) ([]ExportObservationsRow, error) {
+	rows, err := q.db.Query(ctx, exportObservations,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.Column5,
+		arg.Column6,
+		arg.Column7,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ExportObservationsRow{}
+	for rows.Next() {
+		var i ExportObservationsRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.Site,
+			&i.Date,
+			&i.Time,
+			&i.Method,
+			&i.File,
+			&i.AppearanceStart,
+			&i.AppearanceEnd,
+			&i.Temperature,
+			&i.Narrative,
+			&i.Confidence,
+			&i.ScientificName,
+			&i.CommonName,
+			&i.Forest,
+			&i.Indicator,
+			&i.Native,
+			&i.Tenure,
+			&i.Reportable,
+			&i.Block,
+			&i.Taxa,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getObservation = `-- name: GetObservation :one

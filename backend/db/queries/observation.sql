@@ -71,3 +71,40 @@ JOIN sites s ON o.site_id = s.id
 JOIN species sp ON o.species_id = sp.id
 WHERE sp.scientific_name ILIKE $1 OR sp.common_name ILIKE $1 OR o.narrative ILIKE $1
 ORDER BY o.timestamp DESC;
+
+
+-- name: ExportObservations :many
+SELECT
+EXTRACT(YEAR FROM o."timestamp")::integer AS YEAR,
+si.code AS site,
+o."timestamp"::date AS date,
+o."timestamp"::time AS time,
+o.method,
+o.file,
+o.appearance_start,
+o.appearance_end,
+o.temperature,
+o.narrative,
+o.confidence,
+sp.scientific_name,
+sp.common_name,
+si.forest,
+sp.indicator,
+sp.native,
+si.tenure,
+sp.reportable,
+si.block,
+sp.taxa 
+FROM observations o 
+JOIN sites si ON o.site_id = si.id 
+JOIN species sp ON o.species_id = sp.id 
+WHERE (
+  ($1::timestamptz IS NULL OR o."timestamp" >= $1)
+  AND ($2::timestamptz IS NULL OR o."timestamp" <= $2)
+  AND ($3::integer[] IS NULL OR si.block = ANY($3))
+  AND ($4::text[] IS NULL OR si.code = ANY($4))
+  AND ($5::taxa IS NULL OR sp.taxa = $5)
+  AND ($6::text IS NULL OR sp.common_name = $6)
+  AND ($7::boolean IS NULL OR sp.native = $7)
+)
+ORDER BY o."timestamp";
