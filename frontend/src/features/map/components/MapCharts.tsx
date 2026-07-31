@@ -126,7 +126,7 @@ const MapCharts: React.FC = () => {
       )}
 
       {/* Header */}
-      <div className="flex relative justify-between items-center">
+      <div className="flex xs:flex-wrap relative justify-between items-center">
         <h1 className="text-black text-lg font-semibold tracking-tight">
           Zone Filter 🔎
         </h1>

@@ -48,6 +48,8 @@ export async function getObservationBlocks(
 export async function getObservationSites(
   params: Partial<ObservationStatsRequest> = {},
 ): Promise<GetObservationSitesResponse> {
+  console.log(params)
+
   const response = await fetcher.get<GetObservationSitesResponse>(
     '/stats/observations/sites',
     { params },
