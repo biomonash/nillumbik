@@ -1,14 +1,5 @@
-import {
-  MapContainer,
-  TileLayer,
-  GeoJSON,
-  Marker,
-  Popup,
-  useMap,
-} from 'react-leaflet'
 import { useEffect, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
-import { divIcon, type LeafletMouseEvent } from 'leaflet'
 import { useUserLocation } from '../../../hooks/useUserLocation'
 import { findSiteForLocation } from '../../../helpers/siteLocation'
 import type {
@@ -21,107 +12,25 @@ import {
   selectCurrentRegion,
   selectMode,
   updateMode,
-  updateSelectedBlock,
-  updateSelectedSite,
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
+import DesktopSidebar from './DesktopSidebar'
+import MapLayer from './MapLayer'
+import MobileDrawer from './MobileDrawer'
 
 const NAV_WIDTH = 80
-const LEFT_SIDEBAR_WIDTH = 320
-const RIGHT_SIDEBAR_WIDTH = 350
-
-const locationPin = divIcon({
-  html: "<span style='font-size: 32px; line-height: 1; display: block;'>📍</span>",
-  className: '',
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-})
-
-function FlyToUser({
-  coords,
-}: {
-  coords: { latitude: number; longitude: number } | null
-}) {
-  const map = useMap()
-  useEffect(() => {
-    if (coords) map.flyTo([coords.latitude, coords.longitude], 14)
-  }, [coords, map])
-  return null
-}
-
-interface MobileDrawerProps {
-  drawerOpen: boolean
-  setDrawerOpen: (open: boolean) => void
-  activeTab: 'species' | 'filters'
-  setActiveTab: (tab: 'species' | 'filters') => void
-}
-
-function MobileDrawer({
-  drawerOpen,
-  setDrawerOpen,
-  activeTab,
-  setActiveTab,
-}: MobileDrawerProps) {
-  const handleTabClick = (tab: 'species' | 'filters') => {
-    if (!drawerOpen) setDrawerOpen(true)
-    setActiveTab(tab)
-  }
-
-  return (
-    <div
-      className={`
-        fixed bottom-0 left-0 right-0 z-50
-        bg-[var(--muted-foreground2)] rounded-t-2xl shadow-xl
-        transition-transform duration-300 ease-in-out
-        ${drawerOpen ? 'translate-y-0' : 'translate-y-[calc(100%-56px)]'}
-      `}
-    >
-      <div className="flex items-center my-1 p-5 h-14 gap-2 select-none">
-        <button
-          onClick={() => handleTabClick('filters')}
-          className={`
-            flex-1 py-1.5 rounded-full text-xs font-semibold border-2 transition-all duration-200
-            ${
-              activeTab === 'filters'
-                ? 'bg-green-700 border-green-700 text-white'
-                : 'bg-transparent border-green-700 text-[var(--button)]'
-            }
-          `}
-        >
-          Zone Filter
-        </button>
-        <button
-          onClick={() => handleTabClick('species')}
-          className={`
-            flex-1 py-1.5 rounded-full text-xs font-semibold border-2 transition-all duration-200
-            ${
-              activeTab === 'species'
-                ? 'bg-green-700  border-green-700 text-white'
-                : 'bg-transparent border-green-700 text-[var(--button)]'
-            }
-          `}
-        >
-          Species
-        </button>
-
-        <i
-          onClick={() => setDrawerOpen(!drawerOpen)}
-          className={`text-gray-600 text-xs fa cursor-pointer px-1 ${
-            drawerOpen ? 'fa-angle-down' : 'fa-angle-up'
-          }`}
-        />
-      </div>
-
-      {/* Content */}
-      <div className="max-h-[65vh] overflow-y-auto px-4 pb-8">
-        {activeTab === 'species' ? <SpeciesSidebar /> : <MapCharts />}
-      </div>
-    </div>
-  )
-}
 
 export default function MapView() {
+  const [leftWidth, setLeftWidth] = useState(280)
+  const [rightWidth, setRightWidth] = useState(280)
+
+  const [leftCollapsed, setLeftCollapsed] = useState(false)
+  const [rightCollapsed, setRightCollapsed] = useState(false)
+
+  const actualLeftWidth = leftCollapsed ? 60 : leftWidth
+  const actualRightWidth = rightCollapsed ? 60 : rightWidth
   const [geoData, setGeoData] = useState<ZonesGeoJSON | null>(null)
+
   const mode = useAppSelector(selectMode)
   const dispatch = useAppDispatch()
   const [currentSite, setCurrentSite] = useState<SiteProperties | null>(null)
@@ -135,6 +44,10 @@ export default function MapView() {
   const [activeTab, setActiveTab] = useState<'species' | 'filters'>('species')
 
   const isDesktop = windowWidth >= 1024
+  const modes: { label: string; value: 'site' | 'block' }[] = [
+    { label: '30 Sites', value: 'site' },
+    { label: '5 Blocks', value: 'block' },
+  ]
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth)
@@ -163,48 +76,26 @@ export default function MapView() {
   }, [coords, geoData])
 
   return (
-    <div style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
+    <div className="relative h-screen overflow-hidden">
       <div
+        className="fixed top-20 z-40 flex flex-wrap gap-2 rounded-xl bg-white p-2 shadow-md transition-all max-w-[calc(100vw-2rem)]"
         style={{
-          position: 'fixed',
-          top: 80,
-          right: isDesktop ? RIGHT_SIDEBAR_WIDTH + 20 : 20,
-          zIndex: 40,
-          background: 'white',
-          padding: '8px',
-          borderRadius: '10px',
-          display: 'flex',
-          gap: '10px',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-          transition: 'right 0.3s ease',
+          right: isDesktop ? actualRightWidth + 20 : 20,
         }}
       >
-        <button
-          onClick={() => dispatch(updateMode('site'))}
-          style={{
-            padding: '6px 12px',
-            borderRadius: '6px',
-            border: '1px solid #ccc',
-            background: mode === 'site' ? 'green' : 'white',
-            color: mode === 'site' ? 'white' : 'black',
-            cursor: 'pointer',
-          }}
-        >
-          30 Sites
-        </button>
-        <button
-          onClick={() => dispatch(updateMode('block'))}
-          style={{
-            padding: '6px 12px',
-            borderRadius: '6px',
-            border: '1px solid #ccc',
-            background: mode === 'block' ? 'green' : 'white',
-            color: mode === 'block' ? 'white' : 'black',
-            cursor: 'pointer',
-          }}
-        >
-          5 Blocks
-        </button>
+        {modes.map(({ label, value }) => (
+          <button
+            key={value}
+            onClick={() => dispatch(updateMode(value))}
+            className={`flex-1 sm:flex-none rounded-md border px-3 py-2 text-sm sm:text-base transition ${
+              mode === value
+                ? 'border-green-700 bg-green-700 text-white'
+                : 'border-gray-300 bg-white text-black hover:bg-gray-50'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {/* ── Find My Location button ── */}
@@ -212,18 +103,9 @@ export default function MapView() {
         onClick={locate}
         disabled={loading}
         style={{
-          position: 'fixed',
-          bottom: isDesktop ? '30px' : '80px',
-          left: isDesktop ? NAV_WIDTH + LEFT_SIDEBAR_WIDTH + 20 : '90px',
-          zIndex: 40,
-          padding: '8px 16px',
-          color: 'darkgreen',
-          backgroundColor: 'white',
-          border: '2px solid darkgreen',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          transition: 'left 0.3s ease, bottom 0.3s ease',
+          left: isDesktop ? NAV_WIDTH + actualLeftWidth + 20 : '90px',
         }}
+        className="fixed z-40 bottom-20 lg:bottom-8 px-2 py-1 text-md text-green-900 bg-white border-2 border-green-900 rounded cursor-pointer transition-[left,bottom] duration-300"
       >
         {loading ? 'Locating...' : 'Find My Location'}
       </button>
@@ -231,21 +113,9 @@ export default function MapView() {
       {/* ── Location status banner ── */}
       {coords && (
         <div
-          style={{
-            position: 'fixed',
-            bottom: isDesktop ? '20px' : '130px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 40,
-            backgroundColor: 'white',
-            color: 'darkgreen',
-            padding: '10px 16px',
-            borderRadius: '8px',
-            border: '2px solid darkgreen',
-            transition: 'bottom 0.3s ease',
-            whiteSpace: 'nowrap',
-            fontSize: isDesktop ? '14px' : '12px',
-          }}
+          className={`fixed left-1/2 z-40 -translate-x-1/2 bg-white px-4 py-2.5 rounded-lg border-2 border-green-900 transition-[bottom] duration-300 whitespace-nowrap text-xs lg:text-sm bottom-[130px] lg:bottom-5 ${
+            currentSite ? 'text-green-900' : 'text-red-600'
+          }`}
         >
           {currentSite
             ? `You are in monitoring site: ${currentSite.site} (Block ${currentSite.block})`
@@ -256,115 +126,49 @@ export default function MapView() {
       {error && (
         <div
           style={{
-            position: 'fixed',
-            top: '140px',
-            right: isDesktop ? RIGHT_SIDEBAR_WIDTH + 20 : 20,
-            zIndex: 40,
-            color: 'red',
-            backgroundColor: 'white',
-            padding: '8px',
-            borderRadius: '4px',
-            transition: 'right 0.3s ease',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+            right: isDesktop ? actualRightWidth + 20 : 20,
           }}
+          className="fixed top-[140px] z-40 text-red-600 bg-white p-2 rounded shadow-[0_2px_6px_rgba(0,0,0,0.2)] transition-[right] duration-300"
         >
           {error}
         </div>
       )}
 
-      <MapContainer
-        key={mode}
-        center={[-37.6, 145.2]}
-        zoom={10}
-        style={{
-          height: '100vh',
-          width: '100%',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          zIndex: 0,
-        }}
-      >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <FlyToUser coords={coords} />
-        {geoData && (
-          <GeoJSON
-            key={`${mode}-${currentRegion}`}
-            data={geoData}
-            style={(feature) => {
-              const id =
-                mode === 'site'
-                  ? feature?.properties?.site
-                  : String(feature?.properties?.block)
-              const isSelected = currentRegion?.includes(id)
-              const isHovered = hoveredZone === id
-              return {
-                color: isSelected ? '#b45309' : 'green',
-                fillColor: isSelected
-                  ? '#f59e0b'
-                  : isHovered
-                    ? '#86efac'
-                    : 'green',
-                fillOpacity: isSelected ? 0.6 : isHovered ? 0.5 : 0.3,
-                weight: isSelected ? 3 : 2,
-              }
-            }}
-            onEachFeature={(feature, layer) => {
-              const id =
-                mode === 'site'
-                  ? feature.properties.site
-                  : String(feature.properties.block)
-              layer.on('mouseover', () => setHoveredZone(id))
-              layer.on('mouseout', () => setHoveredZone(null))
-              layer.on('click', (e: LeafletMouseEvent) => {
-                const multiselect = e.originalEvent.shiftKey
-                const isAlreadySelected = currentRegion?.includes(id)
-                let newSelection = []
-                if (multiselect) {
-                  newSelection = isAlreadySelected
-                    ? (currentRegion?.filter((region) => region !== id) ?? [])
-                    : [...(currentRegion ?? []), id]
-                } else {
-                  newSelection = isAlreadySelected ? [] : [id]
-                }
-                if (mode === 'block') {
-                  dispatch(updateSelectedBlock(newSelection))
-                } else {
-                  dispatch(updateSelectedSite(newSelection))
-                }
-                // On mobile: open drawer and switch to species tab
-                if (!isDesktop) {
-                  setActiveTab('species')
-                  setDrawerOpen(true)
-                }
-              })
-            }}
-          />
-        )}
-        {coords && (
-          <Marker
-            position={[coords.latitude, coords.longitude]}
-            icon={locationPin}
-          >
-            <Popup>You are here</Popup>
-          </Marker>
-        )}
-      </MapContainer>
+      <MapLayer
+        mode={mode}
+        geoData={geoData}
+        coords={coords}
+        currentRegion={currentRegion}
+        hoveredZone={hoveredZone}
+        isDesktop={isDesktop}
+        setHoveredZone={setHoveredZone}
+        setActiveTab={setActiveTab}
+        setDrawerOpen={setDrawerOpen}
+      />
 
       {isDesktop && (
-        <div className="fixed left-[80px] top-14 h-screen w-[320px] bg-white z-50 flex flex-col shadow-xl">
-          <div className="flex-1 overflow-y-auto">
-            <SpeciesSidebar />
-          </div>
-        </div>
+        <DesktopSidebar
+          side="left"
+          width={leftWidth}
+          collapsed={leftCollapsed}
+          setWidth={setLeftWidth}
+          setCollapsed={setLeftCollapsed}
+          navWidth={NAV_WIDTH}
+        >
+          <SpeciesSidebar />
+        </DesktopSidebar>
       )}
 
       {isDesktop && (
-        <div className="fixed right-0 top-0 h-screen w-[350px] bg-[var(--muted-foreground2)] z-50 flex flex-col shadow-xl">
-          <div className="flex-1 overflow-y-auto p-2 pt-14">
-            <MapCharts />
-          </div>
-        </div>
+        <DesktopSidebar
+          side="right"
+          width={rightWidth}
+          collapsed={rightCollapsed}
+          setWidth={setRightWidth}
+          setCollapsed={setRightCollapsed}
+        >
+          <MapCharts />
+        </DesktopSidebar>
       )}
 
       {!isDesktop && (
