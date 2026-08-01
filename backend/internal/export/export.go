@@ -17,11 +17,11 @@ import (
 
 type ExportRequest struct {
 	models.TimePeriodRequest
-	Blocks []int32 `form:"block[]"`
-	SiteCodes []string `form:"sitecode[]"`
-	Taxa *db.Taxa `form:"taxa"`
-	CommonName *string `form:"commonName"`
-	Native *bool `form:"native"`
+	Blocks     []int32  `form:"block[]"`
+	SiteCodes  []string `form:"sitecode[]"`
+	Taxa       *db.Taxa `form:"taxa"`
+	CommonName *string  `form:"commonName"`
+	Native     *bool    `form:"native"`
 }
 
 // ExportCSV godoc
@@ -30,10 +30,10 @@ type ExportRequest struct {
 //	@Description	Export filtered observations as a downloadable CSV file
 //	@Tags			export
 //	@Produce		text/csv
-//	@Param			from		query	string		false	"Search start from"			format(date-time)
-//	@Param			to			query	string		false	"Search end to"				format(date-time)
-//	@Param			block		query	[]integer	false	"Filter by site block"		collectionFormat(multi)
-//	@Param			siteCode	query	[]string	false	"Filter by site code"		collectionFormat(multi)
+//	@Param			from		query	string		false	"Search start from"		format(date-time)
+//	@Param			to			query	string		false	"Search end to"			format(date-time)
+//	@Param			block		query	[]integer	false	"Filter by site block"	collectionFormat(multi)
+//	@Param			siteCode	query	[]string	false	"Filter by site code"	collectionFormat(multi)
 //	@Param			taxa		query	string		false	"Filter by taxa"
 //	@Param			commonName	query	string		false	"Filter by species common name"
 //	@Param			native		query	boolean		false	"Filter by native status"
@@ -41,7 +41,7 @@ type ExportRequest struct {
 //	@Error			400			{object}	gin.H
 //	@Router			/export [get]
 func (u *Controller) ExportCSV(c *gin.Context) {
-	var req ExportRequest 
+	var req ExportRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
 		c.Error(utils.NewHttpError(http.StatusBadRequest, "failed to parse input", err))
 		return
@@ -55,19 +55,18 @@ func (u *Controller) ExportCSV(c *gin.Context) {
 	}
 
 	params := db.ExportObservationsParams{
-		From: req.From.ToPGTime(),
-		To: req.To.ToPGTime(),
-		Blocks: req.Blocks,
-		SiteCodes: req.SiteCodes,
-		Taxa: taxa,
+		From:       req.From.ToPGTime(),
+		To:         req.To.ToPGTime(),
+		Blocks:     req.Blocks,
+		SiteCodes:  req.SiteCodes,
+		Taxa:       taxa,
 		CommonName: species.CleanOptionalName(req.CommonName),
-		Native: req.Native,
-
+		Native:     req.Native,
 	}
 
-	rows, err := u.q.ExportObservations (ctx, params)
+	rows, err := u.q.ExportObservations(ctx, params)
 	if err != nil {
-		c.Error (fmt.Errorf ("failed to export observations: %w", err))
+		c.Error(fmt.Errorf("failed to export observations: %w", err))
 		return
 	}
 
@@ -79,7 +78,7 @@ func (u *Controller) ExportCSV(c *gin.Context) {
 
 	writer.Write([]string{
 		"Year", "Site", "Lat", "Lon", "Date", "Time", "Method", "File", "Start (s)", "End (s)", "Temp",
-		"Narrative", "Image Path", "Confidence", "Scientific name", "Common name", "Forest type", "Indicator", 
+		"Narrative", "Image Path", "Confidence", "Scientific name", "Common name", "Forest type", "Indicator",
 		"Native", "Tenure", "Reportable", "Block", "Taxa",
 	})
 
@@ -92,8 +91,8 @@ func (u *Controller) ExportCSV(c *gin.Context) {
 		timeStr := ""
 		if row.Time.Valid {
 			totalSeconds := row.Time.Microseconds / 1_000_000
-			h := totalSeconds / 3600 
-			m := (totalSeconds % 3600) /60 
+			h := totalSeconds / 3600
+			m := (totalSeconds % 3600) / 60
 			t := time.Date(0, 0, 0, int(h), int(m), 0, 0, time.UTC)
 			timeStr = t.Format("3:04 PM")
 		}
@@ -125,9 +124,9 @@ func (u *Controller) ExportCSV(c *gin.Context) {
 		})
 
 	}
-	
+
 	writer.Flush()
-}	
+}
 
 func getFilename(req ExportRequest) string {
 	parts := []string{"nillumbik"}

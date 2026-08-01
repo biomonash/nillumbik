@@ -3,11 +3,11 @@ package server
 import (
 	"github.com/biomonash/forestportal/assets"
 	"github.com/biomonash/forestportal/internal/db"
+	"github.com/biomonash/forestportal/internal/export"
 	"github.com/biomonash/forestportal/internal/observation"
 	"github.com/biomonash/forestportal/internal/site"
 	"github.com/biomonash/forestportal/internal/species"
 	"github.com/biomonash/forestportal/internal/stats"
-	"github.com/biomonash/forestportal/internal/export"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"

@@ -261,6 +261,54 @@ info:
   title: Nillubim Shire API
   version: "1.0"
 paths:
+  /export:
+    get:
+      description: Export filtered observations as a downloadable CSV file
+      parameters:
+      - description: Search start from
+        format: date-time
+        in: query
+        name: from
+        type: string
+      - description: Search end to
+        format: date-time
+        in: query
+        name: to
+        type: string
+      - collectionFormat: multi
+        description: Filter by site block
+        in: query
+        items:
+          type: integer
+        name: block
+        type: array
+      - collectionFormat: multi
+        description: Filter by site code
+        in: query
+        items:
+          type: string
+        name: siteCode
+        type: array
+      - description: Filter by taxa
+        in: query
+        name: taxa
+        type: string
+      - description: Filter by species common name
+        in: query
+        name: commonName
+        type: string
+      - description: Filter by native status
+        in: query
+        name: native
+        type: boolean
+      produces:
+      - text/csv
+      responses:
+        "200":
+          description: OK
+      summary: Export observations as CSV
+      tags:
+      - export
   /observations:
     get:
       consumes:

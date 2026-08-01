@@ -23,6 +23,7 @@ type Querier interface {
 	DeleteSite(ctx context.Context, id int64) error
 	DeleteSiteByCode(ctx context.Context, code string) error
 	DeleteSpecies(ctx context.Context, id int64) error
+	ExportObservations(ctx context.Context, arg ExportObservationsParams) ([]ExportObservationsRow, error)
 	GetObservation(ctx context.Context, id int64) (Observation, error)
 	GetSite(ctx context.Context, id int64) (Site, error)
 	GetSiteByCode(ctx context.Context, code string) (Site, error)
