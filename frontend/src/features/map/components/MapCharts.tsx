@@ -119,7 +119,7 @@ const MapCharts: React.FC = () => {
     }
     if (selectedTaxa) params.append('taxa', selectedTaxa)
     if (selectedSpecies) params.append('commonName', selectedSpecies)
-    
+
     const url = `http://localhost:8000/api/export?${params.toString()}`
     window.location.href = url
   }, [selectedBlock, selectedSite, selectedTaxa, selectedSpecies])
@@ -161,7 +161,10 @@ const MapCharts: React.FC = () => {
           <button
             onClick={downloadCSV}
             className="border-2 border-green-700 bg-green-700 font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:bg-[var(--button-hover)] hover:scale-105 hover:shadow-lg"
-          > Download</button>
+          >
+            {' '}
+            Download
+          </button>
         </div>
       </div>
 
