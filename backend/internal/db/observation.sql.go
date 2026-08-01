@@ -108,29 +108,27 @@ func (q *Queries) DeleteObservation(ctx context.Context, id int64) error {
 
 const exportObservations = `-- name: ExportObservations :many
 SELECT
-EXTRACT(YEAR FROM o."timestamp")::integer AS YEAR,
-si.code AS site,
-o."timestamp"::date AS date,
-o."timestamp"::time AS time,
-o.method,
-o.file,
-o.appearance_start,
-o.appearance_end,
-o.temperature,
-o.narrative,
-o.confidence,
-sp.scientific_name,
-sp.common_name,
-si.forest,
-sp.indicator,
-sp.native,
-si.tenure,
-sp.reportable,
-si.block,
-sp.taxa 
-FROM observations o 
-JOIN sites si ON o.site_id = si.id 
-JOIN species sp ON o.species_id = sp.id 
+EXTRACT(YEAR FROM "timestamp")::integer AS YEAR,
+site_code AS site,
+"timestamp"::date AS date,
+"timestamp"::time AS time,
+method,
+file,
+appearance_start,
+appearance_end,
+temperature,
+narrative,
+confidence,
+scientific_name,
+common_name,
+forest,
+indicator,
+native,
+tenure,
+reportable,
+block,
+taxa 
+FROM observations_with_details 
 WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
   AND ($3::int[] IS NULL OR block = ANY($3))
