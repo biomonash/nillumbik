@@ -498,14 +498,14 @@ paths:
         in: query
         items:
           type: integer
-        name: block
+        name: block[]
         type: array
       - collectionFormat: multi
         description: Filter by site code
         in: query
         items:
           type: string
-        name: siteCode
+        name: siteCode[]
         type: array
       - description: Filter by taxa
         in: query
@@ -546,14 +546,14 @@ paths:
         in: query
         items:
           type: integer
-        name: block
+        name: block[]
         type: array
       - collectionFormat: multi
         description: Filter by site code
         in: query
         items:
           type: string
-        name: siteCode
+        name: siteCode[]
         type: array
       - description: Filter by taxa
         in: query
@@ -594,14 +594,14 @@ paths:
         in: query
         items:
           type: integer
-        name: block
+        name: block[]
         type: array
       - collectionFormat: multi
         description: Filter by site code
         in: query
         items:
           type: string
-        name: siteCode
+        name: siteCode[]
         type: array
       - description: Filter by taxa
         in: query
@@ -642,14 +642,14 @@ paths:
         in: query
         items:
           type: integer
-        name: block
+        name: block[]
         type: array
       - collectionFormat: multi
         description: Filter by site code
         in: query
         items:
           type: string
-        name: siteCode
+        name: siteCode[]
         type: array
       - description: Filter by taxa
         in: query
