@@ -98,13 +98,11 @@ sp.taxa
 FROM observations o 
 JOIN sites si ON o.site_id = si.id 
 JOIN species sp ON o.species_id = sp.id 
-WHERE (
-  ($1::timestamptz IS NULL OR o."timestamp" >= $1)
-  AND ($2::timestamptz IS NULL OR o."timestamp" <= $2)
-  AND ($3::integer[] IS NULL OR si.block = ANY($3))
-  AND ($4::text[] IS NULL OR si.code = ANY($4))
-  AND ($5::taxa IS NULL OR sp.taxa = $5)
-  AND ($6::text IS NULL OR sp.common_name = $6)
-  AND ($7::boolean IS NULL OR sp.native = $7)
-)
-ORDER BY o."timestamp";
+WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from')::timestamp)
+  AND (sqlc.narg('to')::timestamp IS NULL OR "timestamp" <= sqlc.narg('to')::timestamp)
+  AND (sqlc.narg('blocks')::int[] IS NULL OR block = ANY(sqlc.narg('blocks')))
+  AND (sqlc.narg('site_codes')::text[] IS NULL OR site_code = ANY(sqlc.narg('site_codes')))
+  AND (sqlc.narg('taxa')::taxa IS NULL OR taxa = sqlc.narg('taxa')::taxa)
+  AND (sqlc.narg('common_name')::text IS NULL OR LOWER(common_name) = LOWER(sqlc.narg('common_name')::text))
+  AND (sqlc.narg('native')::boolean IS NULL OR native = sqlc.narg('native')::boolean)
+ORDER BY "timestamp";
