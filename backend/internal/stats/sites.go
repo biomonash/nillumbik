@@ -44,12 +44,12 @@ type BlockResponse struct {
 //	@Produce		json
 //	@Param			from		query		string		False	"Search start from"		format(date-time)
 //	@Param			to			query		string		False	"Search end to"			format(date-time)
-//	@Param			block		query		[]integer	False	"Filter by site block"	collectionFormat(multi)
-//	@Param			siteCode	query		[]string	False	"Filter by site code"	collectionFormat(multi)
+//	@Param			block[]		query		[]integer	False	"Filter by site block"	collectionFormat(multi)
+//	@Param			siteCode[]	query		[]string	False	"Filter by site code"	collectionFormat(multi)
 //	@Param			taxa		query		string		False	"Filter by taxa"
 //	@Param			commonName	query		string		False	"Filter by species common name"
 //	@Success		200			{object}	ObservationBySitesResponse
-//	@Error			400 																																																																																{object}	gin.H
+//	@Error			400 																																																																																						{object}	gin.H
 //	@Router			/stats/observations/sites [get]
 func (u *Controller) ObservationBySites(c *gin.Context) {
 	var req ObservationBySitesRequest
@@ -101,12 +101,12 @@ func (u *Controller) ObservationBySites(c *gin.Context) {
 //	@Produce		json
 //	@Param			from		query		string		False	"Search start from"		format(date-time)
 //	@Param			to			query		string		False	"Search end to"			format(date-time)
-//	@Param			block		query		[]integer	False	"Filter by site block"	collectionFormat(multi)
-//	@Param			siteCode	query		[]string	False	"Filter by site code"	collectionFormat(multi)
+//	@Param			block[]		query		[]integer	False	"Filter by site block"	collectionFormat(multi)
+//	@Param			siteCode[]	query		[]string	False	"Filter by site code"	collectionFormat(multi)
 //	@Param			taxa		query		string		False	"Filter by taxa"
 //	@Param			commonName	query		string		False	"Filter by species common name"
 //	@Success		200			{object}	ObservationByBlocksResponse
-//	@Error			400 																																																																																{object}	gin.H
+//	@Error			400 																																																																																						{object}	gin.H
 //	@Router			/stats/observations/blocks [get]
 func (u *Controller) ObservationByBlocks(c *gin.Context) {
 	var req ObservationBySitesRequest

@@ -217,7 +217,7 @@ SELECT site_code, COUNT(DISTINCT species_id) AS species_count, COUNT(*) AS obser
 FROM observations_with_details
 WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
-  AND ($3::int[] IS NULL OR block = ANY($3)::int[])
+  AND ($3::int[] IS NULL OR block = ANY($3))
   AND ($4::text[] IS NULL OR site_code = ANY($4))
   AND ($5::taxa IS NULL OR taxa = $5::taxa)
   AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
