@@ -131,26 +131,24 @@ sp.taxa
 FROM observations o 
 JOIN sites si ON o.site_id = si.id 
 JOIN species sp ON o.species_id = sp.id 
-WHERE (
-  ($1::timestamptz IS NULL OR o."timestamp" >= $1)
-  AND ($2::timestamptz IS NULL OR o."timestamp" <= $2)
-  AND ($3::integer[] IS NULL OR si.block = ANY($3))
-  AND ($4::text[] IS NULL OR si.code = ANY($4))
-  AND ($5::taxa IS NULL OR sp.taxa = $5)
-  AND ($6::text IS NULL OR sp.common_name = $6)
-  AND ($7::boolean IS NULL OR sp.native = $7)
-)
-ORDER BY o."timestamp"
+WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
+  AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
+  AND ($3::int[] IS NULL OR block = ANY($3))
+  AND ($4::text[] IS NULL OR site_code = ANY($4))
+  AND ($5::taxa IS NULL OR taxa = $5::taxa)
+  AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
+  AND ($7::boolean IS NULL OR native = $7::boolean)
+ORDER BY "timestamp"
 `
 
 type ExportObservationsParams struct {
-	Column1 pgtype.Timestamptz `json:"column1"`
-	Column2 pgtype.Timestamptz `json:"column2"`
-	Column3 []int32            `json:"column3"`
-	Column4 []string           `json:"column4"`
-	Column5 Taxa               `json:"column5"`
-	Column6 string             `json:"column6"`
-	Column7 bool               `json:"column7"`
+	From       pgtype.Timestamp `json:"from"`
+	To         pgtype.Timestamp `json:"to"`
+	Blocks     []int32          `json:"blocks"`
+	SiteCodes  []string         `json:"siteCodes"`
+	Taxa       NullTaxa         `json:"taxa"`
+	CommonName *string          `json:"commonName"`
+	Native     *bool            `json:"native"`
 }
 
 type ExportObservationsRow struct {
@@ -178,13 +176,13 @@ type ExportObservationsRow struct {
 
 func (q *Queries) ExportObservations(ctx context.Context, arg ExportObservationsParams) ([]ExportObservationsRow, error) {
 	rows, err := q.db.Query(ctx, exportObservations,
-		arg.Column1,
-		arg.Column2,
-		arg.Column3,
-		arg.Column4,
-		arg.Column5,
-		arg.Column6,
-		arg.Column7,
+		arg.From,
+		arg.To,
+		arg.Blocks,
+		arg.SiteCodes,
+		arg.Taxa,
+		arg.CommonName,
+		arg.Native,
 	)
 	if err != nil {
 		return nil, err
