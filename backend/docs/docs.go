@@ -453,7 +453,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site block",
-                        "name": "block",
+                        "name": "block[]",
                         "in": "query"
                     },
                     {
@@ -463,7 +463,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site code",
-                        "name": "siteCode",
+                        "name": "siteCode[]",
                         "in": "query"
                     },
                     {
@@ -524,7 +524,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site block",
-                        "name": "block",
+                        "name": "block[]",
                         "in": "query"
                     },
                     {
@@ -534,7 +534,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site code",
-                        "name": "siteCode",
+                        "name": "siteCode[]",
                         "in": "query"
                     },
                     {
@@ -595,7 +595,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site block",
-                        "name": "block",
+                        "name": "block[]",
                         "in": "query"
                     },
                     {
@@ -605,7 +605,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site code",
-                        "name": "siteCode",
+                        "name": "siteCode[]",
                         "in": "query"
                     },
                     {
@@ -666,7 +666,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site block",
-                        "name": "block",
+                        "name": "block[]",
                         "in": "query"
                     },
                     {
@@ -676,7 +676,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site code",
-                        "name": "siteCode",
+                        "name": "siteCode[]",
                         "in": "query"
                     },
                     {
