@@ -446,7 +446,7 @@
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site block",
-                        "name": "block",
+                        "name": "block[]",
                         "in": "query"
                     },
                     {
@@ -456,7 +456,7 @@
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site code",
-                        "name": "siteCode",
+                        "name": "siteCode[]",
                         "in": "query"
                     },
                     {
@@ -517,7 +517,7 @@
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site block",
-                        "name": "block",
+                        "name": "block[]",
                         "in": "query"
                     },
                     {
@@ -527,7 +527,7 @@
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site code",
-                        "name": "siteCode",
+                        "name": "siteCode[]",
                         "in": "query"
                     },
                     {
@@ -588,7 +588,7 @@
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site block",
-                        "name": "block",
+                        "name": "block[]",
                         "in": "query"
                     },
                     {
@@ -598,7 +598,7 @@
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site code",
-                        "name": "siteCode",
+                        "name": "siteCode[]",
                         "in": "query"
                     },
                     {
@@ -659,7 +659,7 @@
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site block",
-                        "name": "block",
+                        "name": "block[]",
                         "in": "query"
                     },
                     {
@@ -669,7 +669,7 @@
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site code",
-                        "name": "siteCode",
+                        "name": "siteCode[]",
                         "in": "query"
                     },
                     {
