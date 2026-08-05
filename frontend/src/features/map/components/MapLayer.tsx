@@ -14,8 +14,7 @@ import {
   getObservationSites,
 } from '../../../apis/mapCharts.api'
 import { scaleSequential } from 'd3-scale'
-import { interpolateGreens } from 'd3-scale-chromatic'
-// import { interpolateYlGn } from 'd3-scale-chromatic'
+import { interpolateGreens, interpolateYlGn } from 'd3-scale-chromatic'
 const MAP_CENTER: [number, number] = [-37.6, 145.2]
 
 const locationPin = divIcon({
@@ -73,10 +72,20 @@ export default function MapLayer({
     [statsLookup],
   )
 
-  const greenScale = useMemo(
-    () => scaleSequential(interpolateGreens).domain([0, maxObservation * 0.7]),
+  const speciesScale = useMemo(
+    () => scaleSequential(interpolateYlGn).domain([0, maxObservation * 0.7]),
     [maxObservation],
   )
+
+  const overallScale = useMemo(
+    () =>
+      scaleSequential(interpolateGreens)
+        .domain([0, maxObservation * 0.7]),
+    [maxObservation],
+  )
+
+  const hasSpeciesFilter =
+    !!query.species || (query.taxa?.length ?? 0) > 0
 
   useEffect(() => {
     async function loadDistribution() {
@@ -140,7 +149,9 @@ export default function MapLayer({
             const isSelected = currentRegion?.includes(id)
             const isHovered = hoveredZone === id
             const observationCount = statsLookup[id]?.observationCount ?? 0
-            const fillColor = greenScale(observationCount)
+            const fillColor = hasSpeciesFilter
+              ? speciesScale(observationCount)
+              : overallScale(observationCount)
             return {
               color: isSelected ? '#b45309' : '#2d6a4f',
               fillColor: isSelected ? '#f59e0b' : fillColor,
