@@ -137,6 +137,8 @@ WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
   AND ($7::boolean IS NULL OR native = $7::boolean)
 ORDER BY "timestamp"
+LIMIT $9
+OFFSET $8
 `
 
 type ExportObservationsParams struct {
@@ -147,6 +149,8 @@ type ExportObservationsParams struct {
 	Taxa       NullTaxa         `json:"taxa"`
 	CommonName *string          `json:"commonName"`
 	Native     *bool            `json:"native"`
+	Offset     int32            `json:"offset"`
+	Limit      int32            `json:"limit"`
 }
 
 type ExportObservationsRow struct {
@@ -181,6 +185,8 @@ func (q *Queries) ExportObservations(ctx context.Context, arg ExportObservations
 		arg.Taxa,
 		arg.CommonName,
 		arg.Native,
+		arg.Offset,
+		arg.Limit,
 	)
 	if err != nil {
 		return nil, err
