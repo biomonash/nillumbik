@@ -103,4 +103,6 @@ WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from'):
   AND (sqlc.narg('taxa')::taxa IS NULL OR taxa = sqlc.narg('taxa')::taxa)
   AND (sqlc.narg('common_name')::text IS NULL OR LOWER(common_name) = LOWER(sqlc.narg('common_name')::text))
   AND (sqlc.narg('native')::boolean IS NULL OR native = sqlc.narg('native')::boolean)
-ORDER BY "timestamp";
+ORDER BY "timestamp"
+LIMIT sqlc.arg('limit')
+OFFSET sqlc.arg('offset');

@@ -64,15 +64,12 @@ func (u *Controller) ExportCSV(c *gin.Context) {
 		Native:     req.Native,
 	}
 
-	rows, err := u.q.ExportObservations(ctx, params)
-	if err != nil {
-		c.Error(fmt.Errorf("failed to export observations: %w", err))
-		return
-	}
-
 	filename := getFilename(req)
 	c.Header("Content-Type", "text/csv")
 	c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
+
+	const pageSize = 1000
+	offset := 0
 
 	writer := csv.NewWriter(c.Writer)
 
@@ -81,51 +78,69 @@ func (u *Controller) ExportCSV(c *gin.Context) {
 		"Narrative", "Image Path", "Confidence", "Scientific name", "Common name", "Forest type", "Indicator",
 		"Native", "Tenure", "Reportable", "Block", "Taxa",
 	})
+	writer.Flush()
 
-	for _, row := range rows {
-		date := ""
-		if row.Date.Valid {
-			date = row.Date.Time.Format("2-Jan-06")
+	for {
+		params.Limit = int32(pageSize)
+		params.Offset = int32(offset)
+
+		rows, err := u.q.ExportObservations(ctx, params)
+		if err != nil {
+			return
 		}
 
-		timeStr := ""
-		if row.Time.Valid {
-			totalSeconds := row.Time.Microseconds / 1_000_000
-			h := totalSeconds / 3600
-			m := (totalSeconds % 3600) / 60
-			t := time.Date(0, 0, 0, int(h), int(m), 0, 0, time.UTC)
-			timeStr = t.Format("3:04 PM")
+		for _, row := range rows {
+			date := ""
+			if row.Date.Valid {
+				date = row.Date.Time.Format("2-Jan-06")
+			}
+
+			timeStr := ""
+			if row.Time.Valid {
+				totalSeconds := row.Time.Microseconds / 1_000_000
+				h := totalSeconds / 3600
+				m := (totalSeconds % 3600) / 60
+				t := time.Date(0, 0, 0, int(h), int(m), 0, 0, time.UTC)
+				timeStr = t.Format("3:04 PM")
+			}
+
+			writer.Write([]string{
+				strconv.Itoa(int(row.Year)),
+				row.Site,
+				"",
+				"",
+				date,
+				timeStr,
+				capitalise(string(row.Method)),
+				nullableString(row.File),
+				nullableInt32(row.AppearanceStart),
+				nullableInt32(row.AppearanceEnd),
+				nullableInt32(row.Temperature),
+				nullableString(row.Narrative),
+				"",
+				nullableFloat32(row.Confidence),
+				row.ScientificName,
+				row.CommonName,
+				capitalise(string(row.Forest)),
+				boolToYN(row.Indicator),
+				nativeToString(row.Native),
+				capitalise(string(row.Tenure)),
+				boolToYN(row.Reportable),
+				strconv.Itoa(int(row.Block)),
+				capitalise(string(row.Taxa)),
+			})
+
 		}
 
-		writer.Write([]string{
-			strconv.Itoa(int(row.Year)),
-			row.Site,
-			"",
-			"",
-			date,
-			timeStr,
-			capitalise(string(row.Method)),
-			nullableString(row.File),
-			nullableInt32(row.AppearanceStart),
-			nullableInt32(row.AppearanceEnd),
-			nullableInt32(row.Temperature),
-			nullableString(row.Narrative),
-			"",
-			nullableFloat32(row.Confidence),
-			row.ScientificName,
-			row.CommonName,
-			capitalise(string(row.Forest)),
-			boolToYN(row.Indicator),
-			nativeToString(row.Native),
-			capitalise(string(row.Tenure)),
-			boolToYN(row.Reportable),
-			strconv.Itoa(int(row.Block)),
-			capitalise(string(row.Taxa)),
-		})
+		writer.Flush()
+
+		if len(rows) < pageSize {
+			break
+		}
+
+		offset += pageSize
 
 	}
-
-	writer.Flush()
 }
 
 func getFilename(req ExportRequest) string {
