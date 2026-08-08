@@ -1,0 +1,3 @@
+BEGIN;
+ALTER TABLE species DROP COLUMN iucn_status;
+COMMIT;
