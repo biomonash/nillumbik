@@ -51,6 +51,7 @@ export default function MapLayer({
 }: MapLayerProps) {
   const dispatch = useAppDispatch()
   const query = useAppSelector(selectQuery)
+  const sites = useAppSelector((state) => state.map.sites)
   const params = useMemo(
     () => ({
       taxa: query.taxa,
@@ -124,6 +125,29 @@ export default function MapLayer({
     loadDistribution()
   }, [mode, params])
 
+  const filteredGeoData = useMemo(() => {
+    if (!geoData) return null
+
+    if (mode !== 'site' || !query.tenure) {
+      return geoData
+    }
+
+    const matchingSiteCodes = sites
+      .filter(
+        (site) => site.tenure.toLowerCase() === query.tenure?.toLowerCase(),
+      )
+      .map((site) => site.code)
+
+    return {
+      ...geoData,
+      features: geoData.features.filter((feature) => {
+        const siteCode = feature.properties?.site
+
+        return matchingSiteCodes.includes(siteCode)
+      }),
+    }
+  }, [geoData, mode, query.tenure, sites])
+
   return (
     <MapContainer
       key={mode}
@@ -135,10 +159,10 @@ export default function MapLayer({
 
       <FlyToUser coords={coords} />
 
-      {geoData && (
+      {filteredGeoData && (
         <GeoJSON
-          key={`${mode}-${currentRegion}-${Object.keys(statsLookup).length}`}
-          data={geoData}
+          key={`${mode}-${query.tenure}-${currentRegion}-${Object.keys(statsLookup).length}`}
+          data={filteredGeoData}
           style={(feature) => {
             const id =
               mode === 'site'

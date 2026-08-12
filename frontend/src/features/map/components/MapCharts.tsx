@@ -22,6 +22,8 @@ import {
   updateSelectedTaxa,
   selectBlock,
   selectSite,
+  selectTenure,
+  updateSelectedTenure,
   updateSelectedSpecies,
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
@@ -39,15 +41,20 @@ function extractSortedBlocks(data: number[]): ChartInput[] {
 function extractSortedSites(
   data: Site[],
   selectedBlocks?: number[],
+  selectedTenure?: 'Public' | 'Private',
 ): ChartInput[] {
   const sorted = data
     .filter((site) =>
       selectedBlocks ? selectedBlocks.includes(site.block) : true,
     )
-    .map((site) => ({ value: site.code, label: `Site ${site.name}` }))
+    .filter((site) => (selectedTenure ? site.tenure === selectedTenure : true))
+    .map((site) => ({
+      value: site.code,
+      label: `Site ${site.name}`,
+    }))
+
   return [{ value: 'all', label: 'All Sites' }, ...sorted]
 }
-
 const taxaOptions = [
   { value: 'all', label: 'All Taxa' },
   ...['bird', 'mammal', 'reptile'].map((t) => ({
@@ -79,6 +86,8 @@ const MapCharts: React.FC = () => {
   const selectedSite = useSelector(selectSite)
   const selectedTaxa = useSelector(selectTaxa)
   const selectedSpecies = useSelector(selectSpecies)
+  const selectedTenure = useSelector(selectTenure)
+
   const stats = useSelector((state: RootState) => ({
     total: state.map.totalObservations,
     nativeCount: state.map.nativeSpeciesCount,
@@ -89,7 +98,11 @@ const MapCharts: React.FC = () => {
     extractSortedBlocks(state.map.blocks),
   )
   const siteOptions = useAppSelector((state) =>
-    extractSortedSites(state.map.sites, state.map.query.blocks),
+    extractSortedSites(
+      state.map.sites,
+      state.map.query.blocks,
+      state.map.query.tenure,
+    ),
   )
   const speciesOptions = useAppSelector((state) =>
     extractSpeciesOptions(state.map.species, state.map.query.taxa),
@@ -109,11 +122,14 @@ const MapCharts: React.FC = () => {
     })
   }, [])
 
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current)
+  const handleTenureChange = (tenure: 'Public' | 'Private') => {
+    if (selectedTenure === tenure) {
+      dispatch(updateSelectedTenure(null))
+      return
     }
-  }, [])
+
+    dispatch(updateSelectedTenure(tenure))
+  }
 
   return (
     <div className="bg-[var(--muted-foreground2)] flex flex-col gap-3">
@@ -145,7 +161,27 @@ const MapCharts: React.FC = () => {
           </button>
         </div>
       </div>
+      <div className="flex flex-cols-2 gap-3">
+        <div className="flex">
+          <input
+            type="checkbox"
+            checked={selectedTenure === 'Private'}
+            onChange={() => handleTenureChange('Private')}
+          />
 
+          <label className="text-black ml-1">Private</label>
+        </div>
+
+        <div className="flex">
+          <input
+            type="checkbox"
+            checked={selectedTenure === 'Public'}
+            onChange={() => handleTenureChange('Public')}
+          />
+
+          <label className="text-black ml-1">Public</label>
+        </div>
+      </div>
       {/* Select Filters */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col">

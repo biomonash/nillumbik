@@ -128,22 +128,11 @@ export default function MapView() {
               aria-label="Select multiple zones"
             >
               {/* Multiple selection icon */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="h-5 w-5"
-              >
-                <path d="M8 7h10a2 2 0 0 1 2 2v8" />
-                <path d="M6 11H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2" />
-                <rect x="6" y="11" width="12" height="10" rx="2" />
-              </svg>
+              <i className="fa-solid fa-magnifying-glass-plus"></i>
             </button>
           ) : (
             <>
-              <span className="flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800 shadow-sm">
+              <span className="flex items-center gap-1.5 rounded-full border border-amber-300 bg-[var(--pale-yellow)] px-3 py-2 text-xs font-medium text-amber-800 shadow-sm">
                 {selectedCount} selected
                 {selectedCount > 0 && (
                   <button
