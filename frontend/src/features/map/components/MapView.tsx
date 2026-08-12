@@ -12,6 +12,8 @@ import {
   selectCurrentRegion,
   selectMode,
   updateMode,
+  updateSelectedBlock,
+  updateSelectedSite,
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import DesktopSidebar from './DesktopSidebar'
@@ -49,6 +51,21 @@ export default function MapView() {
     { label: '5 Blocks', value: 'block' },
   ]
 
+  const [multiSelectMode, setMultiSelectMode] = useState(false)
+  const selectedCount = currentRegion?.length ?? 0
+
+  const clearRegionSelection = () => {
+    if (mode === 'block') dispatch(updateSelectedBlock([]))
+    else dispatch(updateSelectedSite([]))
+  }
+
+  const handleDoneMultiSelect = () => {
+    setMultiSelectMode(false)
+    if (selectedCount > 0) {
+      setActiveTab('species')
+      setDrawerOpen(true)
+    }
+  }
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth)
     window.addEventListener('resize', handleResize)
@@ -98,6 +115,73 @@ export default function MapView() {
         ))}
       </div>
 
+      {!isDesktop && (
+        <div
+          className="fixed top-[150px] z-40 flex items-center gap-2 rounded-xl bg-white/50 p-2 shadow-md transition-all"
+          style={{ right: 20 }}
+        >
+          {!multiSelectMode ? (
+            <button
+              onClick={() => setMultiSelectMode(true)}
+              className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-green-700 bg-white text-green-700 shadow-sm transition hover:bg-green-50 active:scale-95"
+              title="Select multiple"
+              aria-label="Select multiple zones"
+            >
+              {/* Multiple selection icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="h-5 w-5"
+              >
+                <path d="M8 7h10a2 2 0 0 1 2 2v8" />
+                <path d="M6 11H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2" />
+                <rect x="6" y="11" width="12" height="10" rx="2" />
+              </svg>
+            </button>
+          ) : (
+            <>
+              <span className="flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800 shadow-sm">
+                {selectedCount} selected
+                {selectedCount > 0 && (
+                  <button
+                    onClick={clearRegionSelection}
+                    aria-label="Clear selection"
+                    className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full text-amber-700 transition hover:bg-amber-200/60"
+                  >
+                    ×
+                  </button>
+                )}
+              </span>
+
+              <button
+                onClick={handleDoneMultiSelect}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--pale-green)] text-[var(--button-hover)] shadow-md transition hover:bg-[var(--pale-green)] active:scale-95"
+                title="Done"
+                aria-label="Done selecting zones"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className="h-5 w-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 12l4 4L19 7"
+                  />
+                </svg>
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
       {/* ── Find My Location button ── */}
       <button
         onClick={locate}
@@ -141,6 +225,7 @@ export default function MapView() {
         currentRegion={currentRegion}
         hoveredZone={hoveredZone}
         isDesktop={isDesktop}
+        multiSelectMode={multiSelectMode}
         setHoveredZone={setHoveredZone}
         setActiveTab={setActiveTab}
         setDrawerOpen={setDrawerOpen}

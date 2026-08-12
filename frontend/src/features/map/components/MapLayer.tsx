@@ -31,6 +31,7 @@ interface MapLayerProps {
   currentRegion: string[] | undefined
   hoveredZone: string | null
   isDesktop: boolean
+  multiSelectMode: boolean
   setHoveredZone: (id: string | null) => void
   setActiveTab: (tab: 'species' | 'filters') => void
   setDrawerOpen: (open: boolean) => void
@@ -43,6 +44,7 @@ export default function MapLayer({
   currentRegion,
   hoveredZone,
   isDesktop,
+  multiSelectMode,
   setHoveredZone,
   setActiveTab,
   setDrawerOpen,
@@ -78,14 +80,11 @@ export default function MapLayer({
   )
 
   const overallScale = useMemo(
-    () =>
-      scaleSequential(interpolateGreens)
-        .domain([0, maxObservation * 0.7]),
+    () => scaleSequential(interpolateGreens).domain([0, maxObservation * 0.7]),
     [maxObservation],
   )
 
-  const hasSpeciesFilter =
-    !!query.species || (query.taxa?.length ?? 0) > 0
+  const hasSpeciesFilter = !!query.species || (query.taxa?.length ?? 0) > 0
 
   useEffect(() => {
     async function loadDistribution() {
@@ -174,7 +173,9 @@ export default function MapLayer({
             layer.on('mouseout', () => setHoveredZone(null))
 
             layer.on('click', (e: LeafletMouseEvent) => {
-              const multiselect = e.originalEvent.shiftKey
+              const multiselect = isDesktop
+                ? e.originalEvent.shiftKey
+                : multiSelectMode
               const isAlreadySelected = currentRegion?.includes(id)
 
               let newSelection: string[] = []
@@ -193,7 +194,7 @@ export default function MapLayer({
                 dispatch(updateSelectedSite(newSelection))
               }
 
-              if (!isDesktop) {
+              if (!isDesktop && !multiSelectMode) {
                 setActiveTab('species')
                 setDrawerOpen(true)
               }
