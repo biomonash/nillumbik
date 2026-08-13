@@ -51,7 +51,7 @@ func (q *Queries) CountDistinctSpeciesObserved(ctx context.Context, arg CountDis
 }
 
 const countSpeciesByNative = `-- name: CountSpeciesByNative :many
-SELECT native AS is_native, COUNT(DISTINCT species_id) AS species_count, COUNT(*) AS observation_count
+SELECT native AS is_native, COUNT(DISTINCT species_id) AS species_count, COUNT(id) AS observation_count
 FROM observations_with_details
 WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
   AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)

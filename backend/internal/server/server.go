@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/biomonash/forestportal/assets"
 	"github.com/biomonash/forestportal/internal/db"
+	"github.com/biomonash/forestportal/internal/export"
 	"github.com/biomonash/forestportal/internal/observation"
 	"github.com/biomonash/forestportal/internal/site"
 	"github.com/biomonash/forestportal/internal/species"
@@ -55,6 +56,8 @@ func New(querier db.Querier) *Server {
 	observation.Register(api, observation.NewController(querier))
 
 	stats.Register(api, stats.NewController(querier))
+
+	export.Register(api, export.NewController(querier))
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.Static("/images/species", "../static/species_images")

@@ -109,6 +109,21 @@ const MapCharts: React.FC = () => {
     })
   }, [])
 
+  const downloadCSV = useCallback(() => {
+    const params = new URLSearchParams()
+    if (selectedBlock && selectedBlock.length > 0) {
+      selectedBlock.forEach((b) => params.append('block[]', String(b)))
+    }
+    if (selectedSite && selectedSite.length > 0) {
+      selectedSite.forEach((s) => params.append('siteCode[]', s))
+    }
+    if (selectedTaxa) params.append('taxa', selectedTaxa)
+    if (selectedSpecies) params.append('commonName', selectedSpecies)
+
+    const url = `http://localhost:8000/api/export?${params.toString()}`
+    window.location.href = url
+  }, [selectedBlock, selectedSite, selectedTaxa, selectedSpecies])
+
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
@@ -142,6 +157,13 @@ const MapCharts: React.FC = () => {
             className="border-2 border-green-700 bg-green-700 font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:bg-[var(--button-hover)] hover:scale-105 hover:shadow-lg"
           >
             Reset Filters
+          </button>
+          <button
+            onClick={downloadCSV}
+            className="border-2 border-green-700 bg-green-700 font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:bg-[var(--button-hover)] hover:scale-105 hover:shadow-lg"
+          >
+            {' '}
+            Download
           </button>
         </div>
       </div>

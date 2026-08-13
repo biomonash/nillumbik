@@ -71,3 +71,40 @@ JOIN sites s ON o.site_id = s.id
 JOIN species sp ON o.species_id = sp.id
 WHERE sp.scientific_name ILIKE $1 OR sp.common_name ILIKE $1 OR o.narrative ILIKE $1
 ORDER BY o.timestamp DESC;
+
+
+-- name: ExportObservations :many
+SELECT
+  id,
+  EXTRACT(YEAR FROM "timestamp")::integer AS YEAR,
+  site_code AS site,
+  "timestamp"::date AS date,
+  "timestamp"::time AS time,
+  method,
+  file,
+  appearance_start,
+  appearance_end,
+  temperature,
+  narrative,
+  confidence,
+  scientific_name,
+  common_name,
+  forest,
+  indicator,
+  native,
+  tenure,
+  reportable,
+  block,
+  taxa
+FROM observations_with_details
+WHERE id > sqlc.arg('next')::int
+  AND (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from')::timestamp)
+  AND (sqlc.narg('to')::timestamp IS NULL OR "timestamp" <= sqlc.narg('to')::timestamp)
+  AND (sqlc.narg('blocks')::int[] IS NULL OR block = ANY(sqlc.narg('blocks')))
+  AND (sqlc.narg('site_codes')::text[] IS NULL OR site_code = ANY(sqlc.narg('site_codes')))
+  AND (sqlc.narg('taxa')::taxa IS NULL OR taxa = sqlc.narg('taxa')::taxa)
+  AND (sqlc.narg('common_name')::text IS NULL OR LOWER(common_name) = LOWER(sqlc.narg('common_name')::text))
+  AND (sqlc.narg('native')::boolean IS NULL OR native = sqlc.narg('native')::boolean)
+ORDER BY "id"
+LIMIT sqlc.arg('limit')
+;
