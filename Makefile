@@ -91,7 +91,7 @@ dev-backend: ## Start backend in development mode with hot reload (requires air)
 run-import:
 	@cd $(BACKEND_DIR) && go run $(GO_IMPORTER)
 
-.PHONY: run-import
+.PHONY: run-imgimport
 run-imgimport:
 	@cd $(BACKEND_DIR) && go run $(GO_IMG_IMPORTER)
 
