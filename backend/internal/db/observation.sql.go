@@ -108,40 +108,42 @@ func (q *Queries) DeleteObservation(ctx context.Context, id int64) error {
 
 const exportObservations = `-- name: ExportObservations :many
 SELECT
-EXTRACT(YEAR FROM "timestamp")::integer AS YEAR,
-site_code AS site,
-"timestamp"::date AS date,
-"timestamp"::time AS time,
-method,
-file,
-appearance_start,
-appearance_end,
-temperature,
-narrative,
-confidence,
-scientific_name,
-common_name,
-forest,
-indicator,
-native,
-tenure,
-reportable,
-block,
-taxa 
-FROM observations_with_details 
-WHERE ($1::timestamp IS NULL OR "timestamp" >= $1::timestamp)
-  AND ($2::timestamp IS NULL OR "timestamp" <= $2::timestamp)
-  AND ($3::int[] IS NULL OR block = ANY($3))
-  AND ($4::text[] IS NULL OR site_code = ANY($4))
-  AND ($5::taxa IS NULL OR taxa = $5::taxa)
-  AND ($6::text IS NULL OR LOWER(common_name) = LOWER($6::text))
-  AND ($7::boolean IS NULL OR native = $7::boolean)
-ORDER BY "timestamp"
+  id,
+  EXTRACT(YEAR FROM "timestamp")::integer AS YEAR,
+  site_code AS site,
+  "timestamp"::date AS date,
+  "timestamp"::time AS time,
+  method,
+  file,
+  appearance_start,
+  appearance_end,
+  temperature,
+  narrative,
+  confidence,
+  scientific_name,
+  common_name,
+  forest,
+  indicator,
+  native,
+  tenure,
+  reportable,
+  block,
+  taxa
+FROM observations_with_details
+WHERE id > $1::int
+  AND ($2::timestamp IS NULL OR "timestamp" >= $2::timestamp)
+  AND ($3::timestamp IS NULL OR "timestamp" <= $3::timestamp)
+  AND ($4::int[] IS NULL OR block = ANY($4))
+  AND ($5::text[] IS NULL OR site_code = ANY($5))
+  AND ($6::taxa IS NULL OR taxa = $6::taxa)
+  AND ($7::text IS NULL OR LOWER(common_name) = LOWER($7::text))
+  AND ($8::boolean IS NULL OR native = $8::boolean)
+ORDER BY "id"
 LIMIT $9
-OFFSET $8
 `
 
 type ExportObservationsParams struct {
+	Next       int32            `json:"next"`
 	From       pgtype.Timestamp `json:"from"`
 	To         pgtype.Timestamp `json:"to"`
 	Blocks     []int32          `json:"blocks"`
@@ -149,11 +151,11 @@ type ExportObservationsParams struct {
 	Taxa       NullTaxa         `json:"taxa"`
 	CommonName *string          `json:"commonName"`
 	Native     *bool            `json:"native"`
-	Offset     int32            `json:"offset"`
 	Limit      int32            `json:"limit"`
 }
 
 type ExportObservationsRow struct {
+	ID              int64             `json:"id"`
 	Year            int32             `json:"year"`
 	Site            string            `json:"site"`
 	Date            pgtype.Date       `json:"date"`
@@ -178,6 +180,7 @@ type ExportObservationsRow struct {
 
 func (q *Queries) ExportObservations(ctx context.Context, arg ExportObservationsParams) ([]ExportObservationsRow, error) {
 	rows, err := q.db.Query(ctx, exportObservations,
+		arg.Next,
 		arg.From,
 		arg.To,
 		arg.Blocks,
@@ -185,7 +188,6 @@ func (q *Queries) ExportObservations(ctx context.Context, arg ExportObservations
 		arg.Taxa,
 		arg.CommonName,
 		arg.Native,
-		arg.Offset,
 		arg.Limit,
 	)
 	if err != nil {
@@ -196,6 +198,7 @@ func (q *Queries) ExportObservations(ctx context.Context, arg ExportObservations
 	for rows.Next() {
 		var i ExportObservationsRow
 		if err := rows.Scan(
+			&i.ID,
 			&i.Year,
 			&i.Site,
 			&i.Date,

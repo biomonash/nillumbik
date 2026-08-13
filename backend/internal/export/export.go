@@ -18,7 +18,7 @@ import (
 type ExportRequest struct {
 	models.TimePeriodRequest
 	Blocks     []int32  `form:"block[]"`
-	SiteCodes  []string `form:"sitecode[]"`
+	SiteCodes  []string `form:"siteCode[]"`
 	Taxa       *db.Taxa `form:"taxa"`
 	CommonName *string  `form:"commonName"`
 	Native     *bool    `form:"native"`
@@ -32,8 +32,8 @@ type ExportRequest struct {
 //	@Produce		text/csv
 //	@Param			from		query	string		false	"Search start from"		format(date-time)
 //	@Param			to			query	string		false	"Search end to"			format(date-time)
-//	@Param			block		query	[]integer	false	"Filter by site block"	collectionFormat(multi)
-//	@Param			siteCode	query	[]string	false	"Filter by site code"	collectionFormat(multi)
+//	@Param			block[]		query	[]integer	false	"Filter by site block"	collectionFormat(multi)
+//	@Param			siteCode[]	query	[]string	false	"Filter by site code"	collectionFormat(multi)
 //	@Param			taxa		query	string		false	"Filter by taxa"
 //	@Param			commonName	query	string		false	"Filter by species common name"
 //	@Param			native		query	boolean		false	"Filter by native status"
@@ -69,7 +69,7 @@ func (u *Controller) ExportCSV(c *gin.Context) {
 	c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
 
 	const pageSize = 1000
-	offset := 0
+	var next int32 = 0
 
 	writer := csv.NewWriter(c.Writer)
 
@@ -82,10 +82,11 @@ func (u *Controller) ExportCSV(c *gin.Context) {
 
 	for {
 		params.Limit = int32(pageSize)
-		params.Offset = int32(offset)
+		params.Next = next
 
 		rows, err := u.q.ExportObservations(ctx, params)
 		if err != nil {
+			c.Error(utils.NewHttpError(http.StatusInternalServerError, "failed to read observation", err))
 			return
 		}
 
@@ -138,8 +139,7 @@ func (u *Controller) ExportCSV(c *gin.Context) {
 			break
 		}
 
-		offset += pageSize
-
+		next = int32(rows[len(rows)-1].ID)
 	}
 }
 

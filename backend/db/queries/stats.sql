@@ -5,7 +5,7 @@ WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from'):
   AND (sqlc.narg('to')::timestamp IS NULL OR "timestamp" <= sqlc.narg('to')::timestamp);
 
 -- name: CountSpeciesByNative :many
-SELECT native AS is_native, COUNT(DISTINCT species_id) AS species_count, COUNT(*) AS observation_count
+SELECT native AS is_native, COUNT(DISTINCT species_id) AS species_count, COUNT(id) AS observation_count
 FROM observations_with_details
 WHERE (sqlc.narg('from')::timestamp IS NULL OR "timestamp" >= sqlc.narg('from')::timestamp)
   AND (sqlc.narg('to')::timestamp IS NULL OR "timestamp" <= sqlc.narg('to')::timestamp)
