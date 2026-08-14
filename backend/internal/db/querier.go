@@ -18,7 +18,7 @@ type Querier interface {
 	CreateObservation(ctx context.Context, arg CreateObservationParams) (Observation, error)
 	CreateObservations(ctx context.Context, arg []CreateObservationsParams) (int64, error)
 	CreateSite(ctx context.Context, arg CreateSiteParams) (Site, error)
-	CreateSpecies(ctx context.Context, arg CreateSpeciesParams) (Species, error)
+	CreateSpecies(ctx context.Context, arg CreateSpeciesParams) (CreateSpeciesRow, error)
 	DeleteObservation(ctx context.Context, id int64) error
 	DeleteSite(ctx context.Context, id int64) error
 	DeleteSiteByCode(ctx context.Context, code string) error
@@ -28,27 +28,28 @@ type Querier interface {
 	GetSite(ctx context.Context, id int64) (Site, error)
 	GetSiteByCode(ctx context.Context, code string) (Site, error)
 	GetSiteIDByCode(ctx context.Context, code string) (int64, error)
-	GetSpecies(ctx context.Context, id int64) (Species, error)
-	GetSpeciesByCommonName(ctx context.Context, lower string) (Species, error)
-	GetSpeciesByScientificName(ctx context.Context, lower string) (Species, error)
+	GetSpecies(ctx context.Context, id int64) (GetSpeciesRow, error)
+	GetSpeciesByCommonName(ctx context.Context, lower string) (GetSpeciesByCommonNameRow, error)
+	GetSpeciesByScientificName(ctx context.Context, lower string) (GetSpeciesByScientificNameRow, error)
 	ListObservations(ctx context.Context, arg ListObservationsParams) ([]Observation, error)
 	// ListObservedSpecies returns species observed within a time range.
 	// If site_code is NULL, results include all sites.
 	// Returns species details along with observation count.
 	ListObservedSpecies(ctx context.Context, arg ListObservedSpeciesParams) ([]ListObservedSpeciesRow, error)
 	ListSites(ctx context.Context) ([]Site, error)
-	ListSpecies(ctx context.Context) ([]Species, error)
+	ListSpecies(ctx context.Context) ([]ListSpeciesRow, error)
 	ListSpeciesCountByTaxa(ctx context.Context, arg ListSpeciesCountByTaxaParams) ([]ListSpeciesCountByTaxaRow, error)
 	ObservationGroupByBlocks(ctx context.Context, arg ObservationGroupByBlocksParams) ([]ObservationGroupByBlocksRow, error)
 	ObservationGroupBySites(ctx context.Context, arg ObservationGroupBySitesParams) ([]ObservationGroupBySitesRow, error)
 	ObservationTimeSeriesGroupByNative(ctx context.Context, arg ObservationTimeSeriesGroupByNativeParams) ([]ObservationTimeSeriesGroupByNativeRow, error)
 	SearchObservations(ctx context.Context, scientificName string) ([]SearchObservationsRow, error)
 	SearchSites(ctx context.Context, code string) ([]Site, error)
-	SearchSpecies(ctx context.Context, scientificName string) ([]Species, error)
+	SearchSpecies(ctx context.Context, scientificName string) ([]SearchSpeciesRow, error)
 	UpdateObservation(ctx context.Context, arg UpdateObservationParams) (Observation, error)
 	UpdateSite(ctx context.Context, arg UpdateSiteParams) (Site, error)
 	UpdateSiteByCode(ctx context.Context, arg UpdateSiteByCodeParams) (Site, error)
-	UpdateSpecies(ctx context.Context, arg UpdateSpeciesParams) (Species, error)
+	UpdateSpecies(ctx context.Context, arg UpdateSpeciesParams) (UpdateSpeciesRow, error)
+	UpdateSpeciesIUCNStatus(ctx context.Context, arg UpdateSpeciesIUCNStatusParams) error
 }
 
 var _ Querier = (*Queries)(nil)

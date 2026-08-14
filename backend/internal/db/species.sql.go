@@ -38,7 +38,18 @@ type CreateSpeciesParams struct {
 	Images         []string `json:"images"`
 }
 
-func (q *Queries) CreateSpecies(ctx context.Context, arg CreateSpeciesParams) (Species, error) {
+type CreateSpeciesRow struct {
+	ID             int64    `json:"id"`
+	ScientificName string   `json:"scientificName"`
+	CommonName     string   `json:"commonName"`
+	Native         bool     `json:"native"`
+	Taxa           Taxa     `json:"taxa"`
+	Indicator      bool     `json:"indicator"`
+	Reportable     bool     `json:"reportable"`
+	Images         []string `json:"images"`
+}
+
+func (q *Queries) CreateSpecies(ctx context.Context, arg CreateSpeciesParams) (CreateSpeciesRow, error) {
 	row := q.db.QueryRow(ctx, createSpecies,
 		arg.ScientificName,
 		arg.CommonName,
@@ -48,7 +59,7 @@ func (q *Queries) CreateSpecies(ctx context.Context, arg CreateSpeciesParams) (S
 		arg.Reportable,
 		arg.Images,
 	)
-	var i Species
+	var i CreateSpeciesRow
 	err := row.Scan(
 		&i.ID,
 		&i.ScientificName,
@@ -78,9 +89,20 @@ FROM species
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetSpecies(ctx context.Context, id int64) (Species, error) {
+type GetSpeciesRow struct {
+	ID             int64    `json:"id"`
+	ScientificName string   `json:"scientificName"`
+	CommonName     string   `json:"commonName"`
+	Native         bool     `json:"native"`
+	Taxa           Taxa     `json:"taxa"`
+	Indicator      bool     `json:"indicator"`
+	Reportable     bool     `json:"reportable"`
+	Images         []string `json:"images"`
+}
+
+func (q *Queries) GetSpecies(ctx context.Context, id int64) (GetSpeciesRow, error) {
 	row := q.db.QueryRow(ctx, getSpecies, id)
-	var i Species
+	var i GetSpeciesRow
 	err := row.Scan(
 		&i.ID,
 		&i.ScientificName,
@@ -100,9 +122,20 @@ FROM species
 WHERE lower(common_name) = LOWER($1) LIMIT 1
 `
 
-func (q *Queries) GetSpeciesByCommonName(ctx context.Context, lower string) (Species, error) {
+type GetSpeciesByCommonNameRow struct {
+	ID             int64    `json:"id"`
+	ScientificName string   `json:"scientificName"`
+	CommonName     string   `json:"commonName"`
+	Native         bool     `json:"native"`
+	Taxa           Taxa     `json:"taxa"`
+	Indicator      bool     `json:"indicator"`
+	Reportable     bool     `json:"reportable"`
+	Images         []string `json:"images"`
+}
+
+func (q *Queries) GetSpeciesByCommonName(ctx context.Context, lower string) (GetSpeciesByCommonNameRow, error) {
 	row := q.db.QueryRow(ctx, getSpeciesByCommonName, lower)
-	var i Species
+	var i GetSpeciesByCommonNameRow
 	err := row.Scan(
 		&i.ID,
 		&i.ScientificName,
@@ -122,9 +155,20 @@ FROM species
 WHERE lower(scientific_name) = LOWER($1) LIMIT 1
 `
 
-func (q *Queries) GetSpeciesByScientificName(ctx context.Context, lower string) (Species, error) {
+type GetSpeciesByScientificNameRow struct {
+	ID             int64    `json:"id"`
+	ScientificName string   `json:"scientificName"`
+	CommonName     string   `json:"commonName"`
+	Native         bool     `json:"native"`
+	Taxa           Taxa     `json:"taxa"`
+	Indicator      bool     `json:"indicator"`
+	Reportable     bool     `json:"reportable"`
+	Images         []string `json:"images"`
+}
+
+func (q *Queries) GetSpeciesByScientificName(ctx context.Context, lower string) (GetSpeciesByScientificNameRow, error) {
 	row := q.db.QueryRow(ctx, getSpeciesByScientificName, lower)
-	var i Species
+	var i GetSpeciesByScientificNameRow
 	err := row.Scan(
 		&i.ID,
 		&i.ScientificName,
@@ -242,15 +286,26 @@ FROM species
 ORDER BY scientific_name
 `
 
-func (q *Queries) ListSpecies(ctx context.Context) ([]Species, error) {
+type ListSpeciesRow struct {
+	ID             int64    `json:"id"`
+	ScientificName string   `json:"scientificName"`
+	CommonName     string   `json:"commonName"`
+	Native         bool     `json:"native"`
+	Taxa           Taxa     `json:"taxa"`
+	Indicator      bool     `json:"indicator"`
+	Reportable     bool     `json:"reportable"`
+	Images         []string `json:"images"`
+}
+
+func (q *Queries) ListSpecies(ctx context.Context) ([]ListSpeciesRow, error) {
 	rows, err := q.db.Query(ctx, listSpecies)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Species{}
+	items := []ListSpeciesRow{}
 	for rows.Next() {
-		var i Species
+		var i ListSpeciesRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.ScientificName,
@@ -278,15 +333,26 @@ WHERE scientific_name ILIKE $1 OR common_name ILIKE $1
 ORDER BY scientific_name
 `
 
-func (q *Queries) SearchSpecies(ctx context.Context, scientificName string) ([]Species, error) {
+type SearchSpeciesRow struct {
+	ID             int64    `json:"id"`
+	ScientificName string   `json:"scientificName"`
+	CommonName     string   `json:"commonName"`
+	Native         bool     `json:"native"`
+	Taxa           Taxa     `json:"taxa"`
+	Indicator      bool     `json:"indicator"`
+	Reportable     bool     `json:"reportable"`
+	Images         []string `json:"images"`
+}
+
+func (q *Queries) SearchSpecies(ctx context.Context, scientificName string) ([]SearchSpeciesRow, error) {
 	rows, err := q.db.Query(ctx, searchSpecies, scientificName)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Species{}
+	items := []SearchSpeciesRow{}
 	for rows.Next() {
-		var i Species
+		var i SearchSpeciesRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.ScientificName,
@@ -326,7 +392,18 @@ type UpdateSpeciesParams struct {
 	Images         []string `json:"images"`
 }
 
-func (q *Queries) UpdateSpecies(ctx context.Context, arg UpdateSpeciesParams) (Species, error) {
+type UpdateSpeciesRow struct {
+	ID             int64    `json:"id"`
+	ScientificName string   `json:"scientificName"`
+	CommonName     string   `json:"commonName"`
+	Native         bool     `json:"native"`
+	Taxa           Taxa     `json:"taxa"`
+	Indicator      bool     `json:"indicator"`
+	Reportable     bool     `json:"reportable"`
+	Images         []string `json:"images"`
+}
+
+func (q *Queries) UpdateSpecies(ctx context.Context, arg UpdateSpeciesParams) (UpdateSpeciesRow, error) {
 	row := q.db.QueryRow(ctx, updateSpecies,
 		arg.ID,
 		arg.ScientificName,
@@ -337,7 +414,7 @@ func (q *Queries) UpdateSpecies(ctx context.Context, arg UpdateSpeciesParams) (S
 		arg.Reportable,
 		arg.Images,
 	)
-	var i Species
+	var i UpdateSpeciesRow
 	err := row.Scan(
 		&i.ID,
 		&i.ScientificName,
@@ -349,4 +426,20 @@ func (q *Queries) UpdateSpecies(ctx context.Context, arg UpdateSpeciesParams) (S
 		&i.Images,
 	)
 	return i, err
+}
+
+const updateSpeciesIUCNStatus = `-- name: UpdateSpeciesIUCNStatus :exec
+UPDATE species
+SET iucn_status = $1
+WHERE id = $2
+`
+
+type UpdateSpeciesIUCNStatusParams struct {
+	IucnStatus *string `json:"iucnStatus"`
+	ID         int64   `json:"id"`
+}
+
+func (q *Queries) UpdateSpeciesIUCNStatus(ctx context.Context, arg UpdateSpeciesIUCNStatusParams) error {
+	_, err := q.db.Exec(ctx, updateSpeciesIUCNStatus, arg.IucnStatus, arg.ID)
+	return err
 }

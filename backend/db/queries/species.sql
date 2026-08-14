@@ -84,3 +84,9 @@ JOIN
 ) as observed
 ON sp.id = species_id
 ORDER BY observation_count DESC;
+
+
+-- name: UpdateSpeciesIUCNStatus :exec
+UPDATE species
+SET iucn_status = $1
+WHERE id = $2;
