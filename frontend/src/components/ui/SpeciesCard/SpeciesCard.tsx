@@ -8,6 +8,19 @@ interface SpeciesCardProps {
   observationCount?: number
 }
 
+function iucnBadgeColor(status: string) {
+  switch (status) {
+    case 'LC': return { bg: '#dcfce7', text: '#166534', border: '#bbf7d0' }
+    case 'NT': return { bg: '#fef9c3', text: '#854d0e', border: '#fef08a' }
+    case 'VU': return { bg: '#ffedd5', text: '#9a3412', border: '#fed7aa' }
+    case 'EN': return { bg: '#fee2e2', text: '#991b1b', border: '#fecaca' }
+    case 'CR': return { bg: '#fce7f3', text: '#9d174d', border: '#fbcfe8' }
+    case 'EW':
+    case 'EX': return { bg: '#1f2937', text: '#f9fafb', border: '#374151' }
+    default: return { bg: '#f3f4f6', text: '#374151', border: '#e5e7eb' }
+  }
+}
+
 export default function SpeciesCard({
   species,
   observationCount,
@@ -56,6 +69,19 @@ export default function SpeciesCard({
             </Badge>
           )}
         </div>
+        {/* IUCN Status badge */}
+        {species.iucnStatus && (
+          <div className='flex items-center justify-between gap-2'>
+            <span className='text-xs italic text-gray-500 mb-0'>IUCN Status</span>
+            <Badge
+              style={{
+                backgroundColor: iucnBadgeColor(species.iucnStatus).bg,
+                color: iucnBadgeColor(species.iucnStatus).text,
+                border: `1px solid ${iucnBadgeColor(species.iucnStatus).border}`,
+              }}
+            >{species.iucnStatus}</Badge>
+          </div>
+        )}
         {observationCount && (
           <div className="flex items-center justify-between gap-2">
             <span className="font-semibold text-sm text-gray-900">

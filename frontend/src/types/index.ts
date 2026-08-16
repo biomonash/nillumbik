@@ -12,6 +12,7 @@ export type Species = {
   indicator: boolean
   taxa: string
   images: string[]
+  iucnStatus: string | null
 }
 
 export type ObservedSpecies = Species & {
