@@ -173,6 +173,7 @@ func (u *Controller) GetObservedSpecies(c *gin.Context) {
 				Indicator:      r.Indicator,
 				Reportable:     r.Reportable,
 				Images:         r.Images,
+				IucnStatus:     r.IucnStatus,
 			},
 			ObservationCount: r.ObservationCount,
 		})
