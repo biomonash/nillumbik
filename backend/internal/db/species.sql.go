@@ -192,6 +192,7 @@ SELECT
   sp.indicator,
   sp.reportable,
   sp.images,
+  sp.iucn_status,
   observation_count
 FROM species sp
 JOIN
@@ -238,6 +239,7 @@ type ListObservedSpeciesRow struct {
 	Indicator        bool     `json:"indicator"`
 	Reportable       bool     `json:"reportable"`
 	Images           []string `json:"images"`
+	IucnStatus       *string  `json:"iucnStatus"`
 	ObservationCount int64    `json:"observationCount"`
 }
 
@@ -268,6 +270,7 @@ func (q *Queries) ListObservedSpecies(ctx context.Context, arg ListObservedSpeci
 			&i.Indicator,
 			&i.Reportable,
 			&i.Images,
+			&i.IucnStatus,
 			&i.ObservationCount,
 		); err != nil {
 			return nil, err

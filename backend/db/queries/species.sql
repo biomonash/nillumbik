@@ -57,6 +57,7 @@ SELECT
   sp.indicator,
   sp.reportable,
   sp.images,
+  sp.iucn_status,
   observation_count
 FROM species sp
 JOIN
