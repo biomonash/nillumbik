@@ -14,6 +14,7 @@ DOCKER_DIR=docker
 GO_MAIN=cmd/api/main.go
 GO_IMPORTER=cmd/importer/main.go
 GO_IMG_IMPORTER=cmd/imgimporter/main.go
+GO_IUCN=cmd/iucn/main.go
 DOCKER_COMPOSE_FILE=docker/compose.yml
 # POSTGRESQL_URL=postgres://biom:supersecretpassword@localhost:5432/nillumbik?sslmode=disable
 API_BASE_URL=
@@ -90,6 +91,14 @@ dev-backend: ## Start backend in development mode with hot reload (requires air)
 .PHONY: run-import
 run-import:
 	@cd $(BACKEND_DIR) && go run $(GO_IMPORTER)
+
+.PHONY: run-iucn-fetch
+run-iucn-fetch:
+	@cd $(BACKEND_DIR) && go run $(GO_IUCN) fetch
+
+.PHONY: run-iucn-import
+run-iucn-import:
+	@cd $(BACKEND_DIR) && go run $(GO_IUCN) import
 
 .PHONY: run-imgimport
 run-imgimport:
