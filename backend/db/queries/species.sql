@@ -27,8 +27,6 @@ ORDER BY scientific_name;
 UPDATE species
 SET scientific_name = $2, common_name = $3, native = $4,
     taxa = $5, indicator = $6, reportable = $7, images = $8
-SET scientific_name = $2, common_name = $3, native = $4,
-    taxa = $5, indicator = $6, reportable = $7, images = $8
 WHERE id = $1
 RETURNING id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status;
 

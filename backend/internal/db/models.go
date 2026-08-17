@@ -31,7 +31,6 @@ func (e *ForestType) Scan(src interface{}) error {
 
 type NullForestType struct {
 	ForestType ForestType `json:"forestType"`
-	ForestType ForestType `json:"forestType"`
 	Valid      bool       `json:"valid"` // Valid is true if ForestType is not NULL
 }
 
@@ -51,22 +50,6 @@ func (ns NullForestType) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.ForestType), nil
-}
-
-func (e ForestType) Valid() bool {
-	switch e {
-	case ForestTypeDry,
-		ForestTypeWet:
-		return true
-	}
-	return false
-}
-
-func AllForestTypeValues() []ForestType {
-	return []ForestType{
-		ForestTypeDry,
-		ForestTypeWet,
-	}
 }
 
 func (e ForestType) Valid() bool {
@@ -107,7 +90,6 @@ func (e *ObservationMethod) Scan(src interface{}) error {
 
 type NullObservationMethod struct {
 	ObservationMethod ObservationMethod `json:"observationMethod"`
-	ObservationMethod ObservationMethod `json:"observationMethod"`
 	Valid             bool              `json:"valid"` // Valid is true if ObservationMethod is not NULL
 }
 
@@ -127,24 +109,6 @@ func (ns NullObservationMethod) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.ObservationMethod), nil
-}
-
-func (e ObservationMethod) Valid() bool {
-	switch e {
-	case ObservationMethodAudio,
-		ObservationMethodCamera,
-		ObservationMethodObserved:
-		return true
-	}
-	return false
-}
-
-func AllObservationMethodValues() []ObservationMethod {
-	return []ObservationMethod{
-		ObservationMethodAudio,
-		ObservationMethodCamera,
-		ObservationMethodObserved,
-	}
 }
 
 func (e ObservationMethod) Valid() bool {
@@ -226,24 +190,6 @@ func AllTaxaValues() []Taxa {
 	}
 }
 
-func (e Taxa) Valid() bool {
-	switch e {
-	case TaxaBird,
-		TaxaMammal,
-		TaxaReptile:
-		return true
-	}
-	return false
-}
-
-func AllTaxaValues() []Taxa {
-	return []Taxa{
-		TaxaBird,
-		TaxaMammal,
-		TaxaReptile,
-	}
-}
-
 type TenureType string
 
 const (
@@ -265,7 +211,6 @@ func (e *TenureType) Scan(src interface{}) error {
 
 type NullTenureType struct {
 	TenureType TenureType `json:"tenureType"`
-	TenureType TenureType `json:"tenureType"`
 	Valid      bool       `json:"valid"` // Valid is true if TenureType is not NULL
 }
 
@@ -285,22 +230,6 @@ func (ns NullTenureType) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.TenureType), nil
-}
-
-func (e TenureType) Valid() bool {
-	switch e {
-	case TenureTypePublic,
-		TenureTypePrivate:
-		return true
-	}
-	return false
-}
-
-func AllTenureTypeValues() []TenureType {
-	return []TenureType{
-		TenureTypePublic,
-		TenureTypePrivate,
-	}
 }
 
 func (e TenureType) Valid() bool {
@@ -356,42 +285,6 @@ type ObservationsWithDetail struct {
 	SiteName        *string           `json:"siteName"`
 	Tenure          TenureType        `json:"tenure"`
 	Forest          ForestType        `json:"forest"`
-	ID              int64             `json:"id"`
-	SiteID          int64             `json:"siteId"`
-	SpeciesID       int64             `json:"speciesId"`
-	Timestamp       time.Time         `json:"timestamp"`
-	Method          ObservationMethod `json:"method"`
-	AppearanceStart *int32            `json:"appearanceStart"`
-	AppearanceEnd   *int32            `json:"appearanceEnd"`
-	Temperature     *int32            `json:"temperature"`
-	Narrative       *string           `json:"narrative"`
-	Confidence      *float32          `json:"confidence"`
-	File            *string           `json:"file"`
-}
-
-type ObservationsWithDetail struct {
-	ID              int64             `json:"id"`
-	SiteID          int64             `json:"siteId"`
-	SpeciesID       int64             `json:"speciesId"`
-	Timestamp       time.Time         `json:"timestamp"`
-	Method          ObservationMethod `json:"method"`
-	AppearanceStart *int32            `json:"appearanceStart"`
-	AppearanceEnd   *int32            `json:"appearanceEnd"`
-	Temperature     *int32            `json:"temperature"`
-	Narrative       *string           `json:"narrative"`
-	Confidence      *float32          `json:"confidence"`
-	File            *string           `json:"file"`
-	Native          bool              `json:"native"`
-	Taxa            Taxa              `json:"taxa"`
-	ScientificName  string            `json:"scientificName"`
-	CommonName      string            `json:"commonName"`
-	Indicator       bool              `json:"indicator"`
-	Reportable      bool              `json:"reportable"`
-	Block           int32             `json:"block"`
-	SiteCode        string            `json:"siteCode"`
-	SiteName        *string           `json:"siteName"`
-	Tenure          TenureType        `json:"tenure"`
-	Forest          ForestType        `json:"forest"`
 }
 
 type Site struct {
@@ -402,19 +295,16 @@ type Site struct {
 	Location *string    `json:"location"`
 	Tenure   TenureType `json:"tenure"`
 	Forest   ForestType `json:"forest"`
-	ID       int64      `json:"id"`
-	Code     string     `json:"code"`
-	Block    int32      `json:"block"`
-	Name     *string    `json:"name"`
-	Location *string    `json:"location"`
-	Tenure   TenureType `json:"tenure"`
-	Forest   ForestType `json:"forest"`
 }
 
 type Species struct {
-	ID             int64  `json:"id"`
-	ScientificName string `json:"scientific_name"`
-	CommonName     string `json:"common_name"`
-	Native         bool   `json:"native"`
-	Taxa           Taxa   `json:"taxa"`
+	ID             int64    `json:"id"`
+	ScientificName string   `json:"scientificName"`
+	CommonName     string   `json:"commonName"`
+	Native         bool     `json:"native"`
+	Taxa           Taxa     `json:"taxa"`
+	Indicator      bool     `json:"indicator"`
+	Reportable     bool     `json:"reportable"`
+	Images         []string `json:"images"`
+	IucnStatus     *string  `json:"iucnStatus"`
 }

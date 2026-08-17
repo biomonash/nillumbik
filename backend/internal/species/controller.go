@@ -5,40 +5,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"errors"
-	"fmt"
-	"log"
-	"net/http"
 	"strconv"
 
 	"github.com/biomonash/forestportal/internal/db"
 	"github.com/biomonash/forestportal/internal/models"
 	"github.com/biomonash/forestportal/internal/utils"
-	"github.com/biomonash/forestportal/internal/db"
-	"github.com/biomonash/forestportal/internal/models"
-	"github.com/biomonash/forestportal/internal/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5"
-)
-
-type ObservedSpeciesRequest struct {
-	SiteCodes []string `form:"siteCode[]"`
-	Blocks    []int32  `form:"block[]"`
-	Taxa      *string  `form:"taxa"`
-	models.TimePeriodRequest
-}
-
-// ObservedSpecies represents species with observation count
-type ObservedSpecies struct {
-	db.Species
-	ObservationCount int64 `json:"observationCount"`
-}
-
-// ObservedSpeciesResponse wraps the result with total count
-type ObservedSpeciesResponse struct {
-	Total   int               `json:"total"`
-	Species []ObservedSpecies `json:"species"`
-}
 	"github.com/jackc/pgx/v5"
 )
 
@@ -67,8 +39,6 @@ type Controller struct {
 
 func NewController(queries db.Querier) *Controller {
 	return &Controller{
-func NewController(queries db.Querier) *Controller {
-	return &Controller{
 		q: queries,
 	}
 }
@@ -82,19 +52,9 @@ func NewController(queries db.Querier) *Controller {
 //	@Produce		json
 //	@Success		200	{object}	[]db.Species
 //	@Router			/species [get]
-// ListSpecies godoc
-//
-//	@Summary		List species
-//	@Description	list all species
-//	@Tags			species
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	[]db.Species
-//	@Router			/species [get]
 func (u *Controller) ListSpecies(c *gin.Context) {
 	species, err := u.q.ListSpecies(c.Request.Context())
 	if err != nil {
-		c.Error(fmt.Errorf("failed to list species: %w", err))
 		c.Error(fmt.Errorf("failed to list species: %w", err))
 		return
 	}
@@ -111,22 +71,10 @@ func (u *Controller) ListSpecies(c *gin.Context) {
 //	@Produce		json
 //	@Success		200	{object}	db.Species
 //	@Router			/species/{id} [get]
-// GetSpeciesByID godoc
-//
-//	@Summary		Get species detail
-//	@Description	Get species detail
-//	@Tags			species
-//	@Param			id	path	int	true	"id of the species"
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	db.Species
-//	@Router			/species/{id} [get]
 func (u *Controller) GetSpeciesByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.Error(utils.NewHttpError(400, "invalid id", err))
-		return
 		c.Error(utils.NewHttpError(400, "invalid id", err))
 		return
 	}
@@ -161,38 +109,7 @@ func (u *Controller) GetSpeciesByCommonName(c *gin.Context) {
 		c.Error(utils.NewHttpError(404, "species not found", err))
 		return
 	}
-	if errors.Is(pgx.ErrNoRows, err) {
-		c.Error(utils.NewHttpError(404, "species not found", err))
-		return
-	}
 	if err != nil {
-		c.Error(fmt.Errorf("failed to get species by id: %w", err))
-		return
-	}
-
-	c.JSON(200, species)
-}
-
-// GetSpeciesByCommonName godoc
-//
-//	@Summary		Get species detail by common name
-//	@Description	Get species detail by common name. Case insensitive. Underscores will be replaced with spaces.
-//	@Tags			species
-//	@Param			name	path	string	true	"name of the species. Case insensitive."
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	db.Species
-//	@Router			/species/by-common-name/{name} [get]
-func (u *Controller) GetSpeciesByCommonName(c *gin.Context) {
-	name := c.Param("name")
-	cleanName := CleanName(name)
-	species, err := u.q.GetSpeciesByCommonName(c.Request.Context(), cleanName)
-	if errors.Is(pgx.ErrNoRows, err) {
-		c.Error(utils.NewHttpError(404, "species not found", err))
-		return
-	}
-	if err != nil {
-		c.Error(fmt.Errorf("failed to get species by common name: %w", err))
 		c.Error(fmt.Errorf("failed to get species by common name: %w", err))
 		return
 	}
@@ -215,7 +132,6 @@ func (u *Controller) GetSpeciesByCommonName(c *gin.Context) {
 //	@Success		200	{object}	ObservedSpeciesResponse
 //	@Router			/species/observed [get]
 func (u *Controller) GetObservedSpecies(c *gin.Context) {
-
 	var req ObservedSpeciesRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
 		c.Error(utils.NewHttpError(http.StatusBadRequest, "failed to parse input", err))
@@ -230,11 +146,10 @@ func (u *Controller) GetObservedSpecies(c *gin.Context) {
 		taxa.Valid = true
 	}
 
-	//Call DB query
 	rows, err := u.q.ListObservedSpecies(c.Request.Context(), db.ListObservedSpeciesParams{
 		From:      req.From.ToPGTime(),
 		To:        req.To.ToPGTime(),
-		SiteCodes: req.SiteCodes, // empty string means no filtering
+		SiteCodes: req.SiteCodes,
 		Blocks:    req.Blocks,
 		Taxa:      taxa,
 	})
@@ -243,7 +158,6 @@ func (u *Controller) GetObservedSpecies(c *gin.Context) {
 		return
 	}
 
-	//Transform result
 	result := make([]ObservedSpecies, 0, len(rows))
 	for _, r := range rows {
 		result = append(result, ObservedSpecies{
@@ -262,7 +176,6 @@ func (u *Controller) GetObservedSpecies(c *gin.Context) {
 		})
 	}
 
-	// Return response
 	c.JSON(200, ObservedSpeciesResponse{
 		Total:   len(result),
 		Species: result,
