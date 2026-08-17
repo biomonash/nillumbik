@@ -1,25 +1,25 @@
 -- name: CreateSpecies :one
 INSERT INTO species (scientific_name, common_name, native, taxa, indicator, reportable, images)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
-RETURNING id, scientific_name, common_name, native, taxa, indicator, reportable, images;
+RETURNING id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status;
 
 -- name: GetSpecies :one
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status
 FROM species
 WHERE id = $1 LIMIT 1;
 
 -- name: GetSpeciesByCommonName :one
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status
 FROM species
 WHERE lower(common_name) = LOWER($1) LIMIT 1;
 
 -- name: GetSpeciesByScientificName :one
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status
 FROM species
 WHERE lower(scientific_name) = LOWER($1) LIMIT 1;
 
 -- name: ListSpecies :many
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status
 FROM species
 ORDER BY scientific_name;
 
@@ -28,7 +28,7 @@ UPDATE species
 SET scientific_name = $2, common_name = $3, native = $4,
     taxa = $5, indicator = $6, reportable = $7, images = $8
 WHERE id = $1
-RETURNING id, scientific_name, common_name, native, taxa, indicator, reportable, images;
+RETURNING id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status;
 
 -- name: DeleteSpecies :exec
 DELETE FROM species
@@ -38,7 +38,7 @@ WHERE id = $1;
 SELECT COUNT(*) FROM species;
 
 -- name: SearchSpecies :many
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status
 FROM species
 WHERE scientific_name ILIKE $1 OR common_name ILIKE $1
 ORDER BY scientific_name;

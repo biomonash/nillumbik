@@ -3,6 +3,7 @@
 
 # Load environment and export to all commands
 include .env.dev
+include .env
 export
 
 # Variables

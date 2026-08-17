@@ -60,7 +60,7 @@ export default function SpeciesCard({
         </div>
 
         {/* Scientific Name and Indicator tag*/}
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 mt-4">
           <p className="text-xs italic text-gray-500 mb-0">
             {species.scientificName}
           </p>
@@ -78,7 +78,7 @@ export default function SpeciesCard({
         </div>
         {/* IUCN Status badge */}
         {species.iucnStatus && (
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 mt-4">
             <span className="text-xs italic text-gray-500 mb-0">
               IUCN Status
             </span>

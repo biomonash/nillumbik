@@ -45,10 +45,21 @@ func (c *ImporterCache) GetSpecies(ctx context.Context, sciName string) (db.Spec
 		return species, nil
 	}
 
-	species, err := c.q.GetSpeciesByScientificName(ctx, sciName)
+	row, err := c.q.GetSpeciesByScientificName(ctx, sciName)
 	if err != nil {
 		return db.Species{}, fmt.Errorf("failed to get species by scientific name: %w", err)
 	}
+	species = db.Species{
+			ID:             row.ID,
+			ScientificName: row.ScientificName,
+			CommonName:     row.CommonName,
+			Native:         row.Native,
+			Taxa:           row.Taxa,
+			Indicator:      row.Indicator,
+			Reportable:     row.Reportable,
+			Images:         row.Images,
+			IucnStatus:     row.IucnStatus,
+		}
 	c.species[sciName] = species
 	return species, nil
 }
