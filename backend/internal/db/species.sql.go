@@ -25,7 +25,7 @@ func (q *Queries) CountSpecies(ctx context.Context) (int64, error) {
 const createSpecies = `-- name: CreateSpecies :one
 INSERT INTO species (scientific_name, common_name, native, taxa, indicator, reportable, images)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
-RETURNING id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status
+RETURNING id, scientific_name, common_name, native, taxa, indicator, reportable, images
 `
 
 type CreateSpeciesParams struct {
@@ -58,7 +58,6 @@ func (q *Queries) CreateSpecies(ctx context.Context, arg CreateSpeciesParams) (S
 		&i.Indicator,
 		&i.Reportable,
 		&i.Images,
-		&i.IucnStatus,
 	)
 	return i, err
 }
@@ -74,7 +73,7 @@ func (q *Queries) DeleteSpecies(ctx context.Context, id int64) error {
 }
 
 const getSpecies = `-- name: GetSpecies :one
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images
 FROM species
 WHERE id = $1 LIMIT 1
 `
@@ -91,13 +90,12 @@ func (q *Queries) GetSpecies(ctx context.Context, id int64) (Species, error) {
 		&i.Indicator,
 		&i.Reportable,
 		&i.Images,
-		&i.IucnStatus,
 	)
 	return i, err
 }
 
 const getSpeciesByCommonName = `-- name: GetSpeciesByCommonName :one
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images
 FROM species
 WHERE lower(common_name) = LOWER($1) LIMIT 1
 `
@@ -114,13 +112,12 @@ func (q *Queries) GetSpeciesByCommonName(ctx context.Context, lower string) (Spe
 		&i.Indicator,
 		&i.Reportable,
 		&i.Images,
-		&i.IucnStatus,
 	)
 	return i, err
 }
 
 const getSpeciesByScientificName = `-- name: GetSpeciesByScientificName :one
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images
 FROM species
 WHERE lower(scientific_name) = LOWER($1) LIMIT 1
 `
@@ -137,7 +134,6 @@ func (q *Queries) GetSpeciesByScientificName(ctx context.Context, lower string) 
 		&i.Indicator,
 		&i.Reportable,
 		&i.Images,
-		&i.IucnStatus,
 	)
 	return i, err
 }
@@ -152,7 +148,6 @@ SELECT
   sp.indicator,
   sp.reportable,
   sp.images,
-  sp.iucn_status,
   observation_count
 FROM species sp
 JOIN
@@ -199,7 +194,6 @@ type ListObservedSpeciesRow struct {
 	Indicator        bool     `json:"indicator"`
 	Reportable       bool     `json:"reportable"`
 	Images           []string `json:"images"`
-	IucnStatus       *string  `json:"iucnStatus"`
 	ObservationCount int64    `json:"observationCount"`
 }
 
@@ -230,7 +224,6 @@ func (q *Queries) ListObservedSpecies(ctx context.Context, arg ListObservedSpeci
 			&i.Indicator,
 			&i.Reportable,
 			&i.Images,
-			&i.IucnStatus,
 			&i.ObservationCount,
 		); err != nil {
 			return nil, err
@@ -244,7 +237,7 @@ func (q *Queries) ListObservedSpecies(ctx context.Context, arg ListObservedSpeci
 }
 
 const listSpecies = `-- name: ListSpecies :many
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images
 FROM species
 ORDER BY scientific_name
 `
@@ -267,7 +260,6 @@ func (q *Queries) ListSpecies(ctx context.Context) ([]Species, error) {
 			&i.Indicator,
 			&i.Reportable,
 			&i.Images,
-			&i.IucnStatus,
 		); err != nil {
 			return nil, err
 		}
@@ -280,7 +272,7 @@ func (q *Queries) ListSpecies(ctx context.Context) ([]Species, error) {
 }
 
 const searchSpecies = `-- name: SearchSpecies :many
-SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status
+SELECT id, scientific_name, common_name, native, taxa, indicator, reportable, images
 FROM species
 WHERE scientific_name ILIKE $1 OR common_name ILIKE $1
 ORDER BY scientific_name
@@ -304,7 +296,6 @@ func (q *Queries) SearchSpecies(ctx context.Context, scientificName string) ([]S
 			&i.Indicator,
 			&i.Reportable,
 			&i.Images,
-			&i.IucnStatus,
 		); err != nil {
 			return nil, err
 		}
@@ -321,7 +312,7 @@ UPDATE species
 SET scientific_name = $2, common_name = $3, native = $4,
     taxa = $5, indicator = $6, reportable = $7, images = $8
 WHERE id = $1
-RETURNING id, scientific_name, common_name, native, taxa, indicator, reportable, images, iucn_status
+RETURNING id, scientific_name, common_name, native, taxa, indicator, reportable, images
 `
 
 type UpdateSpeciesParams struct {
@@ -356,7 +347,6 @@ func (q *Queries) UpdateSpecies(ctx context.Context, arg UpdateSpeciesParams) (S
 		&i.Indicator,
 		&i.Reportable,
 		&i.Images,
-		&i.IucnStatus,
 	)
 	return i, err
 }
