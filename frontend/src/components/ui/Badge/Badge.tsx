@@ -19,9 +19,9 @@ const variantClasses: Record<string, string> = {
   destructive: 'bg-red-500 text-white border-transparent hover:bg-red-500/80',
   outline: 'bg-transparent text-[var(--foreground)] border-current',
   native:
-    'bg-pale-green/90 text-[#1f2421] border-white/60 backdrop-blur-sm hover:bg-pale-green',
+    'bg-[var(--button-hover)] text-[var(--muted-foreground2)] border-white/60 backdrop-[var(--muted-foreground2)] hover:bg-pale-green',
   'non-native':
-    'bg-[#f3c9dd]/90 text-[#1f2421] border-white/60 backdrop-blur-sm hover:bg-[#f3c9dd]',
+    'bg-[#FD3E3E] text-[var(--muted-foreground2)] border-white/60 backdrop-blur-sm hover:bg-[#f3c9dd]',
 }
 
 const Badge = ({ className, variant = 'default', ...props }: BadgeProps) => {

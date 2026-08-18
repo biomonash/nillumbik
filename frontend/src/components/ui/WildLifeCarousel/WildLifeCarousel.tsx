@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import SpeciesProfile from '../../../components/ui/SpeciesProfile'
-import type { ObservedSpecies } from '../../../types'
+import type { Species } from '../../../types'
 
 type WildLifeCarouselProps = {
-  species: ObservedSpecies[]
+  species: Species[]
 }
 
 export default function WildLifeCarousel({ species }: WildLifeCarouselProps) {

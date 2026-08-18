@@ -1,14 +1,21 @@
-import { Badge } from '@mantine/core'
+import Badge from '../Badge'
 import { API_BASE_URL } from '../../../constants/api'
-import type { ObservedSpecies } from '../../../types'
+import type { Species } from '../../../types'
 
 type SpeciesProfileProps = {
-  species: ObservedSpecies
+  species: Species
 }
 
 export default function SpeciesProfile({ species }: SpeciesProfileProps) {
   const image = species.images?.[0]
-  const status = (species as { status?: 'native' | 'non-native' }).status
+
+  // species.native is a boolean — convert to a display variant explicitly
+  const status: 'native' | 'non-native' | undefined =
+    species.native === undefined || species.native === null
+      ? undefined
+      : species.native
+        ? 'native'
+        : 'non-native'
 
   return (
     <div className="group flex flex-col items-center w-40 sm:w-44 md:w-48 shrink-0 my-2 ml-2">
@@ -28,15 +35,12 @@ export default function SpeciesProfile({ species }: SpeciesProfileProps) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300">
-              <i
-                className="fa-solid fa-image text-2xl text-gray-400"
-                aria-hidden="true"
-              />
+              <i className="fa-solid fa-image text-2xl text-gray-400" aria-hidden="true" />
             </div>
           )}
         </div>
 
-        {status && (
+        {status !== undefined && (
           <Badge
             variant={status}
             className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap

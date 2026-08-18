@@ -122,7 +122,6 @@ const MapCharts: React.FC = () => {
     })
   }, [])
 
-
   const downloadCSV = useCallback(() => {
     const params = new URLSearchParams()
     if (selectedBlock && selectedBlock.length > 0) {
@@ -138,12 +137,12 @@ const MapCharts: React.FC = () => {
     window.location.href = url
   }, [selectedBlock, selectedSite, selectedTaxa, selectedSpecies])
 
-    useEffect(() => {
+  useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
   }, [])
-  
+
   const handleTenureChange = (tenure: 'Public' | 'Private') => {
     if (selectedTenure === tenure) {
       dispatch(updateSelectedTenure(null))
@@ -191,24 +190,44 @@ const MapCharts: React.FC = () => {
         </div>
       </div>
       <div className="flex flex-cols-2 gap-3">
-        <div className="flex">
-          <input
-            type="checkbox"
-            checked={selectedTenure === 'Private'}
-            onChange={() => handleTenureChange('Private')}
-          />
+        <div className="flex gap-4">
+          <label className="flex items-center gap-1.5 text-sm text-black cursor-pointer">
+            <input
+              type="checkbox"
+              checked={selectedTenure === 'Private'}
+              onChange={() => handleTenureChange('Private')}
+              className="
+        h-4 w-4
+        appearance-none
+        rounded-full
+        border-2 border-green-700
+        bg-white
+        checked:bg-green-700
+        cursor-pointer
+        transition
+      "
+            />
+            Private
+          </label>
 
-          <label className="text-black ml-1">Private</label>
-        </div>
-
-        <div className="flex">
-          <input
-            type="checkbox"
-            checked={selectedTenure === 'Public'}
-            onChange={() => handleTenureChange('Public')}
-          />
-
-          <label className="text-black ml-1">Public</label>
+          <label className="flex items-center gap-1.5 text-sm text-black cursor-pointer">
+            <input
+              type="checkbox"
+              checked={selectedTenure === 'Public'}
+              onChange={() => handleTenureChange('Public')}
+              className="
+        h-4 w-4
+        appearance-none
+        rounded-full
+        border-2 border-green-700
+        bg-white
+        checked:bg-green-700
+        cursor-pointer
+        transition
+      "
+            />
+            Public
+          </label>
         </div>
       </div>
       {/* Select Filters */}
