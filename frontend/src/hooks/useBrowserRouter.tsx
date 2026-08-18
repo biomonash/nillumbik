@@ -7,7 +7,6 @@ import MainLayout from '../layouts/MainLayout/MainLayout.tsx'
 //? LAZY LOADING PAGES & LAYOUTS
 // Layouts
 const DashboardLayout = lazy(() => import('../layouts/DashboardLayout'))
-const AdminLayout = lazy(() => import('../layouts/AdminLayout'))
 
 // Pages
 const Home = lazy(() => import('../pages/Home'))
