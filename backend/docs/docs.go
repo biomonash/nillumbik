@@ -24,6 +24,77 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/export": {
+            "get": {
+                "description": "Export filtered observations as a downloadable CSV file",
+                "produces": [
+                    "text/csv"
+                ],
+                "tags": [
+                    "export"
+                ],
+                "summary": "Export observations as CSV",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Search start from",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Search end to",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "multi",
+                        "description": "Filter by site block",
+                        "name": "block[]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "description": "Filter by site code",
+                        "name": "siteCode[]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by taxa",
+                        "name": "taxa",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by species common name",
+                        "name": "commonName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by native status",
+                        "name": "native",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/observations": {
             "get": {
                 "description": "List observations",
@@ -382,7 +453,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site block",
-                        "name": "block",
+                        "name": "block[]",
                         "in": "query"
                     },
                     {
@@ -392,7 +463,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site code",
-                        "name": "siteCode",
+                        "name": "siteCode[]",
                         "in": "query"
                     },
                     {
@@ -453,7 +524,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site block",
-                        "name": "block",
+                        "name": "block[]",
                         "in": "query"
                     },
                     {
@@ -463,7 +534,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site code",
-                        "name": "siteCode",
+                        "name": "siteCode[]",
                         "in": "query"
                     },
                     {
@@ -524,7 +595,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site block",
-                        "name": "block",
+                        "name": "block[]",
                         "in": "query"
                     },
                     {
@@ -534,7 +605,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site code",
-                        "name": "siteCode",
+                        "name": "siteCode[]",
                         "in": "query"
                     },
                     {
@@ -595,7 +666,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site block",
-                        "name": "block",
+                        "name": "block[]",
                         "in": "query"
                     },
                     {
@@ -605,7 +676,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "description": "Filter by site code",
-                        "name": "siteCode",
+                        "name": "siteCode[]",
                         "in": "query"
                     },
                     {
