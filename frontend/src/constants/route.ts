@@ -1,5 +1,5 @@
 export default {
-  HOME: '/',
+  HOME: '/home',
   ABOUT: '/about',
   INSTRUCTION: '/instruction',
   DASHBOARD: '/dashboard',
