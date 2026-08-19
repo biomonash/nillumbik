@@ -2,7 +2,13 @@ import * as React from 'react'
 import { cn } from '../../../lib/utils'
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'secondary' | 'destructive' | 'outline'
+  variant?:
+    | 'default'
+    | 'secondary'
+    | 'destructive'
+    | 'outline'
+    | 'native'
+    | 'non-native'
 }
 
 const variantClasses: Record<string, string> = {
@@ -12,6 +18,10 @@ const variantClasses: Record<string, string> = {
     'bg-secondary text-[var(--foreground)] border-transparent hover:bg-secondary/80',
   destructive: 'bg-red-500 text-white border-transparent hover:bg-red-500/80',
   outline: 'bg-transparent text-[var(--foreground)] border-current',
+  native:
+    'bg-[var(--button-hover)] text-[var(--muted-foreground2)] border-white/60 backdrop-[var(--muted-foreground2)] hover:bg-pale-green',
+  'non-native':
+    'bg-[#FD3E3E] text-[var(--muted-foreground2)] border-white/60 backdrop-blur-sm hover:bg-[#f3c9dd]',
 }
 
 const Badge = ({ className, variant = 'default', ...props }: BadgeProps) => {

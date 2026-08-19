@@ -22,10 +22,13 @@ import {
   updateSelectedTaxa,
   selectBlock,
   selectSite,
+  selectTenure,
+  updateSelectedTenure,
   updateSelectedSpecies,
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import Badge from '../../../components/ui/Badge'
+import { API_BASE_URL } from '../../../constants/api'
 
 function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
@@ -39,15 +42,20 @@ function extractSortedBlocks(data: number[]): ChartInput[] {
 function extractSortedSites(
   data: Site[],
   selectedBlocks?: number[],
+  selectedTenure?: 'Public' | 'Private',
 ): ChartInput[] {
   const sorted = data
     .filter((site) =>
       selectedBlocks ? selectedBlocks.includes(site.block) : true,
     )
-    .map((site) => ({ value: site.code, label: `Site ${site.name}` }))
+    .filter((site) => (selectedTenure ? site.tenure === selectedTenure : true))
+    .map((site) => ({
+      value: site.code,
+      label: `Site ${site.name}`,
+    }))
+
   return [{ value: 'all', label: 'All Sites' }, ...sorted]
 }
-
 const taxaOptions = [
   { value: 'all', label: 'All Taxa' },
   ...['bird', 'mammal', 'reptile'].map((t) => ({
@@ -79,6 +87,8 @@ const MapCharts: React.FC = () => {
   const selectedSite = useSelector(selectSite)
   const selectedTaxa = useSelector(selectTaxa)
   const selectedSpecies = useSelector(selectSpecies)
+  const selectedTenure = useSelector(selectTenure)
+
   const stats = useSelector((state: RootState) => ({
     total: state.map.totalObservations,
     nativeCount: state.map.nativeSpeciesCount,
@@ -89,7 +99,11 @@ const MapCharts: React.FC = () => {
     extractSortedBlocks(state.map.blocks),
   )
   const siteOptions = useAppSelector((state) =>
-    extractSortedSites(state.map.sites, state.map.query.blocks),
+    extractSortedSites(
+      state.map.sites,
+      state.map.query.blocks,
+      state.map.query.tenure,
+    ),
   )
   const speciesOptions = useAppSelector((state) =>
     extractSpeciesOptions(state.map.species, state.map.query.taxa),
@@ -120,7 +134,7 @@ const MapCharts: React.FC = () => {
     if (selectedTaxa) params.append('taxa', selectedTaxa)
     if (selectedSpecies) params.append('commonName', selectedSpecies)
 
-    const url = `http://localhost:8000/api/export?${params.toString()}`
+    const url = `${API_BASE_URL}/api/export?${params.toString()}`
     window.location.href = url
   }, [selectedBlock, selectedSite, selectedTaxa, selectedSpecies])
 
@@ -129,6 +143,15 @@ const MapCharts: React.FC = () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
   }, [])
+
+  const handleTenureChange = (tenure: 'Public' | 'Private') => {
+    if (selectedTenure === tenure) {
+      dispatch(updateSelectedTenure(null))
+      return
+    }
+
+    dispatch(updateSelectedTenure(tenure))
+  }
 
   return (
     <div className="bg-[var(--muted-foreground2)] flex flex-col gap-3">
@@ -141,30 +164,74 @@ const MapCharts: React.FC = () => {
       )}
 
       {/* Header */}
-      <div className="flex xs:flex-wrap relative justify-between items-center">
-        <h1 className="text-black text-lg font-semibold tracking-tight">
-          Zone Filter 🔎
-        </h1>
-        <div className="flex items-center gap-1.5 my-2">
+      <div className="flex flex-wrap gap-y-2 relative justify-between items-center">
+        <div>
+          <h1 className="text-black text-lg font-semibold tracking-tight">
+            Zone Filter
+          </h1>
+          <p className="text-xs text-gray-500 mt-1 mb-0">
+            Filter observations by zone and tenure
+          </p>
+        </div>
+
+        <div className="flex w-full flex-wrap items-center justify-center gap-2 mt-2">
           <button
             onClick={copy}
-            className="border-2 border-green-700 text-green-700 font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:scale-105 hover:bg-[var(--button-hover)] hover:text-white hover:shadow-md"
+            className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-xs font-semibold shadow-sm transition-all duration-200 hover:border-green-700/40 hover:text-green-700 hover:shadow-md"
           >
             Copy Link
           </button>
+
           <button
             onClick={() => dispatch(resetFilters())}
-            className="border-2 border-green-700 bg-green-700 font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:bg-[var(--button-hover)] hover:scale-105 hover:shadow-lg"
+            className="px-4 py-2 rounded-xl border border-green-700/30 bg-green-50 text-green-700 text-xs font-semibold shadow-sm transition-all duration-200 hover:bg-green-100 hover:shadow-md"
           >
             Reset Filters
           </button>
+
           <button
             onClick={downloadCSV}
-            className="border-2 border-green-700 bg-green-700 font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:bg-[var(--button-hover)] hover:scale-105 hover:shadow-lg"
+            className="px-4 py-2 rounded-xl bg-green-700 text-white text-xs font-semibold shadow-sm transition-all duration-200 hover:bg-[var(--button-hover)] hover:shadow-md"
           >
-            {' '}
             Download
           </button>
+        </div>
+      </div>
+
+      {/* Tenure */}
+      <div className="flex justify-center">
+        <div className="inline-flex gap-2 bg-gray-100 rounded-xl p-1">
+          <label
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer transition-all duration-200 ${
+              selectedTenure === 'Private'
+                ? 'bg-white text-green-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={selectedTenure === 'Private'}
+              onChange={() => handleTenureChange('Private')}
+              className="h-4 w-4 appearance-none rounded-full border-2 border-green-700 bg-white checked:bg-green-700 cursor-pointer transition"
+            />
+            Private
+          </label>
+
+          <label
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer transition-all duration-200 ${
+              selectedTenure === 'Public'
+                ? 'bg-white text-green-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={selectedTenure === 'Public'}
+              onChange={() => handleTenureChange('Public')}
+              className="h-4 w-4 appearance-none rounded-full border-2 border-green-700 bg-white checked:bg-green-700 cursor-pointer transition"
+            />
+            Public
+          </label>
         </div>
       </div>
 

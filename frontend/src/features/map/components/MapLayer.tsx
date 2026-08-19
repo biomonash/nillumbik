@@ -51,6 +51,7 @@ export default function MapLayer({
 }: MapLayerProps) {
   const dispatch = useAppDispatch()
   const query = useAppSelector(selectQuery)
+  const sites = useAppSelector((state) => state.map.sites)
   const params = useMemo(
     () => ({
       taxa: query.taxa,
@@ -124,6 +125,11 @@ export default function MapLayer({
     loadDistribution()
   }, [mode, params])
 
+  const tenureLookup = useMemo(
+    () => Object.fromEntries(sites.map((site) => [site.code, site.tenure])),
+    [sites],
+  )
+
   return (
     <MapContainer
       key={mode}
@@ -134,10 +140,9 @@ export default function MapLayer({
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
       <FlyToUser coords={coords} />
-
       {geoData && (
         <GeoJSON
-          key={`${mode}-${currentRegion}-${Object.keys(statsLookup).length}`}
+          key={`${mode}-${query.tenure}-${currentRegion}-${Object.keys(statsLookup).length}`}
           data={geoData}
           style={(feature) => {
             const id =
@@ -147,15 +152,38 @@ export default function MapLayer({
 
             const isSelected = currentRegion?.includes(id)
             const isHovered = hoveredZone === id
+
             const observationCount = statsLookup[id]?.observationCount ?? 0
+
             const fillColor = hasSpeciesFilter
               ? speciesScale(observationCount)
               : overallScale(observationCount)
+
+            const siteTenure = tenureLookup[id]
+
+            const matchesTenure =
+              mode !== 'site' ||
+              !query.tenure ||
+              siteTenure?.toLowerCase() === query.tenure.toLowerCase()
+
+            const isDisabled = !matchesTenure
+
             return {
-              color: isSelected ? '#b45309' : '#2d6a4f',
-              fillColor: isSelected ? '#f59e0b' : fillColor,
-              weight: isSelected ? 4 : isHovered ? 3 : 2,
-              fillOpacity: isSelected ? 0.75 : 0.45,
+              color: isDisabled
+                ? '#9ca3af'
+                : isSelected
+                  ? '#b45309'
+                  : '#2d6a4f',
+
+              fillColor: isDisabled
+                ? '#d1d5db'
+                : isSelected
+                  ? '#f59e0b'
+                  : fillColor,
+
+              weight: isDisabled ? 1.5 : isSelected ? 4 : isHovered ? 3 : 2,
+
+              fillOpacity: isDisabled ? 0.08 : isSelected ? 0.75 : 0.45,
             }
           }}
           onEachFeature={(feature, layer) => {
@@ -163,19 +191,42 @@ export default function MapLayer({
               mode === 'site'
                 ? feature.properties.site
                 : String(feature.properties.block)
+
             const stats = statsLookup[id]
-            layer.bindTooltip(
-              `<strong>${mode === 'site' ? `Site ${id}` : `Block ${id}`}</strong><br/>
-                            Observations: ${stats?.observationCount ?? 0}<br/>
-                            Species: ${stats?.speciesCount ?? 0}`,
-            )
-            layer.on('mouseover', () => setHoveredZone(id))
-            layer.on('mouseout', () => setHoveredZone(null))
+            const siteTenure = tenureLookup[id]
+
+            const matchesTenure =
+              mode !== 'site' ||
+              !query.tenure ||
+              siteTenure?.toLowerCase() === query.tenure.toLowerCase()
+
+            if (matchesTenure) {
+              layer.bindTooltip(
+                `<strong>${
+                  mode === 'site' ? `Site ${id}` : `Block ${id}`
+                }</strong><br/>
+        Observations: ${stats?.observationCount ?? 0}<br/>
+        Species: ${stats?.speciesCount ?? 0}${
+          mode === 'site' ? `<br/>Tenure: ${siteTenure ?? 'Unknown'}` : ''
+        }`,
+              )
+            }
+
+            layer.on('mouseover', () => {
+              if (matchesTenure) {
+                setHoveredZone(id)
+              }
+            })
+
+            layer.on('mouseout', () => {
+              setHoveredZone(null)
+            })
 
             layer.on('click', (e: LeafletMouseEvent) => {
-              const multiselect = isDesktop
-                ? e.originalEvent.shiftKey
-                : multiSelectMode
+              if (!matchesTenure) return
+
+              const multiselect = e.originalEvent.shiftKey || multiSelectMode
+
               const isAlreadySelected = currentRegion?.includes(id)
 
               let newSelection: string[] = []

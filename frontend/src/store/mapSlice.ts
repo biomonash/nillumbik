@@ -14,6 +14,7 @@ export type MapQuery = Partial<{
   sites: string[]
   taxa: string
   species: string
+  tenure: 'Public' | 'Private'
 }>
 
 interface MapState {
@@ -110,6 +111,13 @@ const mapSlice = createSlice({
       state.query = {}
     },
 
+    setSelectedTenure(
+      state,
+      action: PayloadAction<'Public' | 'Private' | null>,
+    ) {
+      state.query.tenure = action.payload ?? undefined
+    },
+
     setObservedSpecies(state, action: PayloadAction<ObservedSpecies[]>) {
       state.observedSpecies = action.payload
     },
@@ -128,6 +136,7 @@ const {
   setStats,
   setTimeseries,
   reset,
+  setSelectedTenure,
   setObservedSpecies,
 } = mapSlice.actions
 
@@ -221,6 +230,12 @@ export function resetFilters() {
   }
 }
 
+export function updateSelectedTenure(tenure: 'Public' | 'Private' | null) {
+  return (dispatch: AppDispatch) => {
+    dispatch(setSelectedTenure(tenure))
+  }
+}
+
 export const selectMode = (state: RootState) => state.map.mode
 export const selectQuery = (state: RootState) => state.map.query
 export const selectBlock = (state: RootState) => state.map.query.blocks
@@ -235,6 +250,7 @@ export const selectTaxa = (state: RootState) => state.map.query.taxa
 export const selectSpecies = (state: RootState) => state.map.query.species
 export const selectCountByTaxa = (state: RootState) => state.map.countByTaxa
 export const selectTimeSeries = (state: RootState) => state.map.timeseries
+export const selectTenure = (state: RootState) => state.map.query.tenure
 export const selectObservedSpecies = (state: RootState) =>
   state.map.observedSpecies
 
