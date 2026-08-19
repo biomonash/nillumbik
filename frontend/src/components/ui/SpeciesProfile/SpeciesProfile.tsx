@@ -35,7 +35,10 @@ export default function SpeciesProfile({ species }: SpeciesProfileProps) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300">
-              <i className="fa-solid fa-image text-2xl text-gray-400" aria-hidden="true" />
+              <i
+                className="fa-solid fa-image text-2xl text-gray-400"
+                aria-hidden="true"
+              />
             </div>
           )}
         </div>
