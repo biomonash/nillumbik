@@ -122,7 +122,6 @@ const MapCharts: React.FC = () => {
     })
   }, [])
 
-
   const downloadCSV = useCallback(() => {
     const params = new URLSearchParams()
     if (selectedBlock && selectedBlock.length > 0) {
@@ -138,12 +137,12 @@ const MapCharts: React.FC = () => {
     window.location.href = url
   }, [selectedBlock, selectedSite, selectedTaxa, selectedSpecies])
 
-    useEffect(() => {
+  useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
   }, [])
-  
+
   const handleTenureChange = (tenure: 'Public' | 'Private') => {
     if (selectedTenure === tenure) {
       dispatch(updateSelectedTenure(null))
@@ -164,53 +163,77 @@ const MapCharts: React.FC = () => {
       )}
 
       {/* Header */}
-      <div className="flex xs:flex-wrap relative justify-between items-center">
-        <h1 className="text-black text-lg font-semibold tracking-tight">
-          Zone Filter 🔎
-        </h1>
-        <div className="flex items-center gap-1.5 my-2">
+      <div className="flex flex-wrap gap-y-2 relative justify-between items-center">
+        <div>
+          <h1 className="text-black text-lg font-semibold tracking-tight">
+            Zone Filter
+          </h1>
+          <p className="text-xs text-gray-500 mt-1 mb-0">
+            Filter observations by zone and tenure
+          </p>
+        </div>
+
+        <div className="flex w-full flex-wrap items-center justify-center gap-2 mt-2">
           <button
             onClick={copy}
-            className="border-2 border-green-700 text-green-700 font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:scale-105 hover:bg-[var(--button-hover)] hover:text-white hover:shadow-md"
+            className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-xs font-semibold shadow-sm transition-all duration-200 hover:border-green-700/40 hover:text-green-700 hover:shadow-md"
           >
             Copy Link
           </button>
+
           <button
             onClick={() => dispatch(resetFilters())}
-            className="border-2 border-green-700 bg-green-700 font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:bg-[var(--button-hover)] hover:scale-105 hover:shadow-lg"
+            className="px-4 py-2 rounded-xl border border-green-700/30 bg-green-50 text-green-700 text-xs font-semibold shadow-sm transition-all duration-200 hover:bg-green-100 hover:shadow-md"
           >
             Reset Filters
           </button>
+
           <button
             onClick={downloadCSV}
-            className="border-2 border-green-700 bg-green-700 font-semibold py-1.5 w-22 rounded-full text-xs transition-all duration-200 hover:bg-[var(--button-hover)] hover:scale-105 hover:shadow-lg"
+            className="px-4 py-2 rounded-xl bg-green-700 text-white text-xs font-semibold shadow-sm transition-all duration-200 hover:bg-[var(--button-hover)] hover:shadow-md"
           >
-            {' '}
             Download
           </button>
         </div>
       </div>
-      <div className="flex flex-cols-2 gap-3">
-        <div className="flex">
-          <input
-            type="checkbox"
-            checked={selectedTenure === 'Private'}
-            onChange={() => handleTenureChange('Private')}
-          />
 
-          <label className="text-black ml-1">Private</label>
-        </div>
+      {/* Tenure */}
+      <div className="flex justify-center">
+        <div className="inline-flex gap-2 bg-gray-100 rounded-xl p-1">
+          <label
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer transition-all duration-200 ${
+              selectedTenure === 'Private'
+                ? 'bg-white text-green-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={selectedTenure === 'Private'}
+              onChange={() => handleTenureChange('Private')}
+              className="h-4 w-4 appearance-none rounded-full border-2 border-green-700 bg-white checked:bg-green-700 cursor-pointer transition"
+            />
+            Private
+          </label>
 
-        <div className="flex">
-          <input
-            type="checkbox"
-            checked={selectedTenure === 'Public'}
-            onChange={() => handleTenureChange('Public')}
-          />
-
-          <label className="text-black ml-1">Public</label>
+          <label
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer transition-all duration-200 ${
+              selectedTenure === 'Public'
+                ? 'bg-white text-green-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={selectedTenure === 'Public'}
+              onChange={() => handleTenureChange('Public')}
+              className="h-4 w-4 appearance-none rounded-full border-2 border-green-700 bg-white checked:bg-green-700 cursor-pointer transition"
+            />
+            Public
+          </label>
         </div>
       </div>
+
       {/* Select Filters */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col">

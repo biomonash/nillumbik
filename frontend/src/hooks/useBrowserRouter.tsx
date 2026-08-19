@@ -2,45 +2,44 @@ import { lazy } from 'react'
 import routes from '../constants/route'
 import { Navigate } from 'react-router'
 import { createBrowserRouter } from 'react-router'
+import MainLayout from '../layouts/MainLayout/MainLayout.tsx'
 
 //? LAZY LOADING PAGES & LAYOUTS
 // Layouts
 const DashboardLayout = lazy(() => import('../layouts/DashboardLayout'))
-const AdminLayout = lazy(() => import('../layouts/AdminLayout'))
 
 // Pages
-//const Home = lazy(() => import('../pages/Home'))
+const Home = lazy(() => import('../pages/Home'))
 const About = lazy(() => import('../pages/About'))
-const Instruction = lazy(() => import('../pages/Instruction'))
 const Dashboard = lazy(() => import('../pages/Dashboard'))
 const Gallery = lazy(() => import('../pages/Gallery'))
 const Map = lazy(() => import('../pages/Map'))
 const Graph = lazy(() => import('../pages/Graph.tsx'))
 const Settings = lazy(() => import('../pages/Settings'))
-const Admin = lazy(() => import('../pages/Admin'))
 const Error = lazy(() => import('../pages/Error'))
 
 const useBrowserRouter = () => {
   const router = createBrowserRouter(
     [
       {
-        path: routes.HOME,
-        Component: () => <Navigate to={routes.DASHBOARD} replace />,
+        path: '/',
+        Component: MainLayout,
         children: [
           {
             index: true,
-            Component: Dashboard,
+            Component: () => <Navigate to={routes.HOME} replace />,
           },
           {
-            path: routes.ABOUT,
-            Component: About,
-          },
-          {
-            path: routes.INSTRUCTION,
-            Component: Instruction,
+            path: routes.HOME,
+            Component: Home,
           },
         ],
       },
+      {
+        path: routes.ABOUT,
+        Component: About,
+      },
+
       {
         path: '',
         Component: DashboardLayout,
@@ -64,16 +63,6 @@ const useBrowserRouter = () => {
           {
             path: routes.SETTINGS,
             Component: Settings,
-          },
-        ],
-      },
-      {
-        path: routes.ADMIN,
-        Component: AdminLayout,
-        children: [
-          {
-            index: true,
-            Component: Admin,
           },
         ],
       },
