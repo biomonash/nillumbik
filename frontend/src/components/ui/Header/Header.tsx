@@ -8,8 +8,6 @@ const links = [
   { link: routes.HOME, label: 'Home' },
 ]
 
-/*   { link: routes.INSTRUCTION, label: "Community" }, */
-
 const Header: React.FC = (): JSX.Element => {
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
