@@ -225,9 +225,7 @@ export default function MapLayer({
             layer.on('click', (e: LeafletMouseEvent) => {
               if (!matchesTenure) return
 
-              const multiselect = isDesktop
-                ? e.originalEvent.shiftKey
-                : multiSelectMode
+              const multiselect = e.originalEvent.shiftKey || multiSelectMode
 
               const isAlreadySelected = currentRegion?.includes(id)
 

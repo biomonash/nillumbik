@@ -28,6 +28,7 @@ import {
 } from '../../../store/mapSlice'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import Badge from '../../../components/ui/Badge'
+import { API_BASE_URL } from '../../../constants/api'
 
 function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
@@ -133,7 +134,7 @@ const MapCharts: React.FC = () => {
     if (selectedTaxa) params.append('taxa', selectedTaxa)
     if (selectedSpecies) params.append('commonName', selectedSpecies)
 
-    const url = `http://localhost:8000/api/export?${params.toString()}`
+    const url = `${API_BASE_URL}/api/export?${params.toString()}`
     window.location.href = url
   }, [selectedBlock, selectedSite, selectedTaxa, selectedSpecies])
 
