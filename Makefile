@@ -8,7 +8,6 @@ export
 
 # Variables
 MAKE=make
-MAKE=make
 BINARY_NAME=nillumbik
 BACKEND_DIR=backend
 FRONTEND_DIR=frontend
@@ -43,10 +42,8 @@ install: install-backend install-frontend ## Install all dependencies
 dev: ## Start development servers for both backend and frontend
 	@printf "$(GREEN)Starting development environment...$(NC)\n"
 	@$(MAKE) -j 2 dev-backend dev-frontend
-	@$(MAKE) -j 2 dev-backend dev-frontend
 
 .PHONY: build
-build: build-frontend build-backend ## Build both backend and frontend
 build: build-frontend build-backend ## Build both backend and frontend
 
 .PHONY: clean
@@ -74,7 +71,6 @@ install-backend: ## Install Go dependencies
 .PHONY: build-backend
 build-backend: ## Build the Go backend
 	@printf "$(GREEN)Building Go backend...$(NC)\n"
-	@cd $(BACKEND_DIR) && go build -o $(BINARY_NAME) $(GO_MAIN)
 	@cd $(BACKEND_DIR) && go build -o $(BINARY_NAME) $(GO_MAIN)
 
 .PHONY: run-backend
@@ -149,11 +145,6 @@ gen-doc:
 	@printf "$(GREEN)Generating Swagger API Documents...$(NC)\n"
 	@cd $(BACKEND_DIR) && swag fmt && swag init -g internal/server/server.go
 
-.PHONY: gen-doc
-gen-doc:
-	@printf "$(GREEN)Generating Swagger API Documents...$(NC)\n"
-	@cd $(BACKEND_DIR) && swag fmt && swag init -g internal/server/server.go
-
 # =============================================================================
 # Database Commands
 # =============================================================================
@@ -173,7 +164,6 @@ db-migrate-up: ## Run database migrations up (requires golang-migrate)
 	@printf "$(GREEN)Running database migrations up...$(NC)\n"
 	@if command -v migrate >/dev/null 2>&1; then \
 		cd $(BACKEND_DIR) && migrate -path db/migrations -database $(DB_URL) up; \
-		cd $(BACKEND_DIR) && migrate -path db/migrations -database $(DB_URL) up; \
 	else \
 		printf "$(RED)golang-migrate not installed. Install from: https://github.com/golang-migrate/migrate$(NC)\n"; \
 		exit 1; \
@@ -183,7 +173,6 @@ db-migrate-up: ## Run database migrations up (requires golang-migrate)
 db-migrate-down: ## Run database migrations down (requires golang-migrate)
 	@printf "$(YELLOW)Running database migrations down...$(NC)\n"
 	@if command -v migrate >/dev/null 2>&1; then \
-		cd $(BACKEND_DIR) && migrate -path db/migrations -database $(DB_URL) down; \
 		cd $(BACKEND_DIR) && migrate -path db/migrations -database $(DB_URL) down; \
 	else \
 		printf "$(RED)golang-migrate not installed. Install from: https://github.com/golang-migrate/migrate$(NC)\n"; \
@@ -207,7 +196,6 @@ db-migrate-create: ## Create a new migration file (usage: make db-migrate-create
 .PHONY: db-seed
 db-seed:
 		docker compose -f $(DOCKER_COMPOSE_FILE) exec -T db psql $(DB_URL) < $(BACKEND_DIR)/db/seed.sql
-		docker compose -f $(DOCKER_COMPOSE_FILE) exec -T db psql $(DB_URL) < $(BACKEND_DIR)/db/seed.sql
 
 # =============================================================================
 # Frontend (TypeScript) Commands
@@ -218,7 +206,6 @@ install-frontend: ## Install Node.js dependencies
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Installing Node.js dependencies...$(NC)\n"; \
 		cd $(FRONTEND_DIR) && yarn install; \
-		cd $(FRONTEND_DIR) && yarn install; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend installation.$(NC)\n"; \
 	fi
@@ -227,7 +214,6 @@ install-frontend: ## Install Node.js dependencies
 build-frontend: ## Build the TypeScript frontend
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Building TypeScript frontend...$(NC)\n"; \
-		cd $(FRONTEND_DIR) && VITE_API_BASE_URL=$(API_BASE_URL) yarn build --outDir ../backend/assets/dist; \
 		cd $(FRONTEND_DIR) && VITE_API_BASE_URL=$(API_BASE_URL) yarn build --outDir ../backend/assets/dist; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend build.$(NC)\n"; \
@@ -238,7 +224,6 @@ dev-frontend: ## Start frontend in development mode
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Starting frontend development server...$(NC)\n"; \
 		cd $(FRONTEND_DIR) && yarn dev:local; \
-		cd $(FRONTEND_DIR) && yarn dev:local; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend dev server.$(NC)\n"; \
 	fi
@@ -247,7 +232,6 @@ dev-frontend: ## Start frontend in development mode
 test-frontend: ## Run TypeScript/JavaScript tests
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Running frontend tests...$(NC)\n"; \
-		cd $(FRONTEND_DIR) && yarn test; \
 		cd $(FRONTEND_DIR) && yarn test; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend tests.$(NC)\n"; \
@@ -258,7 +242,6 @@ lint-frontend: ## Run frontend linter
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Running frontend linter...$(NC)\n"; \
 		cd $(FRONTEND_DIR) && yarn lint; \
-		cd $(FRONTEND_DIR) && yarn lint; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend linting.$(NC)\n"; \
 	fi
@@ -267,7 +250,6 @@ lint-frontend: ## Run frontend linter
 format-frontend: ## Format frontend code
 	@if [ -f "$(FRONTEND_DIR)/package.json" ]; then \
 		printf "$(GREEN)Formatting frontend code...$(NC)\n"; \
-		cd $(FRONTEND_DIR) && yarn format; \
 		cd $(FRONTEND_DIR) && yarn format; \
 	else \
 		printf "$(YELLOW)No package.json found in $(FRONTEND_DIR). Skipping frontend formatting.$(NC)\n"; \
@@ -322,7 +304,6 @@ setup-dev: ## Setup development environment
 	go install github.com/air-verse/air@v1.62.0
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.29.0
 	go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.0
-	go install github.com/swaggo/swag/cmd/swag@v1.16.6
 	go install github.com/swaggo/swag/cmd/swag@v1.16.6
 	@$(MAKE) install
 

@@ -77,20 +77,9 @@ func ImportCSV(ctx context.Context, q *db.Queries, filename string) error {
 			if err != nil {
 				return fmt.Errorf("Failed to parse species: %w", err)
 			}
-			createdSpecies, err := q.CreateSpecies(ctx, speciesParam)
+			species, err = q.CreateSpecies(ctx, speciesParam)
 			if err != nil {
 				return fmt.Errorf("Row: %d insert species failed: %w\n%v", i, err, speciesParam)
-			}
-			species = 	db.Species{
-				ID:             createdSpecies.ID,
-				ScientificName: createdSpecies.ScientificName,
-				CommonName:     createdSpecies.CommonName,
-				Native:         createdSpecies.Native,
-				Taxa:           createdSpecies.Taxa,
-				Indicator:      createdSpecies.Indicator,
-				Reportable:     createdSpecies.Reportable,
-				Images:         createdSpecies.Images,
-				IucnStatus:     createdSpecies.IucnStatus,
 			}
 			cache.AddSpecies(species)
 		} else if err != nil {
