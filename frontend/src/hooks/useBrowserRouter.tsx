@@ -27,7 +27,7 @@ const useBrowserRouter = () => {
         children: [
           {
             index: true,
-            Component: () => <Navigate to={routes.HOME} replace />,
+            Component: () => <Navigate to={routes.DASHBOARD} replace />,
           },
           {
             path: routes.HOME,
