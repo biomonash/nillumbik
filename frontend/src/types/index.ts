@@ -13,6 +13,7 @@ export type Species = {
   indicator: boolean
   taxa: string
   images: string[]
+  iucnStatus: string | null
   tenure: 'Public' | 'Private'
 }
 

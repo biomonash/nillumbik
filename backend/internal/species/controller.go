@@ -132,7 +132,6 @@ func (u *Controller) GetSpeciesByCommonName(c *gin.Context) {
 //	@Success		200	{object}	ObservedSpeciesResponse
 //	@Router			/species/observed [get]
 func (u *Controller) GetObservedSpecies(c *gin.Context) {
-
 	var req ObservedSpeciesRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
 		c.Error(utils.NewHttpError(http.StatusBadRequest, "failed to parse input", err))
@@ -147,11 +146,10 @@ func (u *Controller) GetObservedSpecies(c *gin.Context) {
 		taxa.Valid = true
 	}
 
-	//Call DB query
 	rows, err := u.q.ListObservedSpecies(c.Request.Context(), db.ListObservedSpeciesParams{
 		From:      req.From.ToPGTime(),
 		To:        req.To.ToPGTime(),
-		SiteCodes: req.SiteCodes, // empty string means no filtering
+		SiteCodes: req.SiteCodes,
 		Blocks:    req.Blocks,
 		Taxa:      taxa,
 	})
@@ -160,7 +158,6 @@ func (u *Controller) GetObservedSpecies(c *gin.Context) {
 		return
 	}
 
-	//Transform result
 	result := make([]ObservedSpecies, 0, len(rows))
 	for _, r := range rows {
 		result = append(result, ObservedSpecies{
@@ -173,12 +170,12 @@ func (u *Controller) GetObservedSpecies(c *gin.Context) {
 				Indicator:      r.Indicator,
 				Reportable:     r.Reportable,
 				Images:         r.Images,
+				IucnStatus:     r.IucnStatus,
 			},
 			ObservationCount: r.ObservationCount,
 		})
 	}
 
-	// Return response
 	c.JSON(200, ObservedSpeciesResponse{
 		Total:   len(result),
 		Species: result,

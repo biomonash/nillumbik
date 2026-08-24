@@ -306,4 +306,5 @@ type Species struct {
 	Indicator      bool     `json:"indicator"`
 	Reportable     bool     `json:"reportable"`
 	Images         []string `json:"images"`
+	IucnStatus     *string  `json:"iucnStatus"`
 }

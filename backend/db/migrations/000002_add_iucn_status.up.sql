@@ -1,0 +1,3 @@
+BEGIN;
+ALTER TABLE species ADD COLUMN iucn_status TEXT;
+COMMIT;
