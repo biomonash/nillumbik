@@ -2,6 +2,7 @@ export type Site = {
   code: string
   name: string
   block: number
+  tenure: 'Public' | 'Private'
 }
 
 export type Species = {
@@ -13,6 +14,7 @@ export type Species = {
   taxa: string
   images: string[]
   iucnStatus: string | null
+  tenure: 'Public' | 'Private'
 }
 
 export type ObservedSpecies = Species & {

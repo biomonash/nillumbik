@@ -3,7 +3,7 @@ import links from '../../../constants/links'
 
 const Footer: React.FC = (): JSX.Element => {
   return (
-    <footer className="bg-[var(--background)] border-t border-white/10 ml-[var(--sidebar-width)]">
+    <footer className="border-t border-white/10 ">
       <div className="max-w-screen-xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center gap-4">
         {/* Copyright */}
         <p className="text-sm text-muted-foreground">

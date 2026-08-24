@@ -5,10 +5,8 @@ import biomLogo from '../../../assets/icon/biom-logo.png'
 
 const links = [
   //{ link: routes.ABOUT, label: 'About' },
-  { link: routes.DASHBOARD, label: 'Dashboard' },
+  { link: routes.HOME, label: 'Home' },
 ]
-
-/*   { link: routes.INSTRUCTION, label: "Community" }, */
 
 const Header: React.FC = (): JSX.Element => {
   const [menuOpen, setMenuOpen] = useState(false)

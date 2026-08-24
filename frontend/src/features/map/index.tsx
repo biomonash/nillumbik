@@ -24,6 +24,12 @@ function parseQuery(qs: string): MapQuery {
       case 'species':
         query.species = value
         break
+
+      case 'tenure':
+        if (value === 'Public' || value === 'Private') {
+          query.tenure = value
+        }
+        break
     }
   }
   return query
@@ -47,7 +53,14 @@ export default function MapPage() {
 
     const params = new URLSearchParams()
 
-    Object.entries(query).map(([k, v]) => v && params.append(k, String(v)))
+    Object.entries(query).forEach(([k, v]) => {
+      if (v === undefined || v === null) return
+
+      if (Array.isArray(v) && v.length === 0) return
+
+      params.append(k, String(v))
+    })
+
     history.pushState(null, '', `?${params.toString()}`)
   }, [query, loaded])
 

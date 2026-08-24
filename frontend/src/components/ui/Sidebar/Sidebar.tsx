@@ -32,7 +32,8 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
 }
 
 const mockdata = [
-  //{ icon: <i className="fa-solid fa-house"></i>, label: 'Home', path: '/' },
+  // Hide this until the home page is ready to release
+  // { icon: <i className="fa-solid fa-house"></i>, label: 'Home', path: '/' },
   {
     icon: <i className="fa-regular fa-window-maximize"></i>,
     label: 'Dashboard',

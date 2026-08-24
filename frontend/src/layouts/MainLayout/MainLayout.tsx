@@ -1,21 +1,20 @@
-import React, { type JSX } from 'react'
+import React from 'react'
 import { Outlet } from 'react-router'
-import Header from '../../components/ui/Header'
-import Footer from '../../components/ui/Footer/Footer'
 import Sidebar from '../../components/ui/Sidebar'
-
-const MainLayout: React.FC = (): JSX.Element => {
+import Header from '../../components/ui/Header'
+import Footer from '../../components/ui/Footer'
+const MainLayout: React.FC = () => {
   return (
-    <>
-      <Header />
-      <main className="min-h-screen flex flex-col">
-        <Sidebar />
-        <div className="min-h-screen bg-[var(--background)] ml-[var(--sidebar-width)] pt-[var(--header-height)] flex-1">
+    <div className="flex min-h-screen text-black">
+      <Sidebar />
+      <div className="flex-1 min-w-0 ml-[var(--sidebar-width)] pt-[var(--header-height)] flex flex-col min-h-screen ">
+        <Header />
+        <main className="flex-1">
           <Outlet />
-        </div>
-      </main>
-      <Footer />
-    </>
+        </main>
+        <Footer />
+      </div>
+    </div>
   )
 }
 

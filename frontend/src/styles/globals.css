@@ -53,10 +53,15 @@
   --button-hover: #4f7f49;
   --grey-accent: #dce1de;
   --pale-green: #8fc0a9;
+  --pale-yellow: #faf3dd;
 }
 
 body {
   background-color: var(--color-background);
   color: var(--color-text);
   font-family: var(--font-family-sans);
+}
+
+.leaflet-container path:focus {
+  outline: none;
 }
