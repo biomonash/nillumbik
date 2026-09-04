@@ -7,11 +7,11 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
-	"github.com/biomonash/forestportal-manager/internal/server"
+	"github.com/biomonash/forestportal/internal/manager/server"
 )
 
 func init() {
-	err := godotenv.Load("../../.env.dev")
+	err := godotenv.Load("../.env.dev")
 	if err != nil {
 		log.Println(err.Error())
 	}
