@@ -1,17 +1,18 @@
 package server
 
 import (
+	"github.com/biomonash/forestportal/internal/db"
+	"github.com/biomonash/forestportal/internal/manager/upload"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Server struct {
 	router *gin.Engine
-	db *pgxpool.Pool
+	q db.Querier
 }
 
-func New(db *pgxpool.Pool) *Server {
+func New(q db.Querier) *Server {
 	r := gin.New()
 
 	r.Use(gin.Logger())
@@ -19,12 +20,12 @@ func New(db *pgxpool.Pool) *Server {
 	r.Use(errorHandler())
 	r.Use(cors.Default())
 
-	api := r.Group("/api")
-	_ = api
+	api := r.Group("/api/manager")
+	upload.Register(api, upload.NewController(q))
 
 	return &Server{
 		router: r,
-		db: db,
+		q: q,
 	}
 }
 

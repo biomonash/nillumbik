@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/biomonash/forestportal/internal/db"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 	"github.com/biomonash/forestportal/internal/manager/server"
@@ -27,7 +28,8 @@ func run() error {
 	}
 	defer conn.Close()
 
-	s := server.New(conn)
+	querier := db.New(conn)
+	s := server.New(querier)
 
 	return s.Run(":8001")
 }
