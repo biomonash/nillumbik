@@ -17,6 +17,7 @@ const Map = lazy(() => import('../pages/Map'))
 const Graph = lazy(() => import('../pages/Graph.tsx'))
 const Settings = lazy(() => import('../pages/Settings'))
 const Error = lazy(() => import('../pages/Error'))
+const Manager = lazy(() => import('../pages/Manager'))
 
 const useBrowserRouter = () => {
   const router = createBrowserRouter(
@@ -63,6 +64,10 @@ const useBrowserRouter = () => {
           {
             path: routes.SETTINGS,
             Component: Settings,
+          },
+          {
+            path: routes.MANAGER,
+            Component: Manager,
           },
         ],
       },
