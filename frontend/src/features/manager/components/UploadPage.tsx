@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { MANAGER_API_URL } from '../../../constants/api'
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null)
@@ -27,7 +28,7 @@ export default function UploadPage() {
     setMessage('')
 
     try {
-      const res = await fetch('http://localhost:8001/api/manager/upload', {
+      const res = await fetch(`${MANAGER_API_URL}/api/manager/upload`, {
         method: 'POST',
         body: formData,
       })
