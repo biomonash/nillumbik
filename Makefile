@@ -16,6 +16,7 @@ GO_MAIN=cmd/api/main.go
 GO_IMPORTER=cmd/importer/main.go
 GO_IMG_IMPORTER=cmd/imgimporter/main.go
 GO_IUCN=cmd/iucn/main.go
+GO_MANAGER=cmd/manager/main.go
 DOCKER_COMPOSE_FILE=docker/compose.yml
 # POSTGRESQL_URL=postgres://biom:supersecretpassword@localhost:5432/nillumbik?sslmode=disable
 API_BASE_URL=
@@ -100,6 +101,10 @@ run-iucn-fetch:
 .PHONY: run-iucn-import
 run-iucn-import:
 	@cd $(BACKEND_DIR) && go run $(GO_IUCN) import
+
+.PHONY: run-manager
+run-manager:
+	@cd $(BACKEND_DIR) && go run $(GO_MANAGER)
 
 .PHONY: run-imgimport
 run-imgimport:
