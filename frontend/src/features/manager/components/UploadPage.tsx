@@ -3,7 +3,9 @@ import { MANAGER_API_URL } from '../../../constants/api'
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null)
-  const [status, setStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<
+    'idle' | 'uploading' | 'success' | 'error'
+  >('idle')
   const [message, setMessage] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -57,9 +59,12 @@ export default function UploadPage() {
         onClick={() => inputRef.current?.click()}
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
-        className="border-2 border-dashed border-[var(--muted-foreground)] rounded-xl p-12 text-center cursor-pointer hover:border-[#216869] transition-colors mt-6">
+        className="border-2 border-dashed border-[var(--muted-foreground)] rounded-xl p-12 text-center cursor-pointer hover:border-[#216869] transition-colors mt-6"
+      >
         <p className="text-[var(--muted-foreground)] text-sm">
-          {file ? file.name : 'Drag and drop a CSV file here, or click to browse'}
+          {file
+            ? file.name
+            : 'Drag and drop a CSV file here, or click to browse'}
         </p>
         <input
           ref={inputRef}
@@ -83,7 +88,9 @@ export default function UploadPage() {
 
       {/* Status message */}
       {message && (
-        <p className={`mt-3 text-sm text-center ${status === 'success' ? 'text-green-600' : 'text-red-500'}`}>
+        <p
+          className={`mt-3 text-sm text-center ${status === 'success' ? 'text-green-600' : 'text-red-500'}`}
+        >
           {message}
         </p>
       )}
