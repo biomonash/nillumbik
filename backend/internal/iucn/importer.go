@@ -18,7 +18,7 @@ func ImportFromCache(ctx context.Context, q db.Querier, cachePath string) error 
 	defer file.Close()
 
 	reader := csv.NewReader(file)
-	
+
 	if _, err := reader.Read(); err != nil {
 		return fmt.Errorf("failed to read header: %w", err)
 	}
@@ -47,7 +47,7 @@ func ImportFromCache(ctx context.Context, q db.Querier, cachePath string) error 
 
 		err = q.UpdateSpeciesIUCNStatus(ctx, db.UpdateSpeciesIUCNStatusParams{
 			IucnStatus: &iucnStatus,
-			ID: species.ID,
+			ID:         species.ID,
 		})
 		if err != nil {
 			fmt.Printf("skipping %s: failed to update: %v\n", scientificName, err)

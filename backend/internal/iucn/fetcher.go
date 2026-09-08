@@ -98,7 +98,7 @@ func FetchAndCache(ctx context.Context, q db.Querier, token string, outputPath s
 
 		fmt.Printf("fetched %s: %s\n", sp.ScientificName, status)
 		writer.Write([]string{sp.ScientificName, status})
-		time.Sleep(500*time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 	}
 	return nil
 }

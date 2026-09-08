@@ -72,6 +72,8 @@ definitions:
         type: array
       indicator:
         type: boolean
+      iucnStatus:
+        type: string
       native:
         type: boolean
       reportable:
@@ -150,6 +152,8 @@ definitions:
         type: array
       indicator:
         type: boolean
+      iucnStatus:
+        type: string
       native:
         type: boolean
       observationCount:

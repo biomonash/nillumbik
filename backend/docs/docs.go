@@ -810,6 +810,9 @@ const docTemplate = `{
                 "indicator": {
                     "type": "boolean"
                 },
+                "iucnStatus": {
+                    "type": "string"
+                },
                 "native": {
                     "type": "boolean"
                 },
@@ -925,6 +928,9 @@ const docTemplate = `{
                 },
                 "indicator": {
                     "type": "boolean"
+                },
+                "iucnStatus": {
+                    "type": "string"
                 },
                 "native": {
                     "type": "boolean"

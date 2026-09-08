@@ -803,6 +803,9 @@
                 "indicator": {
                     "type": "boolean"
                 },
+                "iucnStatus": {
+                    "type": "string"
+                },
                 "native": {
                     "type": "boolean"
                 },
@@ -918,6 +921,9 @@
                 },
                 "indicator": {
                     "type": "boolean"
+                },
+                "iucnStatus": {
+                    "type": "string"
                 },
                 "native": {
                     "type": "boolean"

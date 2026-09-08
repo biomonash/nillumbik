@@ -81,13 +81,7 @@ run-backend: ## Run the Go backend directly
 .PHONY: dev-backend
 dev-backend: ## Start backend in development mode with hot reload (requires air)
 	@printf "$(GREEN)Starting backend development server...$(NC)\n"
-	@if command -v air >/dev/null 2>&1; then \
-		cd $(BACKEND_DIR) && air; \
-	else \
-		printf "$(YELLOW)Air not installed. Install with: go install github.com/air-verse/air@latest$(NC)\n"; \
-		printf "$(YELLOW)Running without hot reload...$(NC)\n"; \
-		$(MAKE) run-backend; \
-	fi
+	cd $(BACKEND_DIR) && go tool air; \
 
 .PHONY: run-import
 run-import:
@@ -143,7 +137,7 @@ clean-backend: ## Clean Go build artifacts
 .PHONY: gen-doc
 gen-doc:
 	@printf "$(GREEN)Generating Swagger API Documents...$(NC)\n"
-	@cd $(BACKEND_DIR) && swag fmt && swag init -g internal/server/server.go
+	@cd $(BACKEND_DIR) && go tool swag fmt && go tool swag init -g internal/server/server.go
 
 # =============================================================================
 # Database Commands
@@ -152,12 +146,7 @@ gen-doc:
 .PHONY: sqlc-generate
 sqlc-generate: ## Generate Go code from SQL using sqlc
 	@printf "$(GREEN)Generating Go code from SQL...$(NC)\n"
-	@if command -v sqlc >/dev/null 2>&1; then \
-		cd $(BACKEND_DIR) && sqlc generate; \
-	else \
-		printf "$(RED)sqlc not installed. Install from: https://docs.sqlc.dev/en/latest/overview/install.html$(NC)\n"; \
-		exit 1; \
-	fi
+	cd $(BACKEND_DIR) && go tool sqlc generate; \
 
 .PHONY: db-migrate-up
 db-migrate-up: ## Run database migrations up (requires golang-migrate)
@@ -301,10 +290,7 @@ setup-dev: ## Setup development environment
 	@printf "$(GREEN)Setting up development environment...$(NC)\n"
 	@echo "Installing development tools..."
 	@printf "$(YELLOW)Recommended tools to install:$(NC)\n"
-	go install github.com/air-verse/air@v1.62.0
-	go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.29.0
 	go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.0
-	go install github.com/swaggo/swag/cmd/swag@v1.16.6
 	@$(MAKE) install
 
 .PHONY: check
